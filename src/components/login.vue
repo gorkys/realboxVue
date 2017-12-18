@@ -28,7 +28,7 @@
         name: '',
         pass: "",
         code: '',
-        codeSrc: 'http://192.168.1.8:8081/code'
+        codeSrc: 'http://192.168.1.6:8081/code'
       }
     },
     methods: {
@@ -49,7 +49,6 @@
             code: this.code
           }
         }).then(response => {
-          debugger
           if (response.data.code == '0000') {
             sessionStorage.setItem("token", response.data.cust.token);
             sessionStorage.setItem("name", response.data.cust.name);

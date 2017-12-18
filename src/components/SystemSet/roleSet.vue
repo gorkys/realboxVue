@@ -66,6 +66,25 @@
     height: 620px;
   }
 
+  .roleForm {
+
+  }
+
+  .roleTree {
+
+    border: 1px solid #b5b8c8;
+    padding: 10px;
+  }
+
+  .roleTree p {
+    text-align: center;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
   .page {
     text-align: right;
     padding-right: 20px;
@@ -88,7 +107,7 @@
           <el-button>搜索</el-button>
         </div>
         <div class="control">
-          <a @click="dialogFormVisible = true"><i class="el-icon-plus"></i>新建</a>
+          <a @click="newRole = true"><i class="el-icon-plus"></i>新建</a>
           <a><i class="el-icon-edit"></i>编辑</a>
           <a><i class="el-icon-delete"></i>删除</a>
         </div>
@@ -107,8 +126,6 @@
       </div>
       <div class="page">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
           :current-page="currentPage4"
           :page-sizes="[100, 200, 300, 400]"
           :page-size="100"
@@ -118,26 +135,23 @@
       </div>
     </div>
     <FooterBar></FooterBar>
-    <el-dialog title="新建" :visible.sync="dialogFormVisible">
-      <el-form :model="form">
-        <el-form-item label="角色名称" :label-width="formLabelWidth">
+    <el-dialog title="新建" :visible.sync="newRole" width="27.5%">
+      <el-form :model="form" class="roleForm">
+        <el-form-item label="角色名称" :label-width="LabelWidth">
           <el-input v-model="form.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="角色描述" :label-width="formLabelWidth">
+        <el-form-item label="角色描述" :label-width="LabelWidth">
           <el-input v-model="form.name" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
-      <el-transfer
-        filterable
-        :filter-method="filterMethod"
-        filter-placeholder="请输入权限名称"
-        :titles="['权限管理', '分配权限']"
-        v-model="value2"
-        :data="data2">
-      </el-transfer>
+      <fieldset class="roleTree">
+        <legend>权限树</legend>
+        <p>分配权限</p>
+        <el-tree :data="roleTree" show-checkbox node-key="id" style="height: 300px;overflow: auto"></el-tree>
+      </fieldset>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="newRole = false">取 消</el-button>
+        <el-button type="primary" @click="newRole = false">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -148,23 +162,12 @@
   import Breadcrumb from '@/components/common/Breadcrumb'
 
   export default {
+    mounted: function () {
+      this.getTree()
+    },
     data() {
-      const generateData2 = _ => {
-        const data = [];
-        const cities = ['删除管理员', '发送邮件', '删除用户', '新建模板', '删除部门', '导出日志', '删除资源'];
-        const pinyin = ['删除管理员', '发送邮件', '删除用户', '新建模板', '删除部门', '导出日志', '删除资源'];
-        cities.forEach((city, index) => {
-          data.push({
-            label: city,
-            key: index,
-            pinyin: pinyin[index]
-          });
-        });
-        return data;
-      };
-
       return {
-        dialogFormVisible:true,
+        newRole: true,        //“新建”的弹出框
         form: {
           name: '',
           region: '',
@@ -175,12 +178,8 @@
           resource: '',
           desc: ''
         },
-        formLabelWidth: '70px',
-        data2: generateData2(),
-        value2: [],
-        filterMethod(query, item) {
-          return item.pinyin.indexOf(query) > -1;
-        }
+        LabelWidth: '70px',
+        roleTree: []
       }
     },
     components: {
@@ -191,6 +190,28 @@
     methods: {
       addRole: function () {
 
+      },
+      getTree:function () {
+        let _this = this
+        this.$http({
+          method: 'get',
+          url: 'tree/query?id=70',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            _this.roleTree = response.data.cust.trees
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
       }
     }
   }

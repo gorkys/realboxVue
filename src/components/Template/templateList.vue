@@ -46,7 +46,7 @@
     margin-right: 10px;
   }
 
-  .templateBox {
+  .templateBox, .tableList {
     padding: 20px;
     height: 580px;
   }
@@ -66,12 +66,12 @@
     cursor: pointer;
   }
 
-  .templateBox li img {
+  .templateList li img {
     width: 50%;
-    height: 87%;
+    height: 88.4%;
   }
 
-  .templateBox li p {
+  .templateList li p {
     background-color: #d2d2d2;
   }
 
@@ -87,28 +87,30 @@
     <div class="controlBox">
       <div class="search">
         <div style="width: 110px">
-          <el-select v-model="select" placeholder="图形模式">
-            <el-option label="图形模式" value="1"></el-option>
-            <el-option label="列表模式" value="2"></el-option>
+          <el-select v-model="value" placeholder="图形模式">
+            <el-option v-for="item in select"
+                       :key="item.value"
+                       :label="item.label"
+                       :value="item.value"></el-option>
           </el-select>
         </div>
         <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input3">
+          <el-input placeholder="请输入内容">
             <template slot="prepend">模板名称</template>
           </el-input>
         </div>
         <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input3">
+          <el-input placeholder="请输入内容">
             <template slot="prepend">所属机构</template>
           </el-input>
         </div>
         <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input3">
+          <el-input placeholder="请输入内容">
             <template slot="prepend">分辨率</template>
           </el-input>
         </div>
         <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input3">
+          <el-input placeholder="请输入内容">
             <template slot="prepend">终端类型</template>
           </el-input>
         </div>
@@ -120,24 +122,32 @@
         <a><i class="el-icon-delete"></i>删除</a>
       </div>
     </div>
-    <div class="tableList">
-
+    <div v-if="value == '2'" class="tableList">
+      <el-table :data="templates" border style="width: 100%">
+        <el-table-column prop="name" align="center" label="模板名称"></el-table-column>
+        <el-table-column prop="screenshot" align="center" label="预览图">
+          <template scope="scope">
+            <img :src="scope.row.screenshot" width="30" height="50"/>
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
+        <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+        <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
+        <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
+        <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+        <el-table-column prop="address" align="center" label="描述"></el-table-column>
+      </el-table>
     </div>
-    <div class="templateBox">
+    <div v-else class="templateBox">
       <ul class="templateList">
-        <li>
-          <img src="../../assets/imgs/login/img.jpg">
-          <p>萨克斯</p>
+        <li v-for="(template,id) in templates" :key="id" @click="go(template.name,22)">
+          <img :src="template.screenshot">
+          <p>{{template.name}}</p>
         </li>
-        <li></li>
-        <li></li>
-        <li></li>
       </ul>
     </div>
     <div class="page">
       <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
         :current-page="currentPage4"
         :page-sizes="[100, 200, 300, 400]"
         :page-size="100"
@@ -150,17 +160,25 @@
 <script>
   export default {
     mounted: function () {
+      let _this = this
+      let t = []
       this.$http({
         method: 'get',
         url: 'template/query?treeId=22',
         withCredentials: true,
         headers: {
           token: sessionStorage.getItem('token'),
-          name: sessionStorage.getItem('name'),
+          name: sessionStorage.getItem('name')
         }
       }).then(response => {
         if (response.data.code == '0000') {
-          response.data.cust.templates
+          let templates = response.data.cust.templates
+          for (let i = 0; i < templates.length; i++) {
+            t.push(templates[i])
+            _this.templates = t
+            debugger
+          }
+
         } else {
           this.$message({
             message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -171,12 +189,25 @@
       })
     },
     data() {
-      return {}
+      return {
+        templates: [],
+        value: '',
+        select: [{
+          value: '1',
+          label: '图形模式'
+        }, {
+          value: '2',
+          label: '列表模式'
+        }]
+      }
     },
     components: {},
     methods: {
       toTemplateMake: function () {
         this.$router.push('/templateMake')
+      },
+      go: function (name, id) {
+        this.$router.push({path: "templateMake", query: {name: name, treeId: id}})
       }
     }
   }

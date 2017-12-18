@@ -118,29 +118,28 @@
           <el-button>搜索</el-button>
         </div>
         <div class="control">
-          <a><i class="el-icon-plus"></i>生成</a>
-          <a><i class="el-icon-edit"></i>批量生成</a>
-          <a><i class="el-icon-delete"></i>删除</a>
+          <a @click="generate"><i class="el-icon-plus"></i>生成</a>
+          <a @click="batch = true"><i class="el-icon-edit"></i>批量生成</a>
+          <a @click="del" ><i class="el-icon-delete"></i>删除</a>
         </div>
       </div>
       <div class="playList">
         <el-table
-          :data="tableData"
-          border
-          style="width: 100%">
+          ref="activeTable"
+          :data="activates"
+          @selection-change="selectChange"
+          height="577">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="date" align="center" label="激活码"></el-table-column>
+          <el-table-column prop="code" align="center" label="激活码"></el-table-column>
           <el-table-column prop="name" align="center" label="所属终端"></el-table-column>
           <el-table-column prop="address" align="center" label="激活状态"></el-table-column>
           <el-table-column prop="address" align="center" label="生成时间"></el-table-column>
           <el-table-column prop="address" align="center" label="创建者"></el-table-column>
-          <el-table-column prop="address" align="center" label="可用状态"></el-table-column>
+          <el-table-column prop="used" align="center" label="可用状态"></el-table-column>
         </el-table>
       </div>
       <div class="page">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
           :current-page="currentPage4"
           :page-sizes="[100, 200, 300, 400]"
           :page-size="100"
@@ -150,6 +149,17 @@
       </div>
     </div>
     <footer-bar></footer-bar>
+    <el-dialog
+      title="批量生成"
+      :visible.sync="batch"
+      width="20%">
+      <div style="text-align: center">
+        <el-input-number v-model="num" :min="1" :max="999"></el-input-number>
+      </div>
+      <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click.native="generateBatch">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -158,15 +168,140 @@
   import Breadcrumb from '@/components/common/Breadcrumb'
 
   export default {
+    mounted:function () {
+        this.activeQuery()
+    },
     data() {
-      return {}
+      return {
+        batch: false,
+        num: 1,
+        activates:[],
+        rowId:[]
+      }
     },
     components: {
       NavBar,
       FooterBar,
       Breadcrumb
     },
-    methods: {}
+    methods: {
+      generate() {
+        this.$http({
+          method: 'get',
+          url: 'activate/create?number=1',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            this.$message({
+              message: '生成成功！',
+              center: true,
+              type: 'success'
+            })
+            this.activeQuery()
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },
+      generateBatch(){
+        this.$http({
+          method: 'get',
+          url: 'activate/create?number=' + this.num,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            this.$message({
+              message: '生成成功！',
+              center: true,
+              type: 'success'
+            })
+            this.activeQuery()
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+        this.batch=false
+      },
+      activeQuery(){
+        let _this=this;
+        let t=[]
+        this.$http({
+          method: 'get',
+          url: 'activate/query',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let activates = response.data.cust.activates
+            for (let i = 0; i < activates.length; i++) {
+              t.push(activates[i])
+              _this.activates = t
+            }
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },
+      del(){
+        var ids = this.rowId.map(item => item.id).join(' ')
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            method: 'delete',
+            url: 'activate/delete?ids=' + ids,
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == '0000') {
+              this.$message({
+                message: '删除成功！',
+                center: true,
+                type: 'success'
+              })
+              this.activeQuery()
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        })
+      },
+      selectChange(selection){
+        this.rowId = selection
+      }     //通过选择回调进行批量删除
+    }
   }
 </script>
 

@@ -62,8 +62,31 @@
     color: #d33a31;
   }
 
-  .playList {
-    height: 620px;
+  .imgList,.tableList{
+    padding: 20px;
+    height: 580px;
+  }
+  .imgList{
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .playList li {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border: 1px solid #a9a9a9;
+    text-align: center;
+    margin: 0 35px 60px;
+    cursor: pointer;
+  }
+
+  .playList li img {
+    width: 50%;
+    height: 88.4%;
+  }
+
+  .playList li p {
+    background-color: #d2d2d2;
   }
 
   .page {
@@ -81,9 +104,11 @@
       <div class="controlBox">
         <div class="search">
           <div style="width: 110px">
-            <el-select v-model="select" placeholder="列表模式">
-              <el-option label="图形模式" value="1"></el-option>
-              <el-option label="列表模式" value="2"></el-option>
+            <el-select v-model="value" placeholder="图形模式">
+              <el-option v-for="item in select"
+                         :key="item.value"
+                         :label="item.label"
+                         :value="item.value"></el-option>
             </el-select>
           </div>
           <div style="width:200px;">
@@ -114,7 +139,7 @@
           <a><i class="el-icon-delete"></i>删除</a>
         </div>
       </div>
-      <div class="playList">
+      <div v-if="value == '2'" class="tableList">
         <el-table
           :data="tableData"
           border
@@ -131,6 +156,15 @@
           <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
           <el-table-column prop="address" align="center" label="操作"></el-table-column>
         </el-table>
+      </div>
+      <div v-else class="imgList">
+        a
+        <ul class="playList">
+          <li v-for="(play,id) in plays" :key="id" @click="go(play.name,22)">
+            <img :src="play.screenshot">
+            <p>{{play.name}}</p>
+          </li>
+        </ul>
       </div>
       <div class="page">
         <el-pagination
@@ -154,7 +188,19 @@
 
   export default {
     data() {
-      return {}
+      return {
+        value: '',
+        select: [
+          {
+            value: 1,
+            label: '图形模式'
+          },
+          {
+            value: 2,
+            label: '列表模式'
+          }
+        ]
+      }
     },
     components: {
       NavBar,
