@@ -52,6 +52,7 @@
           if (response.data.code == '0000') {
             sessionStorage.setItem("token", response.data.cust.token);
             sessionStorage.setItem("name", response.data.cust.name);
+            sessionStorage.setItem("privId",response.data.cust.privId)
             this.$router.push('/index')
           } else {
             this.$message({

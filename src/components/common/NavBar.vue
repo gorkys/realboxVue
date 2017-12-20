@@ -129,7 +129,7 @@
       },
       //节目管理
       goPlay:function () {
-        this.$router.push('/playList')
+        this.$router.push('/play')
       },
       goProgram:function () {
         this.$router.push('/programList')

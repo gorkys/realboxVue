@@ -14,7 +14,7 @@ import roleSet from '@/components/SystemSet/roleSet'
 import terminal from '@/components/Terminal/terminal'         //终端管理
 import activeCode from '@/components/Terminal/activeCode'
 import template from '@/components/Template/template'         //模板管理
-import playList from '@/components/Program/playList'          //节目列表
+import play from '@/components/Program/play'          //节目列表
 import programList from '@/components/Program/programList'
 import auditList from '@/components/Program/auditList'
 import release from '@/components/Program/release'
@@ -95,9 +95,9 @@ export default new Router({
       component: template
     },
     {
-      path: '/playList',
-      name: 'PlayList',
-      component: playList
+      path: '/play',
+      name: '节目列表',
+      component: play
     },
     {
       path: '/programList',

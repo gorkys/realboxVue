@@ -61,6 +61,9 @@ npm run mock
         └── tables    表格
 ```
 ## 填坑之旅
+#### 7.如何动态添加对象属性
+解决方法：对象的访问方式有`data.name`与`data[name]`,动态添加需要使用`data[name]`,代码见roleSet.vue添加权限方法
+
 #### 6.Vue和vue-template-compiler版本之间的问题
 解决方法：删除node_modules,重新安装npm install,再更新npm update
 

@@ -1,5 +1,5 @@
 <style scoped>
-  #playList {
+  #userList {
     border: 1px solid #c1c1c1;
     height: 98%;
     border-radius: 10px;
@@ -46,17 +46,17 @@
     margin-right: 10px;
   }
 
-  .playBox, .tableList {
+  .userBox, .tableList {
     padding: 20px;
     height: 580px;
   }
 
-  .playList {
+  .userList {
     display: flex;
     flex-wrap: wrap;
   }
 
-  .playList li {
+  .userList li {
     width: 150px;
     height: 150px;
     overflow: hidden;
@@ -66,12 +66,12 @@
     cursor: pointer;
   }
 
-  .playList li img {
+  .userList li img {
     width: 50%;
     height: 88.4%;
   }
 
-  .playList li p {
+  .userList li p {
     background-color: #d2d2d2;
   }
 
@@ -82,44 +82,32 @@
 </style>
 
 <template>
-  <div id="playList">
-    <div class="title">节目列表</div>
+  <div id="userList">
+    <div class="title">用户列表</div>
     <div class="controlBox">
       <div class="search">
-        <div style="width: 110px">
-          <el-select v-model="value" placeholder="图形模式">
-            <el-option v-for="item in select"
-                       :key="item.value"
-                       :label="item.label"
-                       :value="item.value"></el-option>
-          </el-select>
-        </div>
         <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input1">
-            <template slot="prepend">节目名称</template>
+          <el-input placeholder="请输入内容" v-model="input3">
+            <template slot="prepend">用户名</template>
           </el-input>
         </div>
         <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input2">
+          <el-input placeholder="请输入内容" v-model="input3">
             <template slot="prepend">所属部门</template>
           </el-input>
         </div>
         <div style="width:200px;">
           <el-input placeholder="请输入内容" v-model="input3">
-            <template slot="prepend">分辨率</template>
-          </el-input>
-        </div>
-        <div style="width:200px;">
-          <el-input placeholder="请输入内容" v-model="input4">
-            <template slot="prepend">终端类型</template>
+            <template slot="prepend">用户类型</template>
           </el-input>
         </div>
         <el-button>搜索</el-button>
       </div>
       <div class="control">
         <a><i class="el-icon-plus"></i>新建</a>
-        <a><i class="el-icon-edit"></i>修改</a>
+        <a><i class="el-icon-edit"></i>编辑</a>
         <a><i class="el-icon-delete"></i>删除</a>
+        <a><i class="el-icon-refresh"></i>刷新</a>
       </div>
     </div>
     <div v-if="value == '2'" class="tableList">
@@ -128,22 +116,21 @@
         border
         style="width: 100%">
         <el-table-column type="selection" align="center" width="55"></el-table-column>
-        <el-table-column prop="date" align="center" label="节目名称"></el-table-column>
-        <el-table-column prop="name" align="center" label="预览图"></el-table-column>
-        <el-table-column prop="address" align="center" label="分辨率"></el-table-column>
-        <el-table-column prop="address" align="center" label="状态"></el-table-column>
-        <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
-        <el-table-column prop="address" align="center" label="素材大小"></el-table-column>
-        <el-table-column prop="address" align="center" label="播放时长"></el-table-column>
+        <el-table-column prop="date" align="center" label="用户名"></el-table-column>
+        <el-table-column prop="name" align="center" label="角色"></el-table-column>
+        <el-table-column prop="address" align="center" label="用户分组"></el-table-column>
+        <el-table-column prop="address" align="center" label="所属部门"></el-table-column>
+        <el-table-column prop="address" align="center" label="用户类型"></el-table-column>
+        <el-table-column prop="address" align="center" label="终端总数"></el-table-column>
+        <el-table-column prop="address" align="center" label="备注"></el-table-column>
+        <el-table-column prop="address" align="center" label="创建人"></el-table-column>
         <el-table-column prop="address" align="center" label="更新时间"></el-table-column>
-        <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
-        <el-table-column prop="address" align="center" label="操作"></el-table-column>
       </el-table>
     </div>
-    <div v-else class="playBox">
-      <ul class="playList">
-        <li v-for="(plays,id) in plays" :key="id" @click="go(plays.name,22)">
-          <img :src="plays.screenshot">
+    <div v-else class="userBox">
+      <ul class="userList">
+        <li v-for="(users,id) in users" :key="id" @click="go(users.name,22)">
+          <img :src="users.screenshot">
           <p>{{template.name}}</p>
         </li>
       </ul>
@@ -174,10 +161,10 @@
         }
       }).then(response => {
         if (response.data.code == '0000') {
-          let plays = response.data.cust.plays
-          for (let i = 0; i < plays.length; i++) {
-            t.push(plays[i])
-            _this.plays = t
+          let users = response.data.cust.users
+          for (let i = 0; i < users.length; i++) {
+            t.push(users[i])
+            _this.users = t
             debugger
           }
 
@@ -192,7 +179,7 @@
     },
     data() {
       return {
-        plays: [],
+        users: [],
         value: '',
         select: [{
           value: '1',

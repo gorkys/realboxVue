@@ -11,8 +11,8 @@
     <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
-      <userTree></userTree>
-      <userList></userList>
+      <playTree></playTree>
+      <playList></playList>
     </Content>
     <footer-bar></footer-bar>
   </div>
@@ -22,8 +22,8 @@
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
   import Content from '@/components/common/content'
-  import userTree from '@/components/SystemSet/userTree'
-  import userList from '@/components/SystemSet/userList'
+  import playTree from '@/components/Program/playTree'
+  import playList from '@/components/Program/playList'
   export default {
     data() {
       return {}
@@ -33,8 +33,8 @@
       FooterBar,
       Breadcrumb,
       Content,
-      userTree,
-      userList
+      playTree,
+      playList
     },
     methods: {}
   }
