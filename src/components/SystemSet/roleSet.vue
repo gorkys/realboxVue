@@ -66,10 +66,6 @@
     height: 620px;
   }
 
-  .roleForm {
-
-  }
-
   .roleTree {
 
     border: 1px solid #b5b8c8;
@@ -135,7 +131,7 @@
     </div>
     <FooterBar></FooterBar>
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="27.5%">
-      <el-form :model="form" class="roleForm">
+      <el-form :model="form">
         <el-form-item label="角色名称" :label-width="LabelWidth">
           <el-input v-model="form.roleName" auto-complete="off"></el-input>
         </el-form-item>
@@ -219,7 +215,7 @@
             if (_this.rolePrivId != '') {
               let rolePrivId = [];
               rolePriv.map(function (item) {rolePrivId.push(item.id)});
-              /*_this.$refs.tree.setCheckedNodes(rolePriv)*/        //
+              /*_this.$refs.tree.setCheckedNodes(rolePriv)*/        //方法无效
               _this.$refs.tree.setCheckedKeys(rolePrivId);
             } else {
               _this.$refs.tree.setCheckedKeys([])
@@ -468,9 +464,7 @@
       handleCurrentChange(val) {
         this.pageNo = val
         this.getRoleList()
-      }      //翻页
-
-
+      }      //当前页翻页
     }
   }
 </script>
