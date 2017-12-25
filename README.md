@@ -61,6 +61,19 @@ npm run mock
         └── tables    表格
 ```
 ## 填坑之旅
+#### 7.如何选择资源时切换选中状态
+解决方法：data中定义一个check变量，默认值为false,触发点击事件后`this.check=!this.check`,</br>
+然后
+```
+if(this.check){
+ //选中时状态代码
+ }
+ else {
+ //未选中时状态代码
+ }
+ ```
+点击时传的`$event`参数中currentTarget与target区别为(代码见resource.vue的资源选中事件):</br>
+target指向被单击的对象而currentTarget指向当前事件活动的对象（一般为父级）
 #### 7.如何动态添加对象属性
 解决方法：对象的访问方式有`data.name`与`data[name]`,动态添加需要使用`data[name]`,代码见roleSet.vue添加权限方法
 

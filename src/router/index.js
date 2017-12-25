@@ -31,12 +31,12 @@ export default new Router({
     },
     {
       path: '/index',
-      name: 'Index',
+      name: '首页',
       component: Index
     },
     {
       path: '/templateMake',
-      name: 'TemplateMake',
+      name: '模板制作',
       component: templateMake
     },
     {

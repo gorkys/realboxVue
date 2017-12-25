@@ -94,19 +94,56 @@
     width: 150px;
     height: 150px;
     overflow: hidden;
-    border: 1px solid #a9a9a9;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     margin: 0 35px 60px;
     cursor: pointer;
+    padding: 10px 5px;
+    border-radius: 5px;
+    position: relative;
+  }
+
+  .imgBox {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #e7e7e7;
   }
 
   .resourceList li img {
-    width: 50%;
-    height: 88.4%;
+    max-width: 120px;
+    max-height: 120px;
   }
 
-  .resourceList li p {
-    background-color: #d2d2d2;
+  .resourceList li:hover {
+    background-color: #ebebeb;
+  }
+
+  .resourceList p {
+    min-width: 20px;
+  }
+
+  .el-upload-list__item-status-label {
+    position: absolute;
+    right: -15px;
+    top: -7px;
+    width: 46px;
+    height: 26px;
+    background: #13ce66;
+    text-align: center;
+    transform: rotate(45deg);
+    box-shadow: 0 1px 1px #ccc;
+  }
+
+  .el-upload-list__item-status-label i {
+    font-size: 12px;
+    margin-top: 12px;
+    transform: rotate(-45deg);
+    color: white;
   }
 
   .page {
@@ -180,9 +217,14 @@
         </div>
         <div v-else class="imgList">
           <ul class="resourceList">
-            <li v-for="(resource,id) in resources" :key="id" :id="resource.id" @click="selected($event)"
-                @dblclick="preview($event)">
-              <img :src="'http://192.168.1.6/'+ resource.url">
+            <li v-for="(resource,id) in resources" :key="id" :id="resource.id"
+                @click="selected($event)" @dblclick="preview($event)">
+              <label class="el-upload-list__item-status-label">
+                <i class="el-icon-upload-success el-icon-check"></i>
+              </label>
+              <div class="imgBox">
+                <img :src="'http://192.168.1.6/'+ resource.url">
+              </div>
               <p>{{resource.name}}</p>
             </li>
           </ul>
@@ -217,12 +259,15 @@
       </span>
         </el-dialog>  <!--上传-->
         <el-dialog
-          title="预览"
+          :title="title + '预览'"
           :visible.sync="view"
           width="30%"
         >
           <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
-            <img style="width: 100%;height: 100%;" :src="url">
+            <img v-if="format==='png'" style="width: 100%;height: 100%;" :src="url">
+            <video v-if="format ==='video'" width="520" height="320" controls autoplay>
+              <source :src="url" type="video/mp4">
+            </video>
           </div>
         </el-dialog><!--预览-->
       </div>
@@ -247,10 +292,10 @@
         resourceTree: [],
 
         dialog: false,
-        title:'',
+        title: '',
         value: '',
         treeId: 1,
-        treeName:'图片',
+        treeName: '图片',
         resources: [],
         url: '',                   //资源地址
         downloadUrl: '',          //下载地址
@@ -269,7 +314,9 @@
         ],
         pageCount: 11,     //每页显示数目
         pageNo: 1,          //当前页
-        total: 0            //总数目
+        total: 0,            //总数目
+        check: false,          //选中资源的变量
+        format:''               //资源格式
       }
     },
     computed: {
@@ -319,15 +366,14 @@
         this.treeId = val.id
         this.treeName = val.label
         this.resourceQuery()
-        debugger
-      },
 
-      upload(){
-       this.title = this.treeName.slice(0,2);
-       this.dialog = true
+      },  //树节点的点击回调
+
+      upload() {
+        this.title = this.treeName.slice(0, 2);
+        this.dialog = true
       },
       beforeUp: function (file) {
-        debugger
       },      //文件上传前的回调
       onSuccess: function (response) {
         if (response.code == '0000') {
@@ -346,6 +392,14 @@
         }
       },  //上传成功的回调
       del() {
+        if (this.id == '') {
+          this.$message({
+            message: '未选择资源！',
+            center: true,
+            type: 'warning'
+          })
+          return false
+        }
         this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
@@ -377,19 +431,46 @@
         })
       },                          //删除资源
       preview(e) {
-        this.url = e.currentTarget.children[0].currentSrc
+        this.url = e.currentTarget.children[1].children[0].currentSrc
+        this.title = this.treeName.slice(0, 2);
+        if (this.url.indexOf('mp4') != '-1'){
+          this.format='video'
+        }
+        if(this.url.indexOf('png') != '-1'){
+          this.format='png'
+        }
         if (!this.view) this.view = true
       },                     //双击预览
       selected(e) {
-        var dom = e.target.id;
-        this.downloadUrl = e.currentTarget.children[0].currentSrc
-        this.downloadName = e.currentTarget.children[1].innerText
-        this.id = dom
-        $('#' + dom).css("border", "1px solid  #e4007f");
-        debugger
-      },                    //选择当前文件
+        this.check = !this.check
+        let dom = e.currentTarget.id;
+        let target = e.currentTarget
+        /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
+          dom = e.target.offsetParent.id
+          target = e.target.offsetParent
+        } else {
+          dom = e.target
+          target = e.target
+        }*/     //currentTarget与target的区别
+        let children = target.children[0];
+        if (this.check) {
+          children.style.display = 'block';
+          target.style.backgroundColor = "#ebebeb";
+
+          this.downloadUrl = target.children[1].children[0].currentSrc;
+          this.downloadName = target.children[2].innerText;
+          this.id = dom
+        } else {
+          children.style.display = 'none';
+          target.style.backgroundColor = "white";
+          this.downloadUrl = '';
+          this.downloadName = '';
+          this.id = ''
+        }
+      },                    //单击选择文件
       resourceQuery() {
         let _this = this
+        this.resources = []
         let t = []
         this.$http({
           method: 'get',
@@ -417,13 +498,19 @@
         })
       },                //查询列表
       download() {
-        if (this.downloadUrl != '') {
+        if (this.downloadUrl != '' || this.downloadName != '') {
           let a = document.createElement('a');
           a.href = this.downloadUrl;
           a.download = this.downloadName ? this.downloadName : '未命名';
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
+        } else {
+          this.$message({
+            message: '未选择资源！',
+            center: true,
+            type: 'warning'
+          })
         }
       },                       //下载文件
       handleCurrentChange(val) {
