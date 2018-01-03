@@ -1,12 +1,29 @@
 # realboxvue
-
+### 项目运行环境
+```
+1、node 
+2、npm
+3、tomcat
+```
 ### 项目运行步骤
 <pre>
-#安装插件
+#安装依赖包
 npm install
-#启动项目 端口号：8080
+
+#启动项目 端口号：8666
 npm run dev
-#启动mock数据 端口号：3000
+
+#更改前端端口
+config文件夹下index.js文件中第30行端口
+
+#更改请求端口
+src目录下的main.js文件中更改第13行地址
+
+#打包项目
+npm run build
+运行命令后会生成一个dist文件夹，将里面的代码复制到tomcat中的Root文件夹下启动tomcat即可
+
+#启动mock数据 端口号：3000（提供mock数据，有后台就不需要启动）
 npm run mock
 </pre>
 
@@ -21,11 +38,11 @@ npm run mock
 ## 功能
 
 - 登录/登出
-- 模板制作
+- 模板管理
     - 保存模板
     - 保存并使用
-- 多语言切换
-- 组件
+- 用户管理
+- 发布节目
 
 ## 文件结构
 ```shell
@@ -36,31 +53,26 @@ npm run mock
 ├── static
 │   ├── fonts    字体图标
 │   └── reset    初始化样式
+├── theme   主题样式
 └── src
     ├── assets    素材资源
     ├── router    路由配置
     └── components    视图组件
-        ├── access    权限管理
-        ├── error_page    错误页面
-        ├── form    表单
-        │   ├── article-publish    文章发布
-        │   └── work-flow    工作流
-        ├── home    首页
-        ├── international    多语言切换
-        ├── main_components    主框架
-        ├── message    消息中心
-        ├── my_components    组件
-        │   ├── count-to    数字渐变
-        │   ├── draggable-list    可拖拽列表
-        │   ├── file-upload    文件上传
-        │   ├── image-editor    图片预览编辑
-        │   ├── markdown-editor    markdown编辑器
-        │   └── text-editer    富文本编辑器
-        ├── own-space    个人中心
-        ├── screen-shorts    锁屏
-        └── tables    表格
+        ├── common      公共组件（导航页尾）
+        ├── Log         系统日志
+        ├── Program     节目管理
+        ├── Resource    资源管理
+        ├── SystemSet    系统设置 用户管理
+        ├── Template    模板管理
+        ├── Terminal    终端管理
+        ├── index       首页
+        └── login       登录
 ```
 ## 填坑之旅
+#### 10.html2canvas无法截取链接图片
+#### 9.切换弹窗时视频存在缓存问题
+#### 8.MP4在网页上播放需要特定编码
+解决方法：由后台去转码
 #### 7.如何选择资源时切换选中状态
 解决方法：data中定义一个check变量，默认值为false,触发点击事件后`this.check=!this.check`,</br>
 然后
@@ -171,7 +183,7 @@ Default: `true`</br>
 </br>2.1npm install jquery --save</br>
 2.2import $ from 'jquery'</br>
 2.3</br>
-```
+```vue
 mounted:function () {
       this.$nextTick().then(function () {
         $('.draggable').on('drop',function (event) {

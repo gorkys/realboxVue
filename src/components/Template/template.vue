@@ -77,7 +77,7 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 0 35px 60px;
+    margin: 0 30px 40px;
     cursor: pointer;
     padding: 10px 5px;
     border-radius: 5px;
@@ -100,7 +100,7 @@
   }
 
   .templateList li:hover {
-    background-color: #ebebeb;
+    background-color: #ebebeb !important;
   }
 
   .templateList p {
@@ -176,17 +176,17 @@
             <el-button>搜索</el-button>
           </div>
           <div class="control">
-            <a @click="toTemplateMake"><i class="el-icon-plus"></i>新建</a>
+            <a @click="openDialog=true"><i class="el-icon-plus"></i>新建</a>
             <a><i class="el-icon-edit"></i>修改</a>
             <a @click="delTemplate"><i class="el-icon-delete"></i>删除</a>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
-          <el-table :data="templates" border style="width: 100%">
+          <el-table :data="templates" style="width: 100%">
             <el-table-column prop="name" align="center" label="模板名称"></el-table-column>
-            <el-table-column prop="screenshot" align="center" label="预览图">
+            <el-table-column prop="preview" align="center" label="预览图">
               <template scope="scope">
-                <img :src="scope.row.screenshot" width="30" height="50"/>
+                <img :src="scope.row.preview" width="30" height="50"/>
               </template>
             </el-table-column>
             <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
@@ -194,13 +194,13 @@
             <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
             <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
             <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
-            <el-table-column prop="address" align="center" label="描述"></el-table-column>
+            <el-table-column prop="desc" align="center" label="描述"></el-table-column>
           </el-table>
         </div>
         <div v-else class="templateBox">
           <ul class="templateList">
             <li v-for="(template,id) in templates" :key="id" :id="template.id"
-                @click="selected($event)" @dblclick="editTemplate(template.name,22)">
+                @click="selected($event)" @dblclick="editTemplate(template.name)">
               <label class="el-upload-list__item-status-label">
                 <i class="el-icon-upload-success el-icon-check"></i>
               </label>
@@ -222,6 +222,32 @@
       </div>
     </Content>
     <footer-bar></footer-bar>
+    <el-dialog title="新建模板" ref="dialog" :visible.sync="openDialog" width="18%">
+      <el-form :model="form">
+        <el-form-item label="模板名称" :label-width="LabelWidth">
+          <el-input v-model="form.temName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="分辨率" :label-width="LabelWidth">
+          <el-select v-model="rltValue" placeholder="800×600" style="width: 100%" @change="rltChange">
+            <el-option v-for="item in resolution"
+                       :key="item.value"
+                       :label="item.label"
+                       :value="item.value"
+                       auto-complete="off"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="模板类型" :label-width="LabelWidth">
+          <el-input v-model="form.temType" auto-complete="off" readonly="readonly"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" :label-width="LabelWidth">
+          <el-input type="textarea" v-model="form.desc" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="openDialog = false">取 消</el-button>
+        <el-button type="primary" @click="NewTemplateMake">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -247,11 +273,31 @@
           value: '2',
           label: '列表模式'
         }],
-        pageCount: 11,     //每页显示数目
+        pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
         treeId: 22,
         check: false,          //选中资源的变量
+
+        openDialog: false,       //新建对话框
+        LabelWidth: '70px',
+        form: {
+          temName: '',
+          resolution: '800×600',
+          temType: '系统模板',
+          desc: '',              //备注
+        },
+        rltValue: '',
+        resolution: [{
+          value: '1',
+          label: '800×600'
+        }, {
+          value: '2',
+          label: '1920×1080'
+        }, {
+          value: '3',
+          label: '1366×768'
+        }],        //分辨率
       }
     },
     components: {
@@ -285,10 +331,10 @@
       },                //查询模板树
       queryList() {
         let _this = this
-        let t = []
+        this.templates = []
         this.$http({
           method: 'get',
-          url: 'template/query?treeId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount,
+          url: 'template/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -298,10 +344,8 @@
           if (response.data.code == '0000') {
             let templates = response.data.cust.templates
             _this.total = response.data.cust.pages.count
-            for (let i = 0; i < templates.length; i++) {
-              t.push(templates[i])
-              _this.templates = t
-              debugger
+            for (let template of templates) {
+              _this.templates.push(template)
             }
 
           } else {
@@ -313,21 +357,19 @@
           }
         })
       },              //获取模板列表
-      toTemplateMake: function () {
-        this.$router.push('/templateMake')
-      },    //新建模板
-      editTemplate: function (name, id) {
-        this.$router.push({path: "templateMake", query: {name: name, treeId: id}})
+      editTemplate(name) {
+        this.$router.push({path: "templateMake", query: {name: name, groupId: this.treeId}})
       },         //编辑模板
       handleCurrentChange(val) {
         this.pageNo = val
         this.getRoleList()
       },        //翻页回调
-      handleNodeClick() {
+      handleNodeClick(val) {
         this.treeId = val.id
-        this.treeName = val.label
+        this.form.temType = this.treeName = val.label
+        debugger
         this.queryList()
-      },
+      },          //点击树回调
       selected(e) {
         this.check = !this.check
         let dom = e.currentTarget.id;
@@ -343,8 +385,8 @@
         if (this.check) {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
-
           this.id = dom
+
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
@@ -390,6 +432,26 @@
           })
         })
       },                          //删除模板
+      NewTemplateMake() {
+        if (this.form.temName == '') {
+          this.$message({
+            message: '请输入模板名称！',
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
+        sessionStorage.setItem('temName', this.form.temName);
+        sessionStorage.setItem('resolution', this.form.resolution);
+        sessionStorage.setItem('temType', this.form.temType);
+        sessionStorage.setItem('desc', this.form.desc);
+        this.$router.push('/templateMake')
+      },        //新建模板
+      rltChange(val) {
+        this.form.resolution = this.resolution.map(item => {
+          if (item.value == val) return item.label
+        }).join('');
+      }
     }
   }
 </script>

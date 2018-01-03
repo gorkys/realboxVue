@@ -224,7 +224,7 @@
           node-key="id" ref="groupTree" highlight-current>
         </el-tree>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="innerVisible = false">取 消</el-button>
+          <el-button @click="openG = false">取 消</el-button>
           <el-button type="primary" @click="groupSelect">确 定</el-button>
         </div>
       </el-dialog>            <!--用户分组选择-->

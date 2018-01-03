@@ -97,7 +97,7 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 0 35px 60px;
+    margin: 0 30px 40px;
     cursor: pointer;
     padding: 10px 5px;
     border-radius: 5px;
@@ -120,7 +120,7 @@
   }
 
   .resourceList li:hover {
-    background-color: #ebebeb;
+    background-color: #ebebeb !important;
   }
 
   .resourceList p {
@@ -170,7 +170,7 @@
         <div class="controlBox">
           <div class="search">
             <div style="width: 110px">
-              <el-select v-model="value" placeholder="图形模式">
+              <el-select v-model="value" placeholder="图形模式" @change="selectChange">
                 <el-option v-for="item in select"
                            :key="item.value"
                            :label="item.label"
@@ -201,29 +201,30 @@
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
-          <el-table :data="resources">
+          <el-table :data="resources" @selection-change="tableSelect">
+            <el-table-column type="selection" align="center" width="55"></el-table-column>
             <el-table-column prop="name" align="center" label="名称"></el-table-column>
             <el-table-column prop="screenshot" align="center" label="预览图">
               <template scope="scope">
-                <img :src="'http://192.168.1.6/'+scope.row.url" width="100" height="70"/>
+                <img :src="'http://'+ scope.row.thumbnail" width="100" height="70"/>
               </template>
             </el-table-column>
             <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
             <el-table-column prop="size" align="center" label="大小(kb)"></el-table-column>
-            <el-table-column prop="deptName" align="center" label="所属部门"></el-table-column>
-            <el-table-column prop="creator" align="center" label="上传人"></el-table-column>
-            <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="orgId" align="center" label="所属部门"></el-table-column>
+            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
+            <el-table-column prop="uploadtime" align="center" label="更新时间"></el-table-column>
           </el-table>
         </div>
         <div v-else class="imgList">
           <ul class="resourceList">
             <li v-for="(resource,id) in resources" :key="id" :id="resource.id"
-                @click="selected($event)" @dblclick="preview($event)">
+                @click="selected($event)" :url="resource.url" @dblclick="preview($event)">
               <label class="el-upload-list__item-status-label">
                 <i class="el-icon-upload-success el-icon-check"></i>
               </label>
               <div class="imgBox">
-                <img :src="'http://192.168.1.6/'+ resource.url">
+                <img :src="'http://'+ resource.thumbnail">
               </div>
               <p>{{resource.name}}</p>
             </li>
@@ -245,14 +246,15 @@
             class="upload-demo"
             drag
             :data="data"
-            action="http://192.168.1.6:8081/resource/upload"
+            :action=" baseURL + 'resource/upload'"
+            :accept="accept"
             :headers="headers"
             :before-upload="beforeUp"
             :on-success="onSuccess"
             multiple>
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            <div class="el-upload__tip" slot="tip">上传说明</div>
+            <div class="el-upload__tip" slot="tip">上传说明：{{directions}}</div>
           </el-upload>
           <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialog = false">确 定</el-button>
@@ -262,11 +264,12 @@
           :title="title + '预览'"
           :visible.sync="view"
           width="30%"
+          @close="viewClose"
         >
           <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
-            <img v-if="format==='png'" style="width: 100%;height: 100%;" :src="url">
-            <video v-if="format ==='video'" width="520" height="320" controls autoplay>
-              <source :src="url" type="video/mp4">
+            <img v-if="format==='image'" style="width: 100%;height: 100%;" :src="url">
+            <video preload="metadata" v-if="format ==='video'" width="520" height="320" controls>
+              <source id="video" :src="url" type="video/mp4">
             </video>
           </div>
         </el-dialog><!--预览-->
@@ -289,14 +292,19 @@
     },
     data() {
       return {
+        baseURL: this.$http.defaults.baseURL, //服务器地址
         resourceTree: [],
 
+        type: 'image',           //资源类型
+        accept: 'image/png,image/jpg,image/jpeg',         //允许上传的资源类型
+        directions: '仅允许上传png、jpg、jpeg文件。',                      //上传时的说明文字
         dialog: false,
         title: '',
         value: '',
         treeId: 1,
         treeName: '图片',
         resources: [],
+        row: [],
         url: '',                   //资源地址
         downloadUrl: '',          //下载地址
         downloadName: '',         //下载名称
@@ -312,11 +320,11 @@
             label: '列表模式'
           }
         ],
-        pageCount: 11,     //每页显示数目
+        pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
         check: false,          //选中资源的变量
-        format:''               //资源格式
+        format: ''               //资源格式
       }
     },
     computed: {
@@ -328,8 +336,9 @@
       },
       data() {                                       //上传组件的附加参数
         return {
-          creator: sessionStorage.getItem('name'),
-          treeId: this.treeId
+          uploader: sessionStorage.getItem('userId'),
+          groupId: this.treeId,
+          type: this.type
         }
       }
     },
@@ -361,20 +370,45 @@
             });
           }
         })
-      },            //获取树资源
+      },                               //获取树资源
       handleNodeClick(val) {
-        this.treeId = val.id
-        this.treeName = val.label
+        this.treeId = val.id;
+        this.type = val.treeType;
+        this.treeName = val.label;
+        let image = 'image/png,image/jpg,image/jpeg';
+        let video = 'video/*';
+        let audio = 'audio/*';
+        if (image.indexOf(val.treeType) != -1) {
+          this.accept = image;
+          this.directions = '仅允许上传png、jpg、jpeg文件。'
+        } else if (video.indexOf(val.treeType) != -1) {
+          this.accept = video;
+          this.directions = '仅允许上传视频文件。'
+        } else if (audio.indexOf(val.treeType) != -1) {
+          this.accept = audio;
+          this.directions = '仅允许上传音频文件。'
+        }else {
+          this.accept ='*'
+          this.directions = '不允许上传任何文件。'
+        }
         this.resourceQuery()
 
-      },  //树节点的点击回调
+      },                    //树节点的点击回调
 
       upload() {
         this.title = this.treeName.slice(0, 2);
         this.dialog = true
       },
       beforeUp: function (file) {
-      },      //文件上传前的回调
+        if (this.accept.indexOf(file.type.slice(0, 4)) == -1) {
+          this.$message({
+            message: '上传资源格式不支持！',
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
+      },               //文件上传前的回调
       onSuccess: function (response) {
         if (response.code == '0000') {
           this.$message({
@@ -390,15 +424,28 @@
             type: 'error'
           });
         }
-      },  //上传成功的回调
+      },          //上传成功的回调
       del() {
-        if (this.id == '') {
-          this.$message({
-            message: '未选择资源！',
-            center: true,
-            type: 'warning'
-          })
-          return false
+        if (this.value == '2') {
+          let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
+          if (ids == '') {
+            this.$message({
+              message: '未选择资源！',
+              center: true,
+              type: 'warning'
+            });
+            return false
+          }
+          this.id = ids
+        } else {
+          if (this.id == '') {
+            this.$message({
+              message: '未选择资源！',
+              center: true,
+              type: 'warning'
+            });
+            return false
+          }
         }
         this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
@@ -406,7 +453,7 @@
         }).then(() => {
           this.$http({
             method: 'delete',
-            url: 'resource/delete?id=' + this.id,
+            url: 'resource/delete?ids=' + this.id,
             withCredentials: true,
             headers: {
               token: sessionStorage.getItem('token'),
@@ -429,18 +476,19 @@
             }
           })
         })
-      },                          //删除资源
+      },                                   //删除资源
       preview(e) {
-        this.url = e.currentTarget.children[1].children[0].currentSrc
+        this.url = "http://" + document.getElementById(e.currentTarget.id).getAttribute("url")
         this.title = this.treeName.slice(0, 2);
-        if (this.url.indexOf('mp4') != '-1'){
-          this.format='video'
-        }
-        if(this.url.indexOf('png') != '-1'){
-          this.format='png'
+        if (this.url.indexOf('mp4') != '-1') {
+          this.format = 'video'
+        } else if (this.url.indexOf('png') != '-1' || this.url.indexOf('jpg') != '-1' || this.url.indexOf('jpeg') != '-1') {
+          this.format = 'image'
+        } else {
+          return false
         }
         if (!this.view) this.view = true
-      },                     //双击预览
+      },                              //双击预览
       selected(e) {
         this.check = !this.check
         let dom = e.currentTarget.id;
@@ -457,7 +505,7 @@
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 
-          this.downloadUrl = target.children[1].children[0].currentSrc;
+          this.downloadUrl = "http://" + document.getElementById(target.id).getAttribute("url")
           this.downloadName = target.children[2].innerText;
           this.id = dom
         } else {
@@ -467,14 +515,13 @@
           this.downloadName = '';
           this.id = ''
         }
-      },                    //单击选择文件
+      },                             //单击选择文件
       resourceQuery() {
         let _this = this
-        this.resources = []
-        let t = []
+        this.resources = [];
         this.$http({
           method: 'get',
-          url: 'resource/query?treeId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -484,9 +531,8 @@
           if (response.data.code == '0000') {
             let resources = response.data.cust.resources
             _this.total = response.data.cust.pages.count
-            for (let i = 0; i < resources.length; i++) {
-              t.push(resources[i])
-              _this.resources = t
+            for (let resource of resources) {
+              _this.resources.push(resource)
             }
           } else {
             this.$message({
@@ -496,8 +542,16 @@
             });
           }
         })
-      },                //查询列表
+      },                         //查询列表
+      selectChange(val) {
+        val == '2' ? this.pageCount = 5 : this.pageCount = 21
+        this.resourceQuery()
+      },                       //选择显示模式
       download() {
+        if (this.value == '2') {
+          this.downloadUrl = 'http://' + this.row.map(item => item.url).join('')
+          this.downloadName = 'http://' + this.row.map(item => item.name).join('')
+        }
         if (this.downloadUrl != '' || this.downloadName != '') {
           let a = document.createElement('a');
           a.href = this.downloadUrl;
@@ -512,11 +566,17 @@
             type: 'warning'
           })
         }
-      },                       //下载文件
+      },                              //下载文件
       handleCurrentChange(val) {
         this.pageNo = val
-        this.getRoleList()
-      }            //当前页翻页
+        this.resourceQuery()
+      },                //当前页翻页
+      tableSelect(row) {
+        this.row = row
+      },                        //表格选择
+      viewClose(){
+
+      }
     }
   }
 </script>

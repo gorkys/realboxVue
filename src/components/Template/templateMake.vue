@@ -136,7 +136,7 @@
   }
 
   /*内容框*/
-  .img {
+  .image {
     height: 100%;
     width: 100%;
     background: url("../../assets/imgs/template/img.png") no-repeat 100% 100%;
@@ -185,14 +185,104 @@
   .templateInfoList, .setBox, .areaBox {
     padding: 10px;
   }
+
+  /*图片管理*/
+  .controlBox {
+    height: 40px;
+    line-height: 40px;
+    text-align: right;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .search {
+    display: flex;
+  }
+
+  .search > div {
+    margin-right: 10px;
+  }
+
+  .imgList, .tableList {
+    padding: 20px;
+    height: 580px;
+  }
+
+  .resourceList {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .resourceList li {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 30px 40px;
+    cursor: pointer;
+    padding: 10px 5px;
+    border-radius: 5px;
+    position: relative;
+  }
+
+  .imgBox {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #e7e7e7;
+  }
+
+  .resourceList li img {
+    max-width: 120px;
+    max-height: 120px;
+  }
+
+  .resourceList li:hover {
+    background-color: #ebebeb !important;
+  }
+
+  .resourceList p {
+    min-width: 20px;
+  }
+
+  .el-upload-list__item-status-label {
+    position: absolute;
+    right: -15px;
+    top: -7px;
+    width: 46px;
+    height: 26px;
+    background: #13ce66;
+    text-align: center;
+    transform: rotate(45deg);
+    box-shadow: 0 1px 1px #ccc;
+  }
+
+  .el-upload-list__item-status-label i {
+    font-size: 12px;
+    margin-top: 12px;
+    transform: rotate(-45deg);
+    color: white;
+  }
+
+  .page {
+    text-align: right;
+    padding-right: 20px;
+  }
 </style>
 <template>
   <div id="resizableBox">
     <div class="area">
       <div class="title">区域</div>
       <ul class="areaList">
-        <li><i class="iconfont icon-beijing"></i><b>背景</b></li>
-        <li @click="add('img',true)"><i class="iconfont icon-tupian"></i><b>图片</b></li>
+        <li @click="setBg = true"><i class="iconfont icon-beijing"></i><b>背景</b></li>
+        <li @click="add('image',true)"><i class="iconfont icon-tupian"></i><b>图片</b></li>
         <li @click="add('video',true)"><i class="iconfont icon-shipin"></i><b>视频</b></li>
         <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>文本</b></li>
         <li @click="add('scroll',false)"><i class="iconfont icon-wenben"></i><b>动态文本</b></li>
@@ -203,10 +293,21 @@
       <div class="title">编辑区</div>
       <div class="editBox">
         <div id="edit">
+          <vue-draggable-resizable v-if="revert" v-for="(item,index) in elements" :key="index"
+                                   :w="item.width" :h="item.height" :x="item.x" :y="item.y" :minw="50" :minh="50"
+                                   @dragging="onDrag" @resizing="onResize" :parent="true" :name="item.name"
+                                   :conflictCheck="item.conflictCheck"  :id="item.id">
+            <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
+              <div class="action" v-show="show">
+                <span @click="elements.splice(index,1)"><i class="el-icon-delete"></i></span>
+              </div>
+            </div>
+          </vue-draggable-resizable>
+
           <vue-draggable-resizable v-for="(item,index) in items" :key="item.key"
                                    :w="189" :h="142" :minw="50" :minh="50"
                                    @dragging="onDrag" @resizing="onResize" :parent="true"
-                                   :conflictCheck="item.conflictCheck" :id="item.id">
+                                   :conflictCheck="item.conflictCheck" :name="item.name" :id="item.id">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
               <div class="action" v-show="show">
                 <span @click="items.splice(index,1)"><i class="el-icon-delete"></i></span>
@@ -220,10 +321,10 @@
       <div class="templateInfo">
         <div class="title" style="margin-bottom: 10px;">模板信息</div>
         <ul class="templateInfoList">
-          <li><span>模板名称：</span><input v-model="templateName" type="text"></li>
-          <li><span>模板类型：</span><b>用户模板</b></li>
-          <li><span>终端类型：</span><i class="iconfont"></i></li>
-          <li><span>分辨率：&nbsp;&nbsp;&nbsp;</span><input type="text"></li>
+          <li><span>模板名称：</span><input v-model="temName" type="text"></li>
+          <li><span>模板类型：</span><b>{{temType}}</b></li>
+          <li><span>终端类型：</span><b>{{terminalType}}</b><i class="iconfont"></i></li>
+          <li><span>分辨率：&nbsp;&nbsp;&nbsp;</span><input type="text" v-model="resolution" readonly="readonly"></li>
         </ul>
       </div>
       <div class="areaInfo">
@@ -259,6 +360,84 @@
         <img id="exportedImage" style="width: 200px">
       </div>
     </div>
+    <el-dialog
+      title="选择背景"
+      :visible.sync="setBg"
+      width="51%"
+      top="1vh"
+    >
+      <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
+        <div class="controlBox">
+          <div class="search">
+            <div style="width: 110px">
+              <el-select v-model="value" placeholder="图形模式" @change="selectChange">
+                <el-option v-for="item in select"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value"></el-option>
+              </el-select>
+            </div>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容">
+                <template slot="prepend">名称</template>
+              </el-input>
+            </div>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容">
+                <template slot="prepend">部门</template>
+              </el-input>
+            </div>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容">
+                <template slot="prepend">上传者</template>
+              </el-input>
+            </div>
+            <el-button>搜索</el-button>
+          </div>
+        </div>
+        <div v-if="value == '2'" class="tableList">
+          <el-table :data="resources" @selection-change="tableSelect">
+            <el-table-column type="selection" align="center" width="55"></el-table-column>
+            <el-table-column prop="name" align="center" label="名称"></el-table-column>
+            <el-table-column prop="screenshot" align="center" label="预览图">
+              <template scope="scope">
+                <img :src="'http://'+ scope.row.thumbnail" width="100" height="70"/>
+              </template>
+            </el-table-column>
+            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+            <el-table-column prop="size" align="center" label="大小(kb)"></el-table-column>
+            <el-table-column prop="orgId" align="center" label="所属部门"></el-table-column>
+            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
+            <el-table-column prop="uploadtime" align="center" label="更新时间"></el-table-column>
+          </el-table>
+        </div>
+        <div v-else class="imgList">
+          <ul class="resourceList">
+            <li v-for="(resource,id) in resources" :key="id" :id="resource.id"
+                @click="selected($event)" :url="resource.url" @dblclick="preview($event)">
+              <label class="el-upload-list__item-status-label">
+                <i class="el-icon-upload-success el-icon-check"></i>
+              </label>
+              <div class="imgBox">
+                <img :src="'http://'+ resource.thumbnail">
+              </div>
+              <p>{{resource.name}}</p>
+            </li>
+          </ul>
+        </div>
+        <div class="page">
+          <el-pagination
+            @current-change="handleCurrentChange"
+            :page-size="pageCount"
+            layout="total, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="setBg = false">确 定</el-button>
+  </span>
+    </el-dialog><!--选择背景-->
   </div>
 </template>
 <script>
@@ -267,6 +446,10 @@
   import Vue from 'vue'
 
   export default {
+    mounted() {
+      this.resourceQuery()
+      this.temEdit()
+    },
     data() {
       return {
         width: 0,
@@ -276,9 +459,36 @@
         items: [],
         show: false,
         id: 1,
-        templateName: '',
-        check: true,
-        preview: ''
+        //模板属性
+        temName: sessionStorage.getItem('temName'),                  //模板名称
+        terminalType: '安卓',          //终端类型
+        temType: sessionStorage.getItem('temType'),                   //模板类型
+        desc: sessionStorage.getItem('desc'),                      //备注
+        resolution: sessionStorage.getItem('resolution'),         //分辨率
+        preview: '',
+        //弹出框
+        resources: [],
+        value: "",
+        setBg: false,        //选择背景对话框
+        pageCount: 12,     //每页显示数目
+        pageNo: 1,          //当前页
+        total: 0,            //总数目
+        select: [
+          {
+            value: 1,
+            label: '图形模式'
+          },
+          {
+            value: 2,
+            label: '列表模式'
+          }
+        ],
+        format: '',               //资源格式
+        check: false,
+        //还原模板元素
+        revert: false,            //是否需要还原
+        elements: [],
+        temId: ''
       }
     },
     components: {},
@@ -288,24 +498,23 @@
         this.y = top
         this.width = width
         this.height = height
-      },   //调整大小的回调
+      },    //调整大小的回调
       onDrag: function (left, top) {
         this.x = left
         this.y = top
-      },                    //移动的回调
+      },                     //移动的回调
       showDel(e) {
         this.show = true
         e.currentTarget
-        debugger
       },
       add: function (content, status) {
-        var id = '';
-        status ? id = 'check' : id = 'Uncheck'      //判断是否检查，用来给不检查的元素赋ID值
-        this.items.push({key: this.id++, content: content, conflictCheck: status, id: id})
-      },                //添加区域块
+        let id = '';
+        status ? id = 'check' : id = 'Uncheck';      //判断是否检查，用来给不检查的元素赋ID值
+        this.items.push({key: this.id++, content: content, conflictCheck: status, id: id, name: new Date().getTime()})
+      },                  //添加区域块
       exit: function () {
         this.$router.go(-1);
-      },                              //后退
+      },                                //后退
       exportImage(value) {
         let vm = this;
         let table = $('#edit');
@@ -314,14 +523,19 @@
         let creator = sessionStorage.getItem('name');  //创建人
         let treeId = 22;     //	树ID
         let Array = [];
+        let queryUrl = '';                     //区分新建与编辑的请求地址
+        let method = '';                  //区分新建与编辑的请求方式
+        let query = this.$route.query;    //区分新建与编辑
+        let data = {}
         //获取区域块的属性值
         table.children().map(function () {
           let height = $(this).height();
           let width = $(this).width();
+          let id = $(this).attr('name');                    //元素的唯一标识
           let x = $(this).position().left;
           let y = $(this).position().top;
           let type = $(this).children().last().attr('class');
-          Array.push({height, width, x, y, type});
+          Array.push({height, width, x, y, type,id});
         });
         let elements = Array    //end
         /* 这部分代码用来解决生成的图片不清晰的问题 */
@@ -337,62 +551,211 @@
         // context.scale(2, 2);
         /* 这部分代码用来解决生成的图片不清晰的问题 */
         html2canvas(table, {
-          // canvas: canvas,
           onrendered(image) {
             var url = image.toDataURL();
             document.getElementById('exportedImage').src = url;
             vm.preview = url;
-            /*创建一个a标签，添加点击事件直接下载*/
-            /*let a = document.createElement('a');
-            a.href = url;
-            a.download = vm.imageName ? vm.imageName : '未命名';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);*/
-            // document.body.removeChild(canvas);
+
+            if (table.html() == "") {
+              vm.$message({message: '请加入区域块！', center: true, type: 'warning'});
+            } else {
+              //区分新建与编辑
+              if (query.name == undefined && query.groupId == undefined) {
+                queryUrl = 'template/create';
+                method = 'post';
+                data = {
+                  body: html,     //模板js代码
+                  creator: creator,      //创建人
+                  temElements: elements,     //List<Elements>模板元素集合
+                  groupId: treeId,     //	树ID
+                  name: vm.temName,     //模板名称
+                  type: vm.temType,     //	模板类型
+                  width: '800',     //模板宽
+                  height: '600',     //模板高
+                  preview: vm.preview, //模板截图
+                  terminalType: vm.terminalType,
+                  desc: vm.desc
+                }
+              } else {
+                queryUrl = 'template/update'
+                method = 'put'
+                data = {
+                  body: html,     //模板js代码
+                  creator: creator,      //创建人
+                  temElements: elements,     //List<Elements>模板元素集合
+                  groupId: treeId,     //	树ID
+                  name: vm.temName,     //模板名称
+                  type: vm.temType,     //	模板类型
+                  width: '800',     //模板宽
+                  height: '600',     //模板高
+                  preview: vm.preview, //模板截图
+                  terminalType: vm.terminalType,
+                  desc: vm.desc,
+                  id: vm.temId
+                }
+              }
+            }
+            vm.$http({
+              method: method,
+              url: queryUrl,
+              withCredentials: true,
+              headers: {
+                token: sessionStorage.getItem('token'),
+                name: sessionStorage.getItem('name'),
+              },
+              data: data
+            }).then(response => {
+              if (response.data.code == '0000') {
+                vm.$message({message: '保存成功！', center: true, type: 'success'});
+                if (value == 'use') {
+                  vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
+                }
+              } else {
+                vm.$message({
+                  message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                  center: true,
+                  type: 'error'
+                });
+              }
+            })
           }
         });
-        if (table.html() == "") {
-          vm.$message({message: '请加入区域块！', center: true, type: 'warning'});
-        } else {
-          this.$http({
-            method: 'post',
-            url: 'template/create',
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name'),
-            },
-            data: {
-              body: html,     //模板js代码
-              creator: creator,      //创建人
-              elements: elements,     //List<Elements>模板元素集合
-              treeId: treeId,     //	树ID
-              name: vm.templateName,     //模板名称
-              type: '用户模板',     //	模板类型
-              width: '800',     //模板宽
-              height: '600',     //模板高
-              preview: vm.preview, //模板截图
-              terminalType:'ios'
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              vm.$message({message: '保存成功！', center: true, type: 'success'});
-              if (value == 'use') {
-                localStorage.setItem("template", html);
-                vm.$router.push('/programMack')
-              }
-            } else {
-              this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
-                center: true,
-                type: 'error'
-              });
-            }
-          })
-        }
 
-      }                              //导出图片
+
+      },                               //导出图片
+
+      resourceQuery() {
+        let _this = this;
+        this.resources = [];
+        this.$http({
+          method: 'get',
+          url: 'resource/query?groupId=1' + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let resources = response.data.cust.resources;
+            _this.total = response.data.cust.pages.count;
+            for (let resource of resources) {
+              _this.resources.push(resource)
+            }
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },                                  //查询资源列表
+      handleCurrentChange(val) {
+        this.pageNo = val
+        this.resourceQuery()
+      },                         //当前页翻页
+      selectChange(val) {
+        val == '2' ? this.pageCount = 5 : this.pageCount = 21
+        this.resourceQuery()
+      },                                //选择显示模式
+      tableSelect(row, val) {
+        this.row = row
+      },                            //表格选择
+      selected(e) {
+        this.check = !this.check
+        let dom = e.currentTarget.id;
+        let target = e.currentTarget
+        /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
+          dom = e.target.offsetParent.id
+          target = e.target.offsetParent
+        } else {
+          dom = e.target
+          target = e.target
+        }*/     //currentTarget与target的区别
+        let children = target.children[0];
+        if (this.check) {
+          children.style.display = 'block';
+          target.style.backgroundColor = "#ebebeb";
+
+          this.downloadUrl = "http://" + document.getElementById(target.id).getAttribute("url")
+          this.downloadName = target.children[2].innerText;
+          this.id = dom
+        } else {
+          children.style.display = 'none';
+          target.style.backgroundColor = "white";
+          this.downloadUrl = '';
+          this.downloadName = '';
+          this.id = ''
+        }
+      },                                      //单击选择文件
+
+      temEdit() {
+        let query = this.$route.query;
+        if (query.name == undefined && query.groupId == undefined) return false;
+        this.revert = true;
+        let _this = this;
+        this.$http({
+          method: 'get',
+          url: 'template/query?groupId=' + query.groupId + '&pageNo=1&pageCount=1' + '&name=' + query.name,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let elements = response.data.cust.templates[0].temElements;
+            let template = response.data.cust.templates[0];
+            _this.temId = template.id
+            _this.temName = template.name;
+            _this.terminalType = template.terminalType;
+            _this.temType = template.type;
+            _this.desc = template.desc;
+            _this.resolution = template.resolution;
+            elements.forEach(item => {
+              let data = {}                       //这个需要定义在循环内部
+              data['width'] = item.width;
+              data['height'] = item.height;
+              data['x'] = item.x;
+              data['y'] = item.y;
+              data['name']=item.id;                     //元素的唯一标识
+              if (item.type == 'image') {
+                data['content'] = item.type;
+                data['conflictCheck'] = true
+                data['id'] = 'check'
+              }
+              if (item.type == 'video') {
+                data['content'] = item.type;
+                data['conflictCheck'] = true
+                data['id'] = 'check'
+              }
+              if (item.type == 'txt') {
+                data['content'] = item.type;
+                data['conflictCheck'] = false
+                data['id'] = 'Uncheck'
+              }
+              if (item.type == 'scroll') {
+                data['content'] = item.type;
+                data['conflictCheck'] = false
+                data['id'] = 'Uncheck'
+              }
+              if (item.type == 'audio') {
+                data['content'] = item.type;
+                data['conflictCheck'] = false
+                data['id'] = 'Uncheck'
+              }
+              _this.elements.push(data)
+            })
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      }
     }
   }
 </script>

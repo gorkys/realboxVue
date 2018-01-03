@@ -22,13 +22,12 @@
 
 <script>
   export default {
-    name: 'HelloWorld',
     data() {
       return {
         name: '',
         pass: "",
         code: '',
-        codeSrc: 'http://192.168.1.6:8081/code'
+        codeSrc: this.$http.defaults.baseURL+'/code'
       }
     },
     methods: {
@@ -52,7 +51,8 @@
           if (response.data.code == '0000') {
             sessionStorage.setItem("token", response.data.cust.token);
             sessionStorage.setItem("name", response.data.cust.name);
-            sessionStorage.setItem("privId",response.data.cust.privId)
+            sessionStorage.setItem("privId",response.data.cust.privId);
+            sessionStorage.setItem("userId",response.data.cust.userId)
             this.$router.push('/index')
           } else {
             this.$message({
@@ -60,12 +60,13 @@
               center: true,
               type: 'error'
             });
+            this.getCode();
           }
         })
 
       },
       getCode: function () {
-        this.codeSrc = this.codeSrc + '?l=' + Math.random();
+        this.codeSrc += '?l=' + Math.random();
       }
     }
   }

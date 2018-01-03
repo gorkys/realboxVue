@@ -114,22 +114,22 @@
     },
     data() {
       return {
-        label: 'aa',                 //新增树的子名称
-        openDialog: false,            //打开对话框
-        innerVisible: false,         //选择上级部门的对话框
-        title: '',                   //弹出框标题
+        label: 'aa',                        //新增树的子名称
+        openDialog: false,                  //打开对话框
+        innerVisible: false,                //选择上级部门的对话框
+        title: '',                          //弹出框标题
         form: {
           deartmentName: '',                 // 部门名称
-          superiorDeartment: '',              //上级部门
+          superiorDeartment: '',             //上级部门
           deartmentDescribe: ''              //部门备注
         },
         LabelWidth: '70px',
         departmentTree: [],
         superiorId: '',                     //上级部门ID
-        treeId: 60,               //树ID
-        creator:'',                //创建人
-        departmentId:'',           //部门ID  编辑用
-        targetId:''                  //编辑时需要移动到的目标树ID
+        treeId: 60,                         //树ID
+        creator:'',                         //创建人
+        departmentId:'',                    //部门ID  编辑用
+        targetId:''                         //编辑时需要移动到的目标树ID
       }
     },
     components: {
@@ -206,18 +206,18 @@
         this.form.superiorDeartment = superior[0].label
         this.targetId = superior[0].id
         this.innerVisible = false
-      },               //选择上级部门
+      },                   //选择上级部门
       submit() {
         if (this.title == '新建部门') {
           this.addDeartment()
         } else {
           this.editDeartment()
         }
-      },                    //判断是新建还是编辑
+      },                     //判断是新建还是编辑
       New() {
         this.openDialog = true
         this.title = '新建部门'
-      },                   //新建部门
+      },                        //新建部门
       Edit() {
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
@@ -230,7 +230,7 @@
         this.superiorId = tree[0].parentId
         this.creator = tree[0].creator
         this.departmentId = tree[0].id
-      },          //编辑部门
+      },                       //编辑部门
       editDeartment() {
         if (this.form.deartmentName == '') {
           this.$message({message: '请填写部门名称！', center: true, type: 'warning'});
@@ -270,7 +270,7 @@
             });
           }
         })
-      },
+      },              //编辑部门方法
       delDeartment(){
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
@@ -308,7 +308,7 @@
             }
           })
         })
-      }
+      }                 //删除部门方法
     }
   }
 </script>
