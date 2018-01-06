@@ -69,7 +69,7 @@
         this.$router.push('/resource')
       },
       toPlay:function () {
-        this.$router.push('/playList')
+        this.$router.push('/play')
       },
       toTerminal:function () {
         this.$router.push('/terminal')

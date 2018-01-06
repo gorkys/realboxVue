@@ -82,17 +82,17 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">节目类型</template>
             </el-input>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">节目名称</template>
             </el-input>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">发布人</template>
             </el-input>
           </div>
@@ -100,7 +100,6 @@
             <el-date-picker
               v-model="date"
               type="datetimerange"
-              :picker-options="pickerOptions2"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
@@ -108,7 +107,7 @@
             </el-date-picker>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">状态</template>
             </el-input>
           </div>
@@ -117,31 +116,35 @@
       </div>
       <div class="auditList">
         <el-table
-          :data="tableData"
-          border
+          :data="publish"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="date" align="center" label="节目类型"></el-table-column>
-          <el-table-column prop="name" align="center" label="发布单号"></el-table-column>
-          <el-table-column prop="address" align="center" label="节目名称"></el-table-column>
-          <el-table-column prop="address" align="center" label="发布类型"></el-table-column>
-          <el-table-column prop="address" align="center" label="播放类型"></el-table-column>
-          <el-table-column prop="address" align="center" label="发布人"></el-table-column>
-          <el-table-column prop="address" align="center" label="发布时间"></el-table-column>
-          <el-table-column prop="address" align="center" label="失效日期"></el-table-column>
-          <el-table-column prop="address" align="center" label="状态"></el-table-column>
-          <el-table-column prop="address" align="center" label="操作"></el-table-column>
+          <el-table-column prop="proType" align="center" label="节目类型"></el-table-column>
+          <el-table-column prop="id" align="center" label="发布单号"></el-table-column>
+          <el-table-column prop="proName" align="center" label="节目名称"></el-table-column>
+          <el-table-column prop="publishType" align="center" label="发布类型"></el-table-column>
+          <el-table-column prop="playType" align="center" label="播放类型"></el-table-column>
+          <el-table-column prop="publisher" align="center" label="发布人"></el-table-column>
+          <el-table-column prop="startTime" align="center" label="发布时间"></el-table-column>
+          <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
+          <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
+          <el-table-column prop="address" align="center" label="操作">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                @click="auditPass(scope.$index, scope.row)">审核通过
+              </el-button>
+            </template>
+          </el-table-column>
+          </el-table-column>
         </el-table>
       </div>
       <div class="page">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage4"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
+          @current-change="pageChange"
+          :page-size="pageCount"
+          layout="total, prev, pager, next, jumper"
+          :total="total">
         </el-pagination>
       </div>
     </div>
@@ -154,9 +157,16 @@
   import Breadcrumb from '@/components/common/Breadcrumb'
 
   export default {
+    mounted() {
+      this.queryPublishList()
+    },
     data() {
       return {
-        date: ''
+        date: '',
+        publish: [],       //发布列表数据
+        pageCount: 11,     //每页显示数目
+        pageNo: 1,          //当前页
+        total: 0,            //总数目
       }
     },
     components: {
@@ -164,7 +174,65 @@
       FooterBar,
       Breadcrumb
     },
-    methods: {}
+    methods: {
+      queryPublishList() {
+        let _this = this;
+        this.publish = [];
+        this.$http({
+          method: 'get',
+          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&status=未审核",
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let publish = response.data.cust.publish;
+            _this.total = response.data.cust.pages.count;
+            for (let item of publish) {
+              _this.publish.push(item)
+            }
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },                //获取节目列表
+      pageChange(val) {
+        this.pageNo = val;
+        this.queryPublishList()
+      },                    //分页
+      auditPass(index,data){
+        this.$http({
+          method: 'get',
+          url: "publish/audit?&id=" + data.id,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            this.$message({
+              message: '审核通过，节目已发布成功！',
+              center: true,
+              type: 'success'
+            });
+            this.queryPublishList()
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      }                           //审核通过
+    }
   }
 </script>
 

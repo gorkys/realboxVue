@@ -240,7 +240,7 @@
     <Content>
       <div id="playTree">
         <div class="title">节目分组</div>
-        <el-tree :data="playTree" node-key="id" @node-click="handleNodeClick" default-expand-all></el-tree>
+        <el-tree :data="playTree" node-key="id" @node-click="handleNodeClick" :expand-on-click-node="false" default-expand-all></el-tree>
       </div>
       <div id="playList">
         <div class="title">节目列表</div>
@@ -336,7 +336,7 @@
       <div class="temDialog">
         <div id="templateTree">
           <div class="title">模板管理</div>
-          <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" default-expand-all></el-tree>
+          <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" :expand-on-click-node="false" default-expand-all></el-tree>
         </div>
         <div id="templateList">
           <div class="controlBox">

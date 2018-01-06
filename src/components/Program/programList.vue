@@ -111,7 +111,6 @@
         </div>
         <div class="control">
           <a @click="New"><i class="el-icon-plus"></i>新建</a>
-          <a><i class="el-icon-edit"></i>编辑</a>
           <a @click="delPro"><i class="el-icon-delete"></i>删除</a>
         </div>
       </div>
@@ -175,7 +174,7 @@
       },
       queryPublishList() {
         let _this = this;
-        this.publishs = [];
+        this.publish = [];
         this.$http({
           method: 'get',
           url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,

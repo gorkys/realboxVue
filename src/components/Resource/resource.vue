@@ -163,7 +163,7 @@
           <a><i class="el-icon-plus"></i>新建</a>
           <a><i class="el-icon-refresh"></i>刷新</a>
         </div>
-        <el-tree :data="resourceTree" default-expand-all @node-click="handleNodeClick"></el-tree>
+        <el-tree :data="resourceTree" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick"></el-tree>
       </div>
       <div id="resourceList">
         <div class="title">资源列表</div>
@@ -415,7 +415,7 @@
             message: '上传成功！',
             center: true,
             type: 'success'
-          })
+          });
           this.resourceQuery()
         } else {
           this.$message({

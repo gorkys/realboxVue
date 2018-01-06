@@ -129,7 +129,7 @@
         treeId: 60,                         //树ID
         creator:'',                         //创建人
         departmentId:'',                    //部门ID  编辑用
-        targetId:''                         //编辑时需要移动到的目标树ID
+        targetId:''                  //编辑时需要移动到的目标树ID
       }
     },
     components: {

@@ -213,10 +213,11 @@
         <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id">
           <span slot="label"></i>{{resourceTitle.label}}</span>
           <ul class="resourceList">
-            <li v-for="(resource,id) in resources" :key="id" :id="resource.id"
+            <li v-for="(resource,id) in resources" :key="id" :id="resource.id" :name="resource.url"
+                :type="resource.type"
                 @mousedown="mouse($event)">
               <div class="imgBox">
-                <img @dragstart="prohibited($event)" :src="'http://'+ resource.url">
+                <img @dragstart="prohibited($event)" :src="'http://'+ resource.thumbnail">
               </div>
               <p>{{resource.name}}</p>
             </li>
@@ -244,7 +245,7 @@
           <a @click="view = true"><i class="el-icon-view"></i> 快速预览</a>
           <a @click="save"><i class="iconfont icon-iconset0237"></i> 保存</a>
           <a><i class="iconfont icon-lingcunwei"></i> 另存为</a>
-          <a><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
+          <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
         </div>
       </div>
       <div v-html="template" class="template"></div>
@@ -271,32 +272,34 @@
 
   export default {
     mounted: function () {
-      document.documentElement.addEventListener('mousemove', this.handleMove, true)          //给window绑定鼠标移动事件
-      document.documentElement.addEventListener('mouseup', this.handleUp, true)
+      document.documentElement.addEventListener('mousemove', this.handleMove, true);          //给window绑定鼠标移动事件
+      document.documentElement.addEventListener('mouseup', this.handleUp, true);
 
-      this.queryList()
-      this.getTree()
+      this.queryList();
+      this.getTree();
       this.resourceQuery()
     },
     updated: function () {
       this.$nextTick(function () {
         //为模板添加移动事件
+        let img = $('.move>img')
         $('div').remove('.handle');
         $('div').remove('.action');
-        $('.vdr').on('mousemove', function (event) {
+        $('.vdr').on('mousemove', function () {
           $(this).css('border', '1px solid red');
-          if ($(this).children().hasClass('image')) {
+          if (img.attr('type') == $(this).children().attr('class')) {
             $(".move>i").removeClass('icon-iconforbidden')
             $(".move>i").addClass('icon-yunxu')
             $(".move>i").css("color", "#33cc1e")
-          }
+          }           //判断当前移动文件类型与模板元素的类型是否一致
         });       //移动到目标位置的样式更改
         $('.vdr').on('mouseup', function (event) {
-          if ($(this).children().hasClass('image')) {
-            let src = $('.move>img').attr('src');
-            let id = $('.move>img').attr('id');
-            $(this).children('.image').children('img').remove()
-            $(this).children('.image').html("<img id='" + id + "' src='" + src + "'>")
+          if (img.attr('type') == $(this).children().attr('class')) {               //判断当前移动文件类型与模板元素的类型是否一致
+            let src = img.attr('src');
+            let name = img.attr('name');
+            let id = img.attr('id');
+            $(this).children('.' + img.attr('type')).children('img').remove();
+            $(this).children('.' + img.attr('type')).html("<img name='" + name + "' id='" + id + "' src='" + src + "'>")
           }
           this.isDown = false;
           $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
@@ -308,7 +311,8 @@
             for (let item of this.res) {
               for (let i = 0; i < edit.length; i++) {
                 if (item.name == edit[i].getAttribute('name')) {
-                  edit[i].children[0].innerHTML = "<img id='" + item.name + "' src='" + item.url + "'>"
+
+                  edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
                 }
               }
             }
@@ -344,7 +348,7 @@
         /*节目*/
         proName: 'PLAYLIST' + new Date().getTime(),            //节目名称
         preview: '',                                  //预览图
-        proElements: [],                              //节目元素
+        proItems: [],                              //节目元素
         view: false,                                    //快速预览
         temId: '',
         /*还原资源*/
@@ -361,8 +365,10 @@
         return false
       },              //禁止浏览器默认拖动事件
       mouse(e) {
-        let src = e.currentTarget.children[0].children[0].currentSrc;         //取当前拖动的图片地址
-        $('.move>img').attr({'src': src, 'id': e.currentTarget.id});                                       //给弹出框赋图片地址
+        let src = e.currentTarget.children[0].children[0].currentSrc;               //取当前拖动素材的缩略图
+        let url = 'http://' + e.currentTarget.getAttribute('name');                 //取当前拖动素材的文件地址
+        let type = e.currentTarget.getAttribute('type');
+        $('.move>img').attr({'src': src, 'id': e.currentTarget.id, 'name': url, 'type': type});   //给弹出框赋缩略图及文件地址
         //获取x坐标和y坐标
         this.x = e.clientX;
         this.y = e.clientY;
@@ -374,11 +380,11 @@
       },                  //选择拖动文件
       handleMove(e) {
         //样式更改
-        let icon = $(".move>i")
+        let icon = $(".move>i");
         $(".vdr").css('border', 'none');
-        icon.removeClass('icon-yunxu')
-        icon.addClass('icon-iconforbidden')
-        icon.css("color", "red")
+        icon.removeClass('icon-yunxu');
+        icon.addClass('icon-iconforbidden');
+        icon.css("color", "red");
         //END
         if (this.isDown) {
           //获取x和y
@@ -467,7 +473,7 @@
         let _this = this;
         let url = '';
         let type = _this.$route.query.type;
-        type == 0 ? url = 'template/query' : url = 'program/query';   //根据类型判断是新增还是编辑，0为新建1为编辑
+        type != 0 && type != undefined ? url = 'program/query' : url = 'template/query';   //根据类型判断是新增还是编辑，0为新建1为编辑
         this.$http({
           method: 'get',
           url: url + '?groupId=' + _this.$route.query.groupId + '&name=' + _this.$route.query.name + '&pageNo=1&pageCount=1',
@@ -478,9 +484,9 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            if (type == 0) {
+            if (type == 0 || type == undefined) {
               let template = response.data.cust.templates[0];
-              _this.template = template.body
+              _this.template = template.body;
               _this.temId = template.id
             } else {
               let program = response.data.cust.programs[0];
@@ -489,8 +495,8 @@
               _this.proName = program.name;
               _this.proId = program.id;
               _this.groupId = program.groupId;
-              program.proElements.forEach(item => {
-                _this.res.push({name: item.id, url: item.url})
+              program.proItems.forEach(item => {
+                _this.res.push({name: item.id, url: item.url, thumbnail: item.thumbnail})
               })
             }
           } else {
@@ -502,8 +508,9 @@
           }
         })
       },              //获取模板列表
-      save() {
-        let _this = this
+      save(type) {
+
+        let _this = this;
         let table = $('#edit');
         /* 这部分代码用来解决生成的图片不清晰的问题 */
         // let tableWidth = table.offsetWidth;
@@ -522,19 +529,20 @@
           /*allowTaint:true,*/
           /*useCORS: true,*/
           onrendered(image) {
-            var url = image.toDataURL();
-            _this.preview = url;
+            let uri = image.toDataURL();
+            _this.preview = uri;
 
             let queryUrl = '', method = ''
             //获取区域块的属性值
             table.children().map(function () {
-              let id = $(this).attr('name');
-              let url = $(this).children().children().attr('src');
-              let resId = $(this).children().children().attr('id');
-              _this.proElements.push({id, url, resId});
+              let id = $(this).attr('name');                                //元素ID
+              let thumbnail = $(this).children().children().attr('src');    //资源缩略图
+              let url = $(this).children().children().attr('name');         //资源地址
+              let resId = $(this).children().children().attr('id');         //资源ID
+              _this.proItems.push({id, resId, thumbnail, url});
             });
             let data = {};
-            if (_this.$route.query.type == 0) {
+            if (_this.$route.query.type == 0 || _this.$route.query.type == undefined) {
               queryUrl = 'program/create';
               method = 'post';
               data = {
@@ -542,7 +550,7 @@
                 modelId: _this.temId,             //模板ID
                 name: _this.proName,                //节目名称
                 preview: _this.preview,             //预览图
-                proElements: _this.proElements          //节目元素
+                proItems: _this.proItems            //节目元素
               };
             } else {
               queryUrl = 'program/update';
@@ -553,7 +561,7 @@
                 modelId: _this.temId,             //模板ID
                 name: _this.proName,                //节目名称
                 preview: _this.preview,             //预览图
-                proElements: _this.proElements          //节目元素
+                proItems: _this.proItems          //节目元素
               };
             } //根据类型判断是新增还是编辑，0为新建1为编辑
             _this.$http({
@@ -568,6 +576,9 @@
             }).then(response => {
               if (response.data.code == '0000') {
                 _this.$message({message: '保存成功！', center: true, type: 'success'});
+                if (type == 'release') {
+                  _this.$router.push({path: '/release', query: {name: _this.proName}})
+                }
               } else {
                 _this.$message({
                   message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -588,7 +599,9 @@
         });
 
       },
-
+      release() {
+        this.save('release');
+      }
     }
   }
 </script>

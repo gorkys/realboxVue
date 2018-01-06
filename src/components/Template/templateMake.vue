@@ -57,8 +57,6 @@
   }
 
   #edit {
-    width: 600px;
-    height: 800px;
     background-color: #000;
     position: relative;
     display: flex;
@@ -292,11 +290,11 @@
     <div id="editBox">
       <div class="title">编辑区</div>
       <div class="editBox">
-        <div id="edit">
+        <div id="edit" :style="{width : temWidth * PP + 'px',height : temHeight * PP + 'px'}">
           <vue-draggable-resizable v-if="revert" v-for="(item,index) in elements" :key="index"
-                                   :w="item.width" :h="item.height" :x="item.x" :y="item.y" :minw="50" :minh="50"
+                                   :w="item.width * PP" :h="item.height * PP" :x="item.x" :y="item.y" :minw="50" :minh="50"
                                    @dragging="onDrag" @resizing="onResize" :parent="true" :name="item.name"
-                                   :conflictCheck="item.conflictCheck"  :id="item.id">
+                                   :conflictCheck="item.conflictCheck" :id="item.id">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
               <div class="action" v-show="show">
                 <span @click="elements.splice(index,1)"><i class="el-icon-delete"></i></span>
@@ -337,16 +335,16 @@
         <div class="title" style="margin-bottom: 10px;">参数设置</div>
         <div class="setBox">
           <div class="pixel">
-            <b>X:</b><input type="number" :value="x"> px</br></br>
-            <b>Y:</b><input type="number" :value="y"> px</br></br>
-            <b>W:</b><input type="number" :value="width"> px</br></br>
-            <b>H:</b><input type="number" :value="height"> px
+            <b>X:</b><input type="number" :value="parseInt(x/PP)"> px</br></br>
+            <b>Y:</b><input type="number" :value="parseInt(y/PP)"> px</br></br>
+            <b>W:</b><input type="number" :value="parseInt(width/PP)"> px</br></br>
+            <b>H:</b><input type="number" :value="parseInt(height/PP)"> px
           </div>
           <div class="percent">
             <b></b><input type="text" disabled :value="(x/600*100).toFixed(2)"> %</br></br>
             <b></b><input type="text" disabled :value="(y/600*100).toFixed(2)"> %</br></br>
-            <b></b><input type="text" disabled :value="(width/600*100).toFixed(2)"> %</br></br>
-            <b></b><input type="text" disabled :value="(height/600*100).toFixed(2)"> %
+            <b></b><input type="text" disabled :value="(width/PP/temWidth*100).toFixed(2)"> %</br></br>
+            <b></b><input type="text" disabled :value="(height/PP/temHeight*100).toFixed(2)"> %
           </div>
         </div>
 
@@ -447,8 +445,8 @@
 
   export default {
     mounted() {
-      this.resourceQuery()
-      this.temEdit()
+      this.resourceQuery();
+      this.temEdit();
     },
     data() {
       return {
@@ -460,19 +458,22 @@
         show: false,
         id: 1,
         //模板属性
-        temName: sessionStorage.getItem('temName'),                  //模板名称
-        terminalType: '安卓',          //终端类型
-        temType: sessionStorage.getItem('temType'),                   //模板类型
-        desc: sessionStorage.getItem('desc'),                      //备注
-        resolution: sessionStorage.getItem('resolution'),         //分辨率
-        preview: '',
+        PP: 0.7,                                                         //百分比
+        temName: sessionStorage.getItem('temName'),                     //模板名称
+        terminalType: '安卓',                                           //终端类型
+        temType: sessionStorage.getItem('temType'),                     //模板类型
+        desc: sessionStorage.getItem('desc'),                           //备注
+        resolution: sessionStorage.getItem('resolution'),               //分辨率
+        preview: '',                                                    //预览图
+        temWidth: sessionStorage.getItem('resolution').split('×')[0],  //模板宽
+        temHeight: sessionStorage.getItem('resolution').split('×')[1],  //模板高
         //弹出框
         resources: [],
         value: "",
-        setBg: false,        //选择背景对话框
-        pageCount: 12,     //每页显示数目
-        pageNo: 1,          //当前页
-        total: 0,            //总数目
+        setBg: false,                                                    //选择背景对话框
+        pageCount: 12,                                                   //每页显示数目
+        pageNo: 1,                                                       //当前页
+        total: 0,                                                        //总数目
         select: [
           {
             value: 1,
@@ -483,10 +484,10 @@
             label: '列表模式'
           }
         ],
-        format: '',               //资源格式
+        format: '',                                                      //资源格式
         check: false,
         //还原模板元素
-        revert: false,            //是否需要还原
+        revert: false,                                                   //是否需要还原
         elements: [],
         temId: ''
       }
@@ -519,25 +520,26 @@
         let vm = this;
         let table = $('#edit');
 
-        let html = $('.editBox').html();      //模板代码
-        let creator = sessionStorage.getItem('name');  //创建人
-        let treeId = 22;     //	树ID
-        let Array = [];
-        let queryUrl = '';                     //区分新建与编辑的请求地址
-        let method = '';                  //区分新建与编辑的请求方式
-        let query = this.$route.query;    //区分新建与编辑
-        let data = {}
+        let html = $('.editBox').html();                      //模板代码
+        let creator = sessionStorage.getItem('name');         //创建人
+        let treeId = 22;                                      //树ID
+        let Array = [];                                       //区域块的属性值
+        let queryUrl = '';                                    //区分新建与编辑的请求地址
+        let method = '';                                      //区分新建与编辑的请求方式
+        let query = this.$route.query;                        //区分新建与编辑
+        let data = {};                                        //请求参数
         //获取区域块的属性值
         table.children().map(function () {
-          let height = $(this).height();
-          let width = $(this).width();
+          let height = $(this).height() / vm.PP;
+          let width = $(this).width() / vm.PP;
+          
           let id = $(this).attr('name');                    //元素的唯一标识
-          let x = $(this).position().left;
-          let y = $(this).position().top;
+          let x = $(this).position().left / vm.PP;
+          let y = $(this).position().top / vm.PP;
           let type = $(this).children().last().attr('class');
-          Array.push({height, width, x, y, type,id});
+          Array.push({height, width, x, y, type, id});
         });
-        let elements = Array    //end
+        let elements = Array;    //end
         /* 这部分代码用来解决生成的图片不清晰的问题 */
         // let tableWidth = table.offsetWidth;
         // let tableHeight = table.offsetHeight;
@@ -552,7 +554,7 @@
         /* 这部分代码用来解决生成的图片不清晰的问题 */
         html2canvas(table, {
           onrendered(image) {
-            var url = image.toDataURL();
+            let url = image.toDataURL();
             document.getElementById('exportedImage').src = url;
             vm.preview = url;
 
@@ -564,33 +566,33 @@
                 queryUrl = 'template/create';
                 method = 'post';
                 data = {
-                  body: html,     //模板js代码
-                  creator: creator,      //创建人
-                  temElements: elements,     //List<Elements>模板元素集合
-                  groupId: treeId,     //	树ID
-                  name: vm.temName,     //模板名称
-                  type: vm.temType,     //	模板类型
-                  width: '800',     //模板宽
-                  height: '600',     //模板高
-                  preview: vm.preview, //模板截图
-                  terminalType: vm.terminalType,
-                  desc: vm.desc
+                  body: html,                     //模板js代码
+                  creator: creator,               //创建人
+                  temItems: elements,             //List<Elements>模板元素集合
+                  groupId: treeId,                //树ID
+                  name: vm.temName,               //模板名称
+                  type: vm.temType,               //模板类型
+                  width: vm.temWidth,                   //模板宽
+                  height: vm.temHeight,                  //模板高
+                  preview: vm.preview,            //模板截图
+                  terminalType: vm.terminalType,  //终端类型
+                  desc: vm.desc                   //备注
                 }
               } else {
-                queryUrl = 'template/update'
-                method = 'put'
+                queryUrl = 'template/update';
+                method = 'put';
                 data = {
-                  body: html,     //模板js代码
-                  creator: creator,      //创建人
-                  temElements: elements,     //List<Elements>模板元素集合
-                  groupId: treeId,     //	树ID
-                  name: vm.temName,     //模板名称
-                  type: vm.temType,     //	模板类型
-                  width: '800',     //模板宽
-                  height: '600',     //模板高
-                  preview: vm.preview, //模板截图
-                  terminalType: vm.terminalType,
-                  desc: vm.desc,
+                  body: html,                     //模板js代码
+                  creator: creator,               //创建人
+                  temItems: elements,             //List<Elements>模板元素集合
+                  groupId: treeId,                //树ID
+                  name: vm.temName,               //模板名称
+                  type: vm.temType,               //模板类型
+                  width: vm.temWidth,                   //模板宽
+                  height: vm.temHeight,                  //模板高
+                  preview: vm.preview,            //模板截图
+                  terminalType: vm.terminalType,  //终端类型
+                  desc: vm.desc,                  //备注
                   id: vm.temId
                 }
               }
@@ -705,7 +707,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let elements = response.data.cust.templates[0].temElements;
+            let elements = response.data.cust.templates[0].temItems;
             let template = response.data.cust.templates[0];
             _this.temId = template.id
             _this.temName = template.name;
@@ -719,7 +721,7 @@
               data['height'] = item.height;
               data['x'] = item.x;
               data['y'] = item.y;
-              data['name']=item.id;                     //元素的唯一标识
+              data['name'] = item.id;                     //元素的唯一标识
               if (item.type == 'image') {
                 data['content'] = item.type;
                 data['conflictCheck'] = true
@@ -755,7 +757,7 @@
             });
           }
         })
-      }
+      },                                        //模板编辑
     }
   }
 </script>

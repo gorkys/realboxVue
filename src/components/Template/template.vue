@@ -139,7 +139,7 @@
     <Content>
       <div id="templateTree">
         <div class="title">模板管理</div>
-        <el-tree :data="templateTree" node-key="id" @node-click="handleNodeClick" default-expand-all></el-tree>
+        <el-tree :data="templateTree" node-key="id" @node-click="handleNodeClick" :expand-on-click-node="false" default-expand-all></el-tree>
       </div>
       <div id="templateList">
         <div class="title">模板列表</div>
@@ -228,7 +228,7 @@
           <el-input v-model="form.temName" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="分辨率" :label-width="LabelWidth">
-          <el-select v-model="rltValue" placeholder="800×600" style="width: 100%" @change="rltChange">
+          <el-select v-model="rltValue" style="width: 100%" @change="rltChange">
             <el-option v-for="item in resolution"
                        :key="item.value"
                        :label="item.label"
@@ -283,20 +283,17 @@
         LabelWidth: '70px',
         form: {
           temName: '',
-          resolution: '800×600',
+          resolution: '1280×720',
           temType: '系统模板',
           desc: '',              //备注
         },
-        rltValue: '',
+        rltValue: '1280×720',
         resolution: [{
           value: '1',
-          label: '800×600'
+          label: '1280×720'
         }, {
           value: '2',
           label: '1920×1080'
-        }, {
-          value: '3',
-          label: '1366×768'
         }],        //分辨率
       }
     },
@@ -328,7 +325,7 @@
             });
           }
         })
-      },                //查询模板树
+      },                        //查询模板树
       queryList() {
         let _this = this
         this.templates = []
@@ -356,20 +353,20 @@
             });
           }
         })
-      },              //获取模板列表
+      },                      //获取模板列表
       editTemplate(name) {
         this.$router.push({path: "templateMake", query: {name: name, groupId: this.treeId}})
-      },         //编辑模板
+      },               //编辑模板
       handleCurrentChange(val) {
         this.pageNo = val
         this.getRoleList()
-      },        //翻页回调
+      },         //翻页回调
       handleNodeClick(val) {
         this.treeId = val.id
         this.form.temType = this.treeName = val.label
-        debugger
+
         this.queryList()
-      },          //点击树回调
+      },             //点击树回调
       selected(e) {
         this.check = !this.check
         let dom = e.currentTarget.id;
@@ -392,7 +389,7 @@
           target.style.backgroundColor = "white";
           this.id = ''
         }
-      },                    //单击选择文件
+      },                      //单击选择文件
       delTemplate() {
         if (this.id == '') {
           this.$message({
@@ -431,7 +428,7 @@
             }
           })
         })
-      },                          //删除模板
+      },                    //删除模板
       NewTemplateMake() {
         if (this.form.temName == '') {
           this.$message({
@@ -446,7 +443,7 @@
         sessionStorage.setItem('temType', this.form.temType);
         sessionStorage.setItem('desc', this.form.desc);
         this.$router.push('/templateMake')
-      },        //新建模板
+      },                //新建模板
       rltChange(val) {
         this.form.resolution = this.resolution.map(item => {
           if (item.value == val) return item.label

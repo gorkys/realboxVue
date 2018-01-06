@@ -69,6 +69,39 @@ npm run mock
         └── login       登录
 ```
 ## 填坑之旅
+#### 12.js截取某个符号前后的字符串
+解决方法：
+```html
+
+<script type="text/javascript">  
+/*  
+  string 字符串;  
+  str 指定字符;  
+  split(),用于把一个字符串分割成字符串数组;  
+  split(str)[0],读取数组中索引为0的值（第一个值）,所有数组索引默认从0开始;  
+ */  
+function getStr(string,str){  
+    var str_before = string.split(str)[0];  
+    var str_after = string.split(str)[1];  
+    alert('前：'+str_before+' - 后：'+str_after);  
+}  
+</script>  
+<body>
+<input type="button" onClick="getStr('1920*720','*');" value="获取值" />
+</body> 
+```
+#### 11.htmlcollection 转数组
+解决方法：这里把符合以下条件的对象称为伪数组（ArrayLike）
+
+     1，具有length属性
+     2，按索引方式存储数据
+     3，不具有数组的push,pop等方法
+方法：
+```
+let ter = document.getElementsByClassName('playImgList')[0].children;
+let terAttr = Array.prototype.slice.call(ter,0);                //将伪数组转为数组
+let terAttr= [].slice.call(ter);                                //此处为简写
+```
 #### 10.html2canvas无法截取链接图片
 #### 9.切换弹窗时视频存在缓存问题
 #### 8.MP4在网页上播放需要特定编码

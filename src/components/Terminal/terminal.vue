@@ -100,8 +100,8 @@
       <div id="terminalTree">
         <div class="title">{{treeTitle}}</div>
         <div class="controlTree">
-          <div style="width: 100px">
-            <el-select v-model="value" placeholder="部门" @change="selectChange">
+          <div style="width: 120px">
+            <el-select v-model="elSelect" @change="selectChange">
               <el-option v-for="item in select"
                          :key="item.value"
                          :label="item.label"
@@ -110,8 +110,10 @@
           </div>
           <div><a><i class="el-icon-refresh"></i>刷新</a></div>
         </div>
-        <el-tree v-if="value == 1" :data="departmentTree" default-expand-all @node-click="treeClick"></el-tree>
-        <el-tree v-else :data="terminalTree" default-expand-all @node-click="treeClick"></el-tree>
+        <el-tree v-if="value" :data="departmentTree" default-expand-all :expand-on-click-node="false"
+                 @node-click="treeClick"></el-tree>
+        <el-tree v-else :data="terminalTree" default-expand-all :expand-on-click-node="false"
+                 @node-click="treeClick"></el-tree>
       </div>
       <div id="terminalList">
         <div class="title">终端列表</div>
@@ -130,8 +132,7 @@
             <el-button>搜索</el-button>
           </div>
           <div class="control">
-            <a><i class="el-icon-plus"></i>新建</a>
-            <a><i class="el-icon-delete"></i>删除</a>
+            <a @click="delTerminal"><i class="el-icon-delete"></i>删除</a>
             <el-dropdown>
           <span class="el-dropdown-link" style="cursor: pointer">
             <i class="el-icon-edit" style="margin-right: 5px"></i>批量操作<i class="el-icon-arrow-down el-icon--right"></i>
@@ -195,20 +196,21 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         row: '',              //行数据
+        elSelect: '企业部门',
         select: [
           {
             value: 1,
-            label: '部门'
+            label: '企业部门'
           },
           {
             value: 2,
-            label: '终端'
+            label: '终端分组'
           }
         ],
-        value: 1,        //当前选择树的值
+        value: true,        //当前选择树的值
         groupId: '',       //终端分组ID
         depfId: '',         //所属部门ID
-        treeTitle:'企业部门',        //树标题
+        treeTitle: '企业部门',        //树标题
       }
     },
     components: {
@@ -220,7 +222,7 @@
     methods: {
       getTree() {
         let _this = this, id = 0;
-        this.value == 1 ? id = 60 : id = 40;
+        this.value? id = 60 : id = 40;
         this.$http({
           method: 'get',
           url: 'tree/query?id=' + id,
@@ -259,8 +261,8 @@
             for (let terminal of terminals) {
               _this.terminals.push(terminal)
             }
-            _this.groupId='';
-            _this.depfId=''
+            _this.groupId = '';
+            _this.depfId = ''
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -314,17 +316,17 @@
         })
       },                      //删除终端
       selectChange(val) {
-        val == '2'
+        if (val != 1) {
+          this.treeTitle = '终端分组';
+          this.value = false
+        } else {
+          this.treeTitle = '企业部门';
+          this.value = true
+        }
         this.getTree()
       },                  //终端部门切换
       treeClick(val) {
-        if(this.value == 1){
-          this.depfId = val.id;
-          this.treeTitle = '企业部门'
-        }else {
-          this.groupId = val.id;
-          this.Treetitle = '终端分组'
-        }
+        this.value ? this.depfId = val.id : this.groupId = val.id;
         this.queryTerminalList()
       },                     //点击树
     }
