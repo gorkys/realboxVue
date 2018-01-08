@@ -33,10 +33,10 @@
     methods: {
       getLogin() {
         if (this.name == '' || this.pass == '') {
-          this.$message({message: '账号与密码不能为空！', center: true, type: 'warning'});
+          this.$message({message: '账号与密码不能为空！',showClose: true, center: true, type: 'warning'});
         }
         if (this.code == '') {
-          this.$message({message: '验证码不能为空！', center: true, type: 'warning'});
+          this.$message({message: '验证码不能为空！',showClose: true, center: true, type: 'warning'});
         }
         this.$http({
           method: 'post',
@@ -57,6 +57,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });

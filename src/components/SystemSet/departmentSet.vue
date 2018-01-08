@@ -154,6 +154,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -162,11 +163,11 @@
       },         //获取树资源
       addDeartment() {
         if (this.form.deartmentName == '') {
-          this.$message({message: '请填写部门名称！', center: true, type: 'warning'});
+          this.$message({message: '请填写部门名称！',showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.form.superiorDeartment == '') {
-          this.$message({message: '请填写上级部门！', center: true, type: 'warning'});
+          this.$message({message: '请填写上级部门！',showClose: true, center: true, type: 'warning'});
           return false
         }
         let _this = this
@@ -191,6 +192,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -200,7 +202,7 @@
       submitSD() {
         let superior = this.$refs.departmentTree.getCheckedNodes()
         if (superior.length > 1) {
-          this.$message({message: '只能选择一个上级！', center: true, type: 'warning'});
+          this.$message({message: '只能选择一个上级！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.form.superiorDeartment = superior[0].label
@@ -221,7 +223,7 @@
       Edit() {
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个部门！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个部门！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.openDialog = true
@@ -233,11 +235,11 @@
       },                       //编辑部门
       editDeartment() {
         if (this.form.deartmentName == '') {
-          this.$message({message: '请填写部门名称！', center: true, type: 'warning'});
+          this.$message({message: '请填写部门名称！',showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.form.superiorDeartment == '') {
-          this.$message({message: '请填写上级部门！', center: true, type: 'warning'});
+          this.$message({message: '请填写上级部门！',showClose: true, center: true, type: 'warning'});
           return false
         }
         let _this = this
@@ -265,6 +267,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -272,12 +275,12 @@
         })
       },              //编辑部门方法
       delDeartment(){
-        let tree = this.$refs.tree.getCheckedNodes()
+        let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '只能选择一个部门！', center: true, type: 'warning'});
+          this.$message({message: '只能选择一个部门！',showClose: true, center: true, type: 'warning'});
           return false
         }
-        let id = tree[0].id
+        let id = tree[0].id;
         this.$confirm('此操作将永久删除该部门及下属的资源等, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -295,6 +298,7 @@
             if (response.data.code == '0000') {
               this.$message({
                 message: '删除成功！',
+                showClose: true,
                 center: true,
                 type: 'success'
               })
@@ -302,6 +306,7 @@
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });

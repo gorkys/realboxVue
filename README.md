@@ -103,6 +103,29 @@ let terAttr = Array.prototype.slice.call(ter,0);                //将伪数组�
 let terAttr= [].slice.call(ter);                                //此处为简写
 ```
 #### 10.html2canvas无法截取链接图片
+解决方法：属于跨域问题，本项目后台使用Nginx作为服务器,需要在nginx.conf中修改配置如下：
+```html
+add_header 'Access-Control-Allow-Origin' '*';
+add_header 'Access-Control-Allow-Credentials' 'true';
+add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,
+            X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+
+```
+参考文章：
+
+[Nginx 跨域设置 Access-Control-Allow-Origin 无效的解决办法](http://blog.csdn.net/frank_passion/article/details/53898769)
+          <br>[html2canvas跨域问题的简单解决方法](http://www.shuijingwanwq.com/2017/05/24/1634/)
+          
+注意：
+```
+      1.useCORS:true 这个参数很重要，没有配置的话，依旧是不能解决问题的,
+        allowTaint和useCORS这两个参数不能共存;
+      2.根据现有的解决方案大致有两种： 
+        (1).在跨域的服务器上设置header设置为允许跨域请求。 
+        (2).借助代理脚本获得外域图片的 base64 编码后的字符串 
+      3.后台设置完后前端需要清理一下缓存。
+```
 #### 9.切换弹窗时视频存在缓存问题
 #### 8.MP4在网页上播放需要特定编码
 解决方法：由后台去转码

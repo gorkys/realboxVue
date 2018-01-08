@@ -634,7 +634,7 @@
       groupSelect() {
         let tree = this.$refs.groupTree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.groupId = tree[0].id
@@ -676,11 +676,12 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '删除成功！', center: true, type: 'success'})
+              this.$message({message: '删除成功！',showClose: true, center: true, type: 'success'});
               this.queryUserList()
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -696,7 +697,7 @@
       selectSuperGroup() {
         let tree = this.$refs.groupSuper.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组作为上级！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组作为上级！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.superId = tree[0].id
@@ -708,7 +709,7 @@
         this.treeTitle = "编辑分组"
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.creator = tree[0].creator
@@ -718,11 +719,11 @@
       },
       groupSubmit() {
         if (this.treeForm.groupName == '') {
-          this.$message({message: '请填写分组名称！', center: true, type: 'warning'});
+          this.$message({message: '请填写分组名称！',showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.treeForm.superiorGroup == '') {
-          this.$message({message: '请填写上级分组！', center: true, type: 'warning'});
+          this.$message({message: '请填写上级分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.treeTitle == '新建分组') {
@@ -744,11 +745,12 @@
           }).then(response => {
             if (response.data.code == '0000') {
               _this.getTree()
-              this.$message({message: '新建分组成功！', center: true, type: 'success'});
+              this.$message({message: '新建分组成功！',showClose: true, center: true, type: 'success'});
               this.openTreeDialog = false
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -775,14 +777,15 @@
             data: data
           }).then(response => {
             if (response.data.code == '0000') {
-              _this.getTree()
-              _this.$message({message: '编辑分组成功！', center: true, type: 'success'});
-              _this.openDialog = false
-              _this.treeForm.superiorGroup = ''
+              _this.getTree();
+              _this.$message({message: '编辑分组成功！',showClose: true, center: true, type: 'success'});
+              _this.openDialog = false;
+              _this.treeForm.superiorGroup = '';
               _this.treeForm.groupName = ''
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -793,7 +796,7 @@
       delTree() {
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '只能选择一个分组！', center: true, type: 'warning'});
+          this.$message({message: '只能选择一个分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id
@@ -814,13 +817,15 @@
             if (response.data.code == '0000') {
               this.$message({
                 message: '删除成功！',
+                showClose: true,
                 center: true,
                 type: 'success'
-              })
+              });
               this.getTree()
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });

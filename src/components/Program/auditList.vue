@@ -196,6 +196,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -219,6 +220,7 @@
           if (response.data.code == '0000') {
             this.$message({
               message: '审核通过，节目已发布成功！',
+              showClose: true,
               center: true,
               type: 'success'
             });
@@ -226,6 +228,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });

@@ -224,6 +224,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -247,6 +248,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -284,6 +286,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -294,6 +297,7 @@
         if (this.roleName == '') {
           this.$message({
             message: '请填写角色名称！',
+            showClose: true,
             center: true,
             type: 'warning'
           });
@@ -319,6 +323,7 @@
           if (response.data.code == '0000') {
             this.$message({
               message: '新建角色成功！',
+              showClose: true,
               center: true,
               type: 'success'
             });
@@ -327,6 +332,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -356,6 +362,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -366,6 +373,7 @@
         if (this.roleName == '') {
           this.$message({
             message: '请填写角色名称！',
+            showClose: true,
             center: true,
             type: 'warning'
           });
@@ -392,6 +400,7 @@
           if (response.data.code == '0000') {
             this.$message({
               message: '更新角色成功！',
+              showClose: true,
               center: true,
               type: 'success'
             });
@@ -400,6 +409,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -425,6 +435,7 @@
             if (response.data.code == '0000') {
               this.$message({
                 message: '删除成功！',
+                showClose: true,
                 center: true,
                 type: 'success'
               })
@@ -432,6 +443,7 @@
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -446,6 +458,7 @@
         if (this.row.length > 1 || this.row.length == 0) {
           this.$message({
             message: '只允许对一个角色进行编辑！',
+            showClose: true,
             center: true,
             type: 'warning'
           });

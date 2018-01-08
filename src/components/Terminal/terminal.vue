@@ -237,6 +237,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -266,6 +267,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -284,6 +286,7 @@
         if (ids == '') {
           this.$message({
             message: '未选择资源！',
+            showClose: true,
             center: true,
             type: 'warning'
           });
@@ -303,11 +306,12 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '删除成功！', center: true, type: 'success'});
+              this.$message({message: '删除成功！',showClose: true, center: true, type: 'success'});
               this.queryTerminalList()
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });

@@ -82,12 +82,12 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">发布单号</template>
             </el-input>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">节目名称</template>
             </el-input>
           </div>
@@ -95,7 +95,6 @@
             <el-date-picker
               v-model="date"
               type="datetimerange"
-              :picker-options="pickerOptions2"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
@@ -103,7 +102,7 @@
             </el-date-picker>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">节目状态</template>
             </el-input>
           </div>
@@ -193,6 +192,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -212,6 +212,7 @@
         if (ids == '') {
           _this.$message({
             message: '未选择资源！',
+            showClose: true,
             center: true,
             type: 'warning'
           });
@@ -231,11 +232,12 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              _this.$message({message: '删除成功！', center: true, type: 'success'});
+              _this.$message({message: '删除成功！',showClose: true, center: true, type: 'success'});
               _this.queryPublishList()
             } else {
               _this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });

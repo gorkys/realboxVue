@@ -311,7 +311,6 @@
             for (let item of this.res) {
               for (let i = 0; i < edit.length; i++) {
                 if (item.name == edit[i].getAttribute('name')) {
-
                   edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
                 }
               }
@@ -426,6 +425,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -458,6 +458,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -496,12 +497,13 @@
               _this.proId = program.id;
               _this.groupId = program.groupId;
               program.proItems.forEach(item => {
-                _this.res.push({name: item.id, url: item.url, thumbnail: item.thumbnail})
+                _this.res.push({name: item.itemsId, url: item.url, thumbnail: item.thumbnail})
               })
             }
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -527,19 +529,19 @@
         html2canvas(table, {
           // canvas: canvas,
           /*allowTaint:true,*/
-          /*useCORS: true,*/
+          useCORS: true,
           onrendered(image) {
             let uri = image.toDataURL();
             _this.preview = uri;
 
-            let queryUrl = '', method = ''
+            let queryUrl = '', method = '';
             //获取区域块的属性值
             table.children().map(function () {
-              let id = $(this).attr('name');                                //元素ID
+              let itemsId = $(this).attr('name');                                //元素ID
               let thumbnail = $(this).children().children().attr('src');    //资源缩略图
               let url = $(this).children().children().attr('name');         //资源地址
               let resId = $(this).children().children().attr('id');         //资源ID
-              _this.proItems.push({id, resId, thumbnail, url});
+              _this.proItems.push({itemsId, resId, thumbnail, url});
             });
             let data = {};
             if (_this.$route.query.type == 0 || _this.$route.query.type == undefined) {
@@ -575,13 +577,14 @@
               data: data
             }).then(response => {
               if (response.data.code == '0000') {
-                _this.$message({message: '保存成功！', center: true, type: 'success'});
+                _this.$message({message: '保存成功！',showClose: true, center: true, type: 'success'});
                 if (type == 'release') {
                   _this.$router.push({path: '/release', query: {name: _this.proName}})
                 }
               } else {
                 _this.$message({
                   message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                  showClose: true,
                   center: true,
                   type: 'error'
                 });

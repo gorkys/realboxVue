@@ -139,7 +139,8 @@
     <Content>
       <div id="templateTree">
         <div class="title">模板管理</div>
-        <el-tree :data="templateTree" node-key="id" @node-click="handleNodeClick" :expand-on-click-node="false" default-expand-all></el-tree>
+        <el-tree :data="templateTree" node-key="id" @node-click="handleNodeClick" :expand-on-click-node="false"
+                 default-expand-all></el-tree>
       </div>
       <div id="templateList">
         <div class="title">模板列表</div>
@@ -176,9 +177,9 @@
             <el-button>搜索</el-button>
           </div>
           <div class="control">
-            <a @click="openDialog=true"><i class="el-icon-plus"></i>新建</a>
-            <a><i class="el-icon-edit"></i>修改</a>
-            <a @click="delTemplate"><i class="el-icon-delete"></i>删除</a>
+            <a v-if="form.resolution=='系统模板'" @click="openDialog=true"><i class="el-icon-plus"></i>新建</a>
+            <a v-if="form.resolution=='系统模板'" @click="editTemplate(temName)"><i class="el-icon-edit"></i>修改</a>
+            <a v-if="form.resolution=='系统模板'" @click="delTemplate"><i class="el-icon-delete"></i>删除</a>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
@@ -258,7 +259,7 @@
 
   export default {
     mounted: function () {
-      this.getTree()
+      this.getTree();
       this.queryList()
     },
     data() {
@@ -284,7 +285,7 @@
         form: {
           temName: '',
           resolution: '1280×720',
-          temType: '系统模板',
+          temType: '用户模板',
           desc: '',              //备注
         },
         rltValue: '1280×720',
@@ -295,6 +296,7 @@
           value: '2',
           label: '1920×1080'
         }],        //分辨率
+        temName: ''            //模板名
       }
     },
     components: {
@@ -305,7 +307,7 @@
     },
     methods: {
       getTree() {
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: 'tree/query?id=20',
@@ -320,6 +322,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -348,6 +351,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -355,22 +359,32 @@
         })
       },                      //获取模板列表
       editTemplate(name) {
+        this.temName = '';
+        if (name == '') {
+          this.$message({
+            message: '请选择模板进行修改！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
         this.$router.push({path: "templateMake", query: {name: name, groupId: this.treeId}})
       },               //编辑模板
       handleCurrentChange(val) {
-        this.pageNo = val
+        this.pageNo = val;
         this.getRoleList()
       },         //翻页回调
       handleNodeClick(val) {
-        this.treeId = val.id
-        this.form.temType = this.treeName = val.label
+        this.treeId = val.id;
+        this.form.temType = this.treeName = val.label;
 
         this.queryList()
       },             //点击树回调
       selected(e) {
-        this.check = !this.check
+        this.check = !this.check;
         let dom = e.currentTarget.id;
-        let target = e.currentTarget
+        let target = e.currentTarget;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
           dom = e.target.offsetParent.id
           target = e.target.offsetParent
@@ -382,21 +396,23 @@
         if (this.check) {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
-          this.id = dom
-
+          this.id = dom;
+          this.temName = target.children[2].innerText
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
-          this.id = ''
+          this.id = '';
+          this.temName = ''
         }
       },                      //单击选择文件
       delTemplate() {
         if (this.id == '') {
           this.$message({
             message: '未选择模板！',
+            showClose: true,
             center: true,
             type: 'warning'
-          })
+          });
           return false
         }
         this.$confirm('此操作将删除该模板, 是否继续?', '提示', {
@@ -416,12 +432,14 @@
               this.queryList()
               this.$message({
                 message: '删除成功！',
+                showClose: true,
                 center: true,
                 type: 'success'
               })
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -433,6 +451,7 @@
         if (this.form.temName == '') {
           this.$message({
             message: '请输入模板名称！',
+            showClose: true,
             center: true,
             type: 'warning'
           });

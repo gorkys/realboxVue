@@ -246,6 +246,7 @@
           if (response.data.code == '0000') {
             this.$message({
               message: '生成成功！',
+              showClose: true,
               center: true,
               type: 'success'
             });
@@ -253,6 +254,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -281,6 +283,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -306,6 +309,7 @@
             if (response.data.code == '0000') {
               this.$message({
                 message: '删除成功！',
+                showClose: true,
                 center: true,
                 type: 'success'
               })
@@ -313,6 +317,7 @@
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -350,7 +355,7 @@
       selectDep() {
         let tree = this.$refs.departmentTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个部门！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个部门！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.depfId = tree[0].id;
@@ -360,7 +365,7 @@
       selectGroup() {
         let tree = this.$refs.terminalTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
         this.groupId = tree[0].id;
@@ -384,6 +389,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });

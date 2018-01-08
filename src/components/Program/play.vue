@@ -278,7 +278,7 @@
           </div>
           <div class="control">
             <a @click="newPlay"><i class="el-icon-plus"></i>新建</a>
-            <a @click="editPlay"><i class="el-icon-edit"></i>修改</a>
+            <a @click="editPlay(playName)"><i class="el-icon-edit"></i>修改</a>
             <a @click="delPlay"><i class="el-icon-delete"></i>删除</a>
           </div>
         </div>
@@ -376,7 +376,7 @@
           <div v-else class="templateBox">
             <ul class="templateList">
               <li v-for="(template,id) in templates" :key="id" :id="template.id"
-                  @click="selectedTem($event)">
+                  @click="selectedTem($event)" @dblclick="editPlay(template.name)">
                 <label class="el-upload-list__item-status-label">
                   <i class="el-icon-upload-success el-icon-check"></i>
                 </label>
@@ -475,6 +475,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -502,6 +503,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -532,12 +534,12 @@
         if (this.check) {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
-          this.playName = playName
+          this.playName = playName;
           this.id = id
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
-          this.playName = ''
+          this.playName = '';
           this.id = ''
         }
       },                    //单击选择文件
@@ -565,6 +567,7 @@
               this.queryPlayList()
               this.$message({
                 message: '删除成功！',
+                showClose: true,
                 center: true,
                 type: 'success'
               })
@@ -572,6 +575,7 @@
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
                 center: true,
                 type: 'error'
               });
@@ -579,7 +583,15 @@
           })
         })
       },
-      editPlay() {
+      editPlay(name) {
+        if(name==''){
+          this.$message({
+            message: '请选择模板进行修改！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+        }
         this.$router.push({path: '/programMack', query: {name: this.playName, groupId: this.treeId, type: 1}})
       },
       /*模板事件*/
@@ -604,6 +616,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -634,6 +647,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });

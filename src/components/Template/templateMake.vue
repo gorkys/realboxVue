@@ -532,7 +532,7 @@
         table.children().map(function () {
           let height = $(this).height() / vm.PP;
           let width = $(this).width() / vm.PP;
-          
+
           let id = $(this).attr('name');                    //元素的唯一标识
           let x = $(this).position().left / vm.PP;
           let y = $(this).position().top / vm.PP;
@@ -559,7 +559,7 @@
             vm.preview = url;
 
             if (table.html() == "") {
-              vm.$message({message: '请加入区域块！', center: true, type: 'warning'});
+              vm.$message({message: '请加入区域块！',showClose: true, center: true, type: 'warning'});
             } else {
               //区分新建与编辑
               if (query.name == undefined && query.groupId == undefined) {
@@ -608,13 +608,14 @@
               data: data
             }).then(response => {
               if (response.data.code == '0000') {
-                vm.$message({message: '保存成功！', center: true, type: 'success'});
+                vm.$message({message: '保存成功！',showClose: true, center: true, type: 'success'});
                 if (value == 'use') {
                   vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
                 }
               } else {
                 vm.$message({
                   message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                  showClose: true,
                   center: true,
                   type: 'error'
                 });
@@ -647,6 +648,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
@@ -752,6 +754,7 @@
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
               center: true,
               type: 'error'
             });
