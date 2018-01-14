@@ -139,11 +139,11 @@
     <Content>
       <div id="templateTree">
         <div class="title">模板管理</div>
-        <el-tree :data="templateTree" node-key="id" @node-click="handleNodeClick" :expand-on-click-node="false"
+        <el-tree :data="templateTree" node-key="id" :highlight-current="true" @node-click="handleNodeClick" :expand-on-click-node="false"
                  default-expand-all></el-tree>
       </div>
       <div id="templateList">
-        <div class="title">模板列表</div>
+        <div class="title">{{treeName}}</div>
         <div class="controlBox">
           <div class="search">
             <div style="width: 110px">
@@ -155,31 +155,21 @@
               </el-select>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="searchName">
                 <template slot="prepend">模板名称</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">所属机构</template>
-              </el-input>
-            </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="searchResolution">
                 <template slot="prepend">分辨率</template>
               </el-input>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">终端类型</template>
-              </el-input>
-            </div>
-            <el-button>搜索</el-button>
+            <el-button @click="queryList">搜索</el-button>
           </div>
           <div class="control">
-            <a v-if="form.resolution=='系统模板'" @click="openDialog=true"><i class="el-icon-plus"></i>新建</a>
-            <a v-if="form.resolution=='系统模板'" @click="editTemplate(temName)"><i class="el-icon-edit"></i>修改</a>
-            <a v-if="form.resolution=='系统模板'" @click="delTemplate"><i class="el-icon-delete"></i>删除</a>
+            <a v-if="treeName=='用户模板'" @click="openDialog=true"><i class="el-icon-plus"></i>新建</a>
+            <a v-if="treeName=='用户模板'" @click="editTemplate(temName)"><i class="el-icon-edit"></i>修改</a>
+            <a v-if="treeName=='用户模板'" @click="delTemplate"><i class="el-icon-delete"></i>删除</a>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
@@ -295,8 +285,18 @@
         }, {
           value: '2',
           label: '1920×1080'
-        }],        //分辨率
-        temName: ''            //模板名
+        }, {
+          value: '3',
+          label: '1080×1920'
+        }, {
+          value: '4',
+          label: '720×1280'
+        }],                     //分辨率
+        temName: '',            //模板名
+        treeName:'用户模板',
+        ids:[],                  //存储选中节目ID
+        searchName:'',              //搜索名称
+        searchResolution:'',              //搜索分辨率
       }
     },
     components: {
@@ -330,11 +330,11 @@
         })
       },                        //查询模板树
       queryList() {
-        let _this = this
-        this.templates = []
+        let _this = this;
+        this.templates = [];
         this.$http({
           method: 'get',
-          url: 'template/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount,
+          url: 'template/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount + '&name='+this.searchName + '&resolution=' +this.searchResolution,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -342,8 +342,8 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let templates = response.data.cust.templates
-            _this.total = response.data.cust.pages.count
+            let templates = response.data.cust.templates;
+            _this.total = response.data.cust.pages.count;
             for (let template of templates) {
               _this.templates.push(template)
             }
@@ -378,7 +378,6 @@
       handleNodeClick(val) {
         this.treeId = val.id;
         this.form.temType = this.treeName = val.label;
-
         this.queryList()
       },             //点击树回调
       selected(e) {
@@ -396,17 +395,20 @@
         if (this.check) {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
-          this.id = dom;
+          this.ids.push(dom);
           this.temName = target.children[2].innerText
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
-          this.id = '';
+          for (let i = 0; i < this.ids.length; i++) {
+            if (this.ids[i] == dom) this.ids.splice(i, 1)
+          }    //取消则从ids删除该元素
           this.temName = ''
         }
       },                      //单击选择文件
       delTemplate() {
-        if (this.id == '') {
+        let ids = this.ids.join(' ');
+        if (ids == '') {
           this.$message({
             message: '未选择模板！',
             showClose: true,
@@ -421,7 +423,7 @@
         }).then(() => {
           this.$http({
             method: 'delete',
-            url: 'template/delete?ids=' + this.id,
+            url: 'template/delete?ids=' + ids,
             withCredentials: true,
             headers: {
               token: sessionStorage.getItem('token'),
@@ -429,7 +431,7 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.queryList()
+              this.queryList();
               this.$message({
                 message: '删除成功！',
                 showClose: true,
@@ -467,7 +469,7 @@
         this.form.resolution = this.resolution.map(item => {
           if (item.value == val) return item.label
         }).join('');
-      }
+      }                    //分辨率选择
     }
   }
 </script>

@@ -242,9 +242,10 @@
           </div>
         </div>
         <div class="control">
-          <a @click="view = true"><i class="el-icon-view"></i> 快速预览</a>
+          <!--<a @click="view = true"><i class="el-icon-view"></i> 快速预览</a>-->
           <a @click="save"><i class="iconfont icon-iconset0237"></i> 保存</a>
-          <a><i class="iconfont icon-lingcunwei"></i> 另存为</a>
+          <a @click="exit"><i class="iconfont icon-lingcunwei"></i> 返回</a>
+
           <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
         </div>
       </div>
@@ -258,10 +259,10 @@
     <el-dialog
       title="快速预览"
       :visible.sync="view"
-      width="30%"
+
     >
       <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
-
+        <div v-html="template" class="template"></div>
       </div>
     </el-dialog><!--预览-->
   </div>
@@ -330,10 +331,10 @@
         template: '',
         resources: [],
         treeId: 1,
-        pageCount: 20,     //每页显示数目
-        pageNo: 1,          //当前页
-        total: 0,            //总数目
-        resourceTitles: '',   //资源标题
+        pageCount: 20,          //每页显示数目
+        pageNo: 1,              //当前页
+        total: 0,               //总数目
+        resourceTitles: '',     //资源标题
         /*移动参数*/
         isDown: false,
         x: 0,
@@ -345,9 +346,9 @@
         nl: 0,
         nt: 0,
         /*节目*/
-        proName: 'PLAYLIST' + new Date().getTime(),            //节目名称
-        preview: '',                                  //预览图
-        proItems: [],                              //节目元素
+        proName: 'PLAYLIST' + new Date().getTime(),     //节目名称
+        preview: '',                                    //预览图
+        proItems: [],                                   //节目元素
         view: false,                                    //快速预览
         temId: '',
         /*还原资源*/
@@ -362,7 +363,7 @@
         // 阻止默认事件的触发
         e.preventDefault()
         return false
-      },              //禁止浏览器默认拖动事件
+      },                              //禁止浏览器默认拖动事件
       mouse(e) {
         let src = e.currentTarget.children[0].children[0].currentSrc;               //取当前拖动素材的缩略图
         let url = 'http://' + e.currentTarget.getAttribute('name');                 //取当前拖动素材的文件地址
@@ -376,7 +377,7 @@
         this.l = this.x + 20;
         this.t = this.y + 20;
         $('.move').css({'display': 'block', 'left': this.l + 'px', 'top': this.t + 'px'})
-      },                  //选择拖动文件
+      },                                   //选择拖动文件
       handleMove(e) {
         //样式更改
         let icon = $(".move>i");
@@ -399,10 +400,10 @@
           $('.move').css('left', this.nl + 'px');
           $('.move').css('top', this.nt + 'px');
         }
-      },             //window中移动事件
+      },                              //window中移动事件
       handleUp() {
         $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
-      },                //window中松开事件
+      },                                 //window中松开事件
 
       resourceQuery() {
         let _this = this;
@@ -431,11 +432,11 @@
             });
           }
         })
-      },                //查询资源列表
+      },                            //查询资源列表
       handleCurrentChange(val) {
         this.pageNo = val
         this.resourceQuery()
-      },            //当前页翻页
+      },                   //当前页翻页
 
       getTree() {
         let _this = this
@@ -464,7 +465,7 @@
             });
           }
         })
-      },            //获取树资源
+      },                                  //获取树资源
       handleClick(tab, event) {
         this.treeId = tab.label
         this.resourceQuery()
@@ -509,7 +510,7 @@
             });
           }
         })
-      },              //获取模板列表
+      },                                //获取模板列表
       save(type) {
 
         let _this = this;
@@ -601,10 +602,13 @@
           }
         });
 
-      },
+      },                                 //保存
       release() {
         this.save('release');
-      }
+      },                                   //发布
+      exit() {
+        this.$router.go(-1);
+      },                                     //返回
     }
   }
 </script>

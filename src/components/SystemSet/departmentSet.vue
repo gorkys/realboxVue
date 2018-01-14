@@ -52,7 +52,7 @@
     <nav-bar></nav-bar>
     <Breadcrumb></Breadcrumb>
     <div class="content">
-      <div class="title">部门设置</div>
+      <div class="title">终端设置</div>
       <div class="controlBox">
         <a @click="New"><i class="el-icon-plus"></i>新建</a>
         <a @click="Edit"><i class="el-icon-edit"></i>编辑</a>
@@ -72,7 +72,7 @@
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="27.5%">
       <el-dialog
         width="30%"
-        title="选择上级部门"
+        title="选择上级分组"
         :visible.sync="innerVisible"
         append-to-body>
         <el-tree
@@ -83,16 +83,16 @@
           <el-button @click="innerVisible = false">取 消</el-button>
           <el-button type="primary" @click="submitSD">确 定</el-button>
         </div>
-      </el-dialog>            <!--上级部门选择-->
+      </el-dialog>            <!--上级分组选择-->
       <el-form :model="form">
-        <el-form-item label="部门名称" :label-width="LabelWidth">
+        <el-form-item label="分组名称" :label-width="LabelWidth">
           <el-input v-model="form.deartmentName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="上级部门" :label-width="LabelWidth">
+        <el-form-item label="上级分组" :label-width="LabelWidth">
           <input v-model="form.superiorDeartment" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="innerVisible = true" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="部门描述" :label-width="LabelWidth">
+        <el-form-item label="分组描述" :label-width="LabelWidth">
           <el-input type="textarea" v-model="form.deartmentDescribe" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -116,20 +116,20 @@
       return {
         label: 'aa',                        //新增树的子名称
         openDialog: false,                  //打开对话框
-        innerVisible: false,                //选择上级部门的对话框
+        innerVisible: false,                //选择上级分组的对话框
         title: '',                          //弹出框标题
         form: {
-          deartmentName: '',                 // 部门名称
-          superiorDeartment: '',             //上级部门
-          deartmentDescribe: ''              //部门备注
+          deartmentName: '',                 // 分组名称
+          superiorDeartment: '',             //上级分组
+          deartmentDescribe: ''              //分组备注
         },
         LabelWidth: '70px',
         departmentTree: [],
-        superiorId: '',                     //上级部门ID
+        superiorId: '',                     //上级分组ID
         treeId: 60,                         //树ID
-        creator:'',                         //创建人
-        departmentId:'',                    //部门ID  编辑用
-        targetId:''                  //编辑时需要移动到的目标树ID
+        creator: '',                         //创建人
+        departmentId: '',                    //分组ID  编辑用
+        targetId: ''                  //编辑时需要移动到的目标树ID
       }
     },
     components: {
@@ -163,19 +163,19 @@
       },         //获取树资源
       addDeartment() {
         if (this.form.deartmentName == '') {
-          this.$message({message: '请填写部门名称！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.form.superiorDeartment == '') {
-          this.$message({message: '请填写上级部门！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        let _this = this
+        let _this = this;
         let data = {
           parentId: this.targetId,
           label: this.form.deartmentName,
           creator: sessionStorage.getItem('name')
-        }
+        };
         this.$http({
           method: 'post',
           url: 'tree/create',
@@ -187,7 +187,7 @@
           data: data
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.getTree()
+            _this.getTree();
             this.openDialog = false
           } else {
             this.$message({
@@ -200,57 +200,61 @@
         })
       },
       submitSD() {
-        let superior = this.$refs.departmentTree.getCheckedNodes()
+        let superior = this.$refs.departmentTree.getCheckedNodes();
         if (superior.length > 1) {
-          this.$message({message: '只能选择一个上级！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '只能选择一个上级！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        this.form.superiorDeartment = superior[0].label
-        this.targetId = superior[0].id
+        this.form.superiorDeartment = superior[0].label;
+        this.targetId = superior[0].id;
         this.innerVisible = false
-      },                   //选择上级部门
+      },                   //选择上级分组
       submit() {
-        if (this.title == '新建部门') {
+        if (this.title == '新建分组') {
           this.addDeartment()
         } else {
           this.editDeartment()
         }
       },                     //判断是新建还是编辑
       New() {
-        this.openDialog = true
-        this.title = '新建部门'
-      },                        //新建部门
+        this.title = '新建分组';
+        this.form.deartmentName = '';
+        this.form.superiorDeartment = '';
+        this.openDialog = true;
+      },                        //新建分组
       Edit() {
-        let tree = this.$refs.tree.getCheckedNodes()
+        let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个部门！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        this.openDialog = true
-        this.title = '编辑部门'
-        this.form.deartmentName = tree[0].label
-        this.superiorId = tree[0].parentId
-        this.creator = tree[0].creator
-        this.departmentId = tree[0].id
-      },                       //编辑部门
+        this.openDialog = true;
+        this.title = '编辑分组';
+        this.form.deartmentName = tree[0].label;
+        this.superiorId = tree[0].parentId;
+        this.creator = tree[0].creator;
+        this.departmentId = tree[0].id;
+        this.form.superiorDeartment = tree[0].parentName;
+        debugger
+      },                       //编辑分组
       editDeartment() {
         if (this.form.deartmentName == '') {
-          this.$message({message: '请填写部门名称！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.form.superiorDeartment == '') {
-          this.$message({message: '请填写上级部门！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        let _this = this
+        let _this = this;
         let data = {
-          id:this.departmentId,
+          id: this.departmentId,
           parentId: this.superiorId,
           label: this.form.deartmentName,
-          creator:this.creator,
+          creator: this.creator,
           updaterCreator: sessionStorage.getItem('name'),
-          treeId:this.targetId
-        }
+          /*treeId:this.targetId*/
+        };
         this.$http({
           method: 'put',
           url: 'tree/update',
@@ -262,7 +266,7 @@
           data: data
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.getTree()
+            _this.getTree();
             this.openDialog = false
           } else {
             this.$message({
@@ -273,15 +277,15 @@
             });
           }
         })
-      },              //编辑部门方法
-      delDeartment(){
+      },              //编辑分组方法
+      delDeartment() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '只能选择一个部门！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '只能选择一个分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id;
-        this.$confirm('此操作将永久删除该部门及下属的资源等, 是否继续?', '提示', {
+        this.$confirm('此操作将永久删除该分组及下属的资源等, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -301,7 +305,7 @@
                 showClose: true,
                 center: true,
                 type: 'success'
-              })
+              });
               this.getTree()
             } else {
               this.$message({
@@ -313,7 +317,7 @@
             }
           })
         })
-      }                 //删除部门方法
+      }                 //删除分组方法
     }
   }
 </script>

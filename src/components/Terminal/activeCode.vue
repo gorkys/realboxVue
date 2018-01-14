@@ -80,7 +80,7 @@
       <div class="title">激活码管理</div>
       <div class="controlBox">
         <div class="search">
-          <div style="width:200px;">
+          <!--<div style="width:200px;">
             <el-input placeholder="请输入内容">
               <template slot="prepend">激活码</template>
             </el-input>
@@ -92,22 +92,7 @@
           </div>
           <div style="width:200px;">
             <el-input placeholder="请输入内容">
-              <template slot="prepend">所属部门</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容">
               <template slot="prepend">激活状态</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容">
-              <template slot="prepend">生成时间</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容">
-              <template slot="prepend">创建者</template>
             </el-input>
           </div>
           <div style="width:200px;">
@@ -115,12 +100,14 @@
               <template slot="prepend">可用状态</template>
             </el-input>
           </div>
-          <el-button>搜索</el-button>
+          <el-button>搜索</el-button>-->
         </div>
         <div class="control">
-          <a @click="gert"><i class="el-icon-plus"></i>生成</a>
-          <a @click="batch"><i class="el-icon-edit"></i>批量生成</a>
-          <a @click="delCode"><i class="el-icon-delete"></i>删除</a>
+          <a @click="gert"><i class="el-icon-plus"></i> 生成</a>
+          <a @click="batch"><i class="el-icon-edit"></i> 批量生成</a>
+          <a @click="exportCode"><i class="iconfont icon-lingcunwei"></i> 导出</a>
+          <a @click="unbundled"><i class="el-icon-sort"></i> 解绑</a>
+          <a @click="delCode"><i class="el-icon-delete"></i> 删除</a>
         </div>
       </div>
       <div class="playList">
@@ -264,7 +251,7 @@
       },
       activeQuery() {
         let _this = this;
-        this.activates = [];
+        _this.activates = [];
         this.$http({
           method: 'get',
           url: 'activate/query?pageNo=' + _this.pageNo + '&pageCount=' + _this.pageCount,
@@ -396,6 +383,18 @@
           }
         })
       },                                  //获取树资源
+      exportCode(){
+        this.$confirm('功能正在开发中...', '提示', {
+          confirmButtonText: '确定',
+          type: 'warning'
+        })
+      },                                //导出激活码
+      unbundled(){
+        this.$confirm('功能正在开发中...', '提示', {
+          confirmButtonText: '确定',
+          type: 'warning'
+        })
+      }                                     //解绑激活码
     }
   }
 </script>

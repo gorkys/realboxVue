@@ -82,31 +82,21 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容">
-              <template slot="prepend">发布单号</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容">
+            <el-input placeholder="请输入内容" v-model="searchName">
               <template slot="prepend">节目名称</template>
             </el-input>
           </div>
-          <div style="width:400px;">
-            <el-date-picker
-              v-model="date"
-              type="datetimerange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              align="right">
-            </el-date-picker>
+          <div style="width:200px;">
+            <el-input placeholder="请输入内容" v-model="searchStatus">
+              <template slot="prepend">发布状态</template>
+            </el-input>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容">
+            <el-input placeholder="请输入内容" v-model="searchProStatus">
               <template slot="prepend">节目状态</template>
             </el-input>
           </div>
-          <el-button>搜索</el-button>
+          <el-button @click="queryPublishList">搜索</el-button>
         </div>
         <div class="control">
           <a @click="New"><i class="el-icon-plus"></i>新建</a>
@@ -122,13 +112,13 @@
           <el-table-column prop="proType" align="center" label="节目类型"></el-table-column>
           <el-table-column prop="id" align="center" label="发布单号"></el-table-column>
           <el-table-column prop="proName" align="center" label="节目名称"></el-table-column>
-          <el-table-column prop="publishType" align="center" label="发布类型"></el-table-column>
-          <el-table-column prop="playType" align="center" label="播放类型"></el-table-column>
+          <el-table-column prop="disType" align="center" label="发布类型"></el-table-column>
+          <el-table-column prop="playMode" align="center" label="播放类型"></el-table-column>
           <el-table-column prop="publisher" align="center" label="发布人"></el-table-column>
-          <el-table-column prop="startTime" align="center" label="发布时间"></el-table-column>
+          <el-table-column prop="date" align="center" label="发布时间"></el-table-column>
           <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
           <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
-          <el-table-column prop="address" align="center" label="操作"></el-table-column>
+          <el-table-column prop="proStatus" align="center" label="节目状态"></el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -156,10 +146,13 @@
       return {
         date: '',
         publish: [],       //发布列表数据
-        pageCount: 11,     //每页显示数目
+        pageCount: 8,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
         row: '',              //行数据
+        searchName:'',
+        searchStatus:'',
+        searchProStatus:'',
       }
     },
     components: {
@@ -176,7 +169,7 @@
         this.publish = [];
         this.$http({
           method: 'get',
-          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo+ '&proName='+this.searchName + '&status=' +this.searchStatus+ '&proStatus=' +this.searchProStatus,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -218,7 +211,7 @@
           });
           return false
         }
-        _this.$confirm('此操作将删除该终端, 是否继续?', '提示', {
+        _this.$confirm('此操作将删除该节目单, 是否继续?', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
         }).then(() => {

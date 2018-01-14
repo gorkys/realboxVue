@@ -38,10 +38,27 @@
     width: 100%;
     height: 30px;
     line-height: 30px;
-    text-align: right;
     padding: 5px;
     display: flex;
     border-bottom: 1px solid #e0e0e0;
+  }
+
+  .box {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    display: flex;
+    flex-wrap: nowrap;
+
+  }
+
+  .box > div {
+    margin-left: 10px;
+    display: flex;
+  }
+
+  .box > div > label {
+    margin-right: 10px;
   }
 
   .control {
@@ -69,7 +86,7 @@
   }
 
   .checkedList {
-    height: 404px;
+    height: 394px;
   }
 
   .confirm {
@@ -160,8 +177,8 @@
         <div class="title">部门/终端</div>
         <div class="controlBox">
           <div style="width: 120px">
-            <el-select v-model="terSelect" size="mini" @change="selectChange">
-              <el-option v-for="item in terSelect"
+            <el-select v-model="terSelect" size="mini" placeholder="终端分组" @change="getTree">
+              <el-option v-for="item in terSelects"
                          :key="item.value"
                          :label="item.label"
                          :value="item.value"></el-option>
@@ -169,7 +186,7 @@
           </div>
         </div>
         <div class="terminalList">
-          <el-tree v-if="value" :data="depTree" show-checkbox :check-strictly="true" @check-change="depCheck"
+          <el-tree v-if="terSelect == 1" :data="depTree" show-checkbox :check-strictly="true" @check-change="depCheck"
                    default-expand-all :expand-on-click-node="false" ref="depTree"></el-tree>
           <el-tree v-else :data="terTree" show-checkbox :check-strictly="true" @check-change="terCheck"
                    default-expand-all :expand-on-click-node="false" ref="terTree"></el-tree>
@@ -179,36 +196,109 @@
     <div class="right">
       <div class="releaseAttr">
         <div class="title">发布属性</div>
-        <div class="controlBox">
-          <label>播放模式</label>
-          <div style="width:120px;">
-            <el-select v-model="playMode" size="mini" @change="selectChange">
-              <el-option v-for="item in playModes"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value"></el-option>
-            </el-select>
+        <div class="controlBox" style="height: 62px;line-height: normal;flex-wrap: wrap">
+          <div class="box" style="margin-bottom: 2px">
+            <div>
+              <label>播放模式</label>
+              <div style="width:120px;">
+                <el-select v-model="playMode" size="mini" placeholder="循环播放">
+                  <el-option v-for="item in playModes"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
+              </div>
+            </div>                <!--//播放模式-->
+            <div v-if="playMode == '2'|| playMode == '3'">
+              <div style="width:120px;">
+                <el-select v-model="timingMode" size="mini" placeholder="按日期">
+                  <el-option v-for="item in timingModes"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
+              </div>
+            </div>
+            <div>
+              <label>失效时间</label>
+              <el-date-picker
+                v-model="failTime"
+                style="width:125px;"
+                type="date"
+                size="mini"
+                :editable="false"
+                value-format="yyyy-MM-dd"
+                placeholder="失效时间">
+              </el-date-picker>
+            </div>                <!--//失效时间-->
+            <div>
+              <label>发布策略</label>
+              <div style="width:120px;">
+                <el-select v-model="releasePloy" size="mini" placeholder="追加日程">
+                  <el-option v-for="item in releasePloys"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
+              </div>
+            </div>                <!--//发布策略-->
+            <div>
+              <label>发布类型</label>
+              <div style="width:120px;">
+                <el-select v-model="releaseType" size="mini" placeholder="立即发布">
+                  <el-option v-for="item in releaseTypes"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
+              </div>
+            </div>                <!--//发布类型-->
+            <div v-if="releaseType == '2'">
+              <el-date-picker
+                v-model="reservationDate"
+                style="width:175px;"
+                type="datetime"
+                size="mini"
+                :editable="false"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                placeholder="预约时间">
+              </el-date-picker>
+            </div>
           </div>
-          <label>失效时间</label>
-          <div>
-            <el-date-picker
-              v-model="failTime"
-              style="width:125px;"
-              type="date"
-              size="mini"
-              :editable="false"
-              value-format="yyyy-MM-dd"
-              placeholder="失效时间">
-            </el-date-picker>
-          </div>
-          <label>发布类型</label>
-          <div style="width:120px;">
-            <el-select v-model="releaseType" size="mini" @change="selectChange">
-              <el-option v-for="item in releaseTypes"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value"></el-option>
-            </el-select>
+          <div v-if="playMode == '2'|| playMode == '3'" class="box">
+            <div v-if="timingMode == '1'">
+              <label>播放日期</label>
+              <el-date-picker
+                v-model="playDate"
+                style="width:350px;"
+                size="mini"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                value-format="yyyy-MM-dd"
+              >
+              </el-date-picker>
+            </div>
+            <div v-else="">
+              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选
+              </el-checkbox>
+              <el-checkbox-group v-model="checkedWeeks" @change="CheckedWeeksChange">
+                <el-checkbox v-for="week in weeks" :label="week.value" :key="week.value">{{week.label}}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+            <div>
+              <label>播放时间</label>
+              <el-time-picker
+                is-range
+                v-model="playTime"
+                size="mini"
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                value-format="HH:mm:ss">
+              </el-time-picker>
+            </div>
           </div>
         </div>
       </div>
@@ -216,17 +306,17 @@
         <div class="title">播放列表</div>
         <div class="controlBox playListControl">
           <div class="control">
-            <div style="width: 120px">
+            <!--<div style="width: 120px">
               <el-select v-model="playValue" size="mini" @change="playChange">
                 <el-option v-for="item in playSelect"
                            :key="item.value"
                            :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
-            </div>
+            </div>-->
             <label>节目类型</label>
             <div style="width:120px;">
-              <el-select v-model="proType" size="mini" @change="selectChange">
+              <el-select v-model="proType" size="mini" placeholder="播放列表">
                 <el-option v-for="item in proTypes"
                            :key="item.value"
                            :label="item.label"
@@ -281,8 +371,8 @@
         </div>
       </div>
       <div class="confirm">
-        <el-button @click="release">发布</el-button>
-        <el-button @click.native="exit">取消</el-button>
+        <el-button @click="release" size="mini">发布</el-button>
+        <el-button @click.native="exit" size="mini">取消</el-button>
       </div>
     </div>
     <el-dialog
@@ -348,56 +438,104 @@
         terTree: [],              //终端树数据
         terminals: [],             //终端列表
         tree: true,               //区分部门与终端树
-        terSelect: '企业部门',
+        terSelect: 1,
         terSelects: [{
-          value: '1',
-          label: '企业部门'
-        }, {
-          value: '2',
+          value: 1,
           label: '终端分组'
-        }],
-        playValue: '图形模式',
+        }/*, {
+          value: 2,
+          label: '终端分组'
+        }*/],
+        /*playValue: '图形模式',
         playSelect: [{
           value: '1',
           label: '图形模式'
         }, {
           value: '2',
           label: '列表模式'
-        }],
-        value: true,               //当前选择部门为真
+        }],*/
         depfId: '',
         groupId: '',
         /*播放列表*/
-        proType: '播放列表',
+        proType: 1,
         proTypes: [{
-          value: '1',
+          value: 1,
           label: '播放列表'
         }, {
-          value: '2',
+          value: 2,
           label: '滚动字幕'
         }],
         playImgs: [],                 //播放列表显示
         /*发布属性*/
-        playMode: '循环播放',
+        playMode: 1,
         playModes: [{
-          value: '1',
+          value: 1,
           label: '循环播放'
         }, {
-          value: '2',
+          value: 2,
           label: '定时播放'
-        }, {
+        }/*, {
           value: '3',
           label: '插播节目'
-        }],
+        }*/],
         failTime: '',             //失效时间
-        releaseType: '立即发布',
+        releaseType: 1,
         releaseTypes: [{
-          value: '1',
+          value: 1,
           label: '立即发布'
         }, {
-          value: '2',
+          value: 2,
           label: '预约发布'
         }],
+        releasePloy: 1,
+        releasePloys: [
+          {
+            value: 1,
+            label: '追加日程'
+          }, {
+            value: 2,
+            label: '覆盖日程'
+          }
+        ],
+        playDate: '',            //播放日期
+        playTime: '',             //播放时间
+        reservationDate: '',     //预约时间
+        timingMode: 1,           //按日期
+        timingModes: [{
+          value: 1,
+          label: '按日期'
+        }, {
+          value: 2,
+          label: '按星期'
+        }],
+        week: [1, 2, 3, 4, 5, 6, 0],      //全选星期
+        weeks: [
+          {
+            value: 0,
+            label: '周天'
+          }, {
+            value: 1,
+            label: '周一'
+          }, {
+            value: 2,
+            label: '周二'
+          }, {
+            value: 3,
+            label: '周三'
+          }, {
+            value: 4,
+            label: '周四'
+          }, {
+            value: 5,
+            label: '周五'
+          }, {
+            value: 6,
+            label: '周六'
+          }
+        ],
+        isIndeterminate: false,                                                //全选状态
+        checkAll: false,                                                       //选择全部
+        checkedWeeks: [],                                                      //选择中的周
         /*节目列表*/
         openProList: false,
         plays: [],
@@ -420,13 +558,9 @@
       exit() {
         this.$router.go(-1);
       },                               //返回
-      selectChange(val) {
-        val == '2' ? this.value = false : this.value = true;
-        this.getTree()
-      },                    //部门、终端切换
       getTree() {
         let _this = this, id = 0;
-        this.value ? id = 60 : id = 40;
+        this.terSelect == 1 ? id = 60 : id = 40;
         this.$http({
           method: 'get',
           url: 'tree/query?id=' + id,
@@ -437,7 +571,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.value == 1 ? _this.depTree = response.data.cust.trees : _this.terTree = response.data.cust.trees;
+            _this.terSelect == 1 ? _this.depTree = response.data.cust.trees : _this.terTree = response.data.cust.trees;
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -529,11 +663,11 @@
       proChange(val) {
         this.proPageNo = val
         this.queryPlayList()
-      },                        //节目列表翻页
+      },                       //节目列表翻页
       openPro() {
         this.openProList = true;
         this.queryPlayList()
-      },                             //打开节目列表弹窗
+      },                            //打开节目列表弹窗
       ProSelect(row) {
         this.proRow = row
       },                       //节目表格选中回调
@@ -550,7 +684,7 @@
           return false
         }
         this.openProList = false
-      },                           //选择节目
+      },                          //选择节目
       selected(e) {
         this.check = !this.check;
         let target = e.currentTarget;
@@ -566,10 +700,10 @@
 
           this.index = 10
         }
-      },                             //单击选择节目
+      },                          //单击选择节目
       delPro() {
         this.playImgs.splice(this.index, 1)
-      },                              //删除节目
+      },                             //删除节目
 
       terChange(val) {
         this.pageNo = val;
@@ -577,23 +711,29 @@
       },                       //终端列表翻页
       terminalSelect(row) {
         this.terRow = row
-      },                       //终端列表选中回调
+      },                  //终端列表选中回调
       release() {
         let _this = this;
         let ter = document.getElementsByClassName('playImgList')[0].children;
-        let terAttr = [].slice.call(ter);                          //将伪数组转为数组
-        let proId = terAttr.map(item => item.id).join(' ');       //节目ID
+        let terAttr = [].slice.call(ter);                             //将伪数组转为数组
+        let proId = terAttr.map(item => item.id).join(' ');           //节目ID
         let terId = this.terRow.map(item => item.id).join(' ');       //终端ID
+        let playMode = _this.playMode == '1' ? 'loop' : 'time';
+        let disType = _this.releaseType == '1' ? 'now' : 'plan';
+        let releasePloy = _this.releasePloy == '1' ? 'append' : 'overwrite';
+        let date = _this.timingMode == '1' ? _this.playDate.toString() : _this.checkedWeeks.toString();
         let data = {
           invalidTime: _this.failTime,	                              //失效时间
-          playType: _this.playMode,	                                  //播放类型
-          proId: proId,	                                        //节目ID
+          playMode: playMode,	                                        //播放类型
+          proId: proId,	                                              //节目ID
           proType: _this.proType,	                                    //节目类型
-          publishType: _this.releaseType,	                            //发布类型
+          disType: disType,	                                          //发布类型
           publisher: sessionStorage.getItem('name'),	                //发布人
-          startTime: '',	                                        //开始时间
-          endTime: '',	                                          //结束时间
-          terminalId: terId                                            //终端ID
+          date: date,	                                                //播放日期
+          time: _this.playTime.toString(),	                          //播放时间
+          terminalId: terId,                                          //终端ID
+          makeTime: _this.reservationDate,                            //预约时间
+          disStrategy: releasePloy                                    //发布策略
         };
         this.$http({
           method: 'post',
@@ -606,7 +746,7 @@
           data: data
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.$message({message: '发布成功！',showClose: true, center: true, type: 'success'});
+            _this.$message({message: '发布成功！', showClose: true, center: true, type: 'success'});
             _this.$router.push('/programList')
           } else {
             _this.$message({
@@ -617,7 +757,17 @@
             });
           }
         })
-      },                                //发布
+      },                            //发布
+
+      handleCheckAllChange(val) {
+        this.checkedWeeks = val ? this.week : [];
+        this.isIndeterminate = false;
+      },                    //按星期时全选状态回调
+      CheckedWeeksChange(value) {
+        let checkedCount = value.length;
+        this.checkAll = checkedCount === this.weeks.length;
+        this.isIndeterminate = checkedCount > 0 && checkedCount < this.weeks.length;
+      },                    //按星期时选择状态回调
     }
   }
 </script>

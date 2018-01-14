@@ -96,11 +96,11 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容">
+            <el-input placeholder="请输入内容" v-model="searchName">
               <template slot="prepend">角色名称</template>
             </el-input>
           </div>
-          <el-button>搜索</el-button>
+          <el-button @click="getRoleList">搜索</el-button>
         </div>
         <div class="control">
           <a @click="newRole"><i class="el-icon-plus"></i>新建</a>
@@ -165,23 +165,24 @@
     },
     data() {
       return {
-        openDialog: false,           //“新建”的弹出框
-        title: '',                   //弹出框标题
+        openDialog: false,            //“新建”的弹出框
+        title: '',                    //弹出框标题
         form: {
-          roleName: '',           // 角色名称
-          roleDescribe: '',       //角色描述
+          roleName: '',               // 角色名称
+          roleDescribe: '',           //角色描述
         },
         LabelWidth: '70px',
-        userPrivId: '',            //当前用户权限ID
-        rolePrivId: '',          //当前编辑角色的权限ID
-        powerTree: [],         //权限树
-        roles: [],             //角色列表
-        row: [],               //当前选中的行
-        pageCount: 11,         //每页显示条目
-        pageNo: 1,             //当前页
-        total: 0,              //总数量
-        creator: '',              //创建人
-        roleId: ''             //角色ID
+        userPrivId: '',               //当前用户权限ID
+        rolePrivId: '',               //当前编辑角色的权限ID
+        powerTree: [],                //权限树
+        roles: [],                    //角色列表
+        row: [],                      //当前选中的行
+        pageCount: 11,                //每页显示条目
+        pageNo: 1,                    //当前页
+        total: 0,                     //总数量
+        creator: '',                  //创建人
+        roleId: '',                   //角色ID
+        searchName: ''
       }
     },
     computed: {},
@@ -192,14 +193,14 @@
     },
     methods: {
       newRole: function () {
-        this.openDialog = true
-        this.title = '新建角色'
-        this.creator = sessionStorage.getItem('name')
-        this.userPrivId = sessionStorage.getItem('privId')
+        this.openDialog = true;
+        this.title = '新建角色';
+        this.creator = sessionStorage.getItem('name');
+        this.userPrivId = sessionStorage.getItem('privId');
         this.getTree()
       },        //新建角色
       getTree: function () {
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: 'privilege/query?userId=' + this.userPrivId + '&roleId=' + this.rolePrivId,
@@ -210,11 +211,13 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.powerTree = response.data.cust.trees
-            let rolePriv = response.data.cust.tree
+            _this.powerTree = response.data.cust.trees;
+            let rolePriv = response.data.cust.tree;
             if (_this.rolePrivId != '') {
               let rolePrivId = [];
-              rolePriv.map(function (item) {rolePrivId.push(item.id)});
+              rolePriv.map(function (item) {
+                rolePrivId.push(item.id)
+              });
               /*_this.$refs.tree.setCheckedNodes(rolePriv)*/        //方法无效
               _this.$refs.tree.setCheckedKeys(rolePrivId);
             } else {
@@ -232,10 +235,10 @@
         })
       },        //获取权限树
       getRoleList: function () {
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
-          url: '/role/query?pageCount=' + _this.pageCount + '&pageNo=' + _this.pageNo,
+          url: '/role/query?pageCount=' + _this.pageCount + '&pageNo=' + _this.pageNo + '&name=' + this.searchName,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -264,12 +267,12 @@
       },
       powerAdd: function () {
         let power = this.$refs.tree.getCheckedNodes()
-        let data = {}
+        let data = {};
         power.map(function (item, index) {          //遍历选中权限
-          let name = item.property                  //取出权限名称
+          let name = item.property;               //取出权限名称
           data[name] = 1                            //添加到对象并赋值为1（1为有权限0为无），对象的访问方式有data.name与data[name],动态添加需要使用data[name]
-        })
-        let _this = this
+        });
+        let _this = this;
         this.$http({
           method: 'post',
           url: 'privilege/create',
@@ -308,8 +311,8 @@
           name: this.form.roleName,
           desc: this.form.roleDescribe,
           privId: this.userPrivId
-        }
-        let _this = this
+        };
+        let _this = this;
         this.$http({
           method: 'post',
           url: 'role/create',
@@ -463,19 +466,19 @@
             type: 'warning'
           });
         } else {
-          this.openDialog = true
-          this.title = '编辑角色'
-          this.creator = this.row[0].creator
-          this.userPrivId = sessionStorage.getItem('privId')
-          this.rolePrivId = this.row[0].privId
-          this.form.roleName = this.row[0].name
-          this.form.roleDescribe = this.row[0].desc
-          this.roleId = this.row[0].id
+          this.openDialog = true;
+          this.title = '编辑角色';
+          this.creator = this.row[0].creator;
+          this.userPrivId = sessionStorage.getItem('privId');
+          this.rolePrivId = this.row[0].privId;
+          this.form.roleName = this.row[0].name;
+          this.form.roleDescribe = this.row[0].desc;
+          this.roleId = this.row[0].id;
           this.getTree()
         }
       },                  //编辑角色
       handleCurrentChange(val) {
-        this.pageNo = val
+        this.pageNo = val;
         this.getRoleList()
       }      //当前页翻页
     }

@@ -231,6 +231,26 @@
   .templateList p {
     min-width: 20px;
   }
+
+  .controlTree {
+    height: 40px;
+    line-height: 40px;
+    text-align: right;
+    padding-right: 10px;
+    border-bottom: 1px solid #dedede;
+  }
+
+  .controlTree > a {
+    margin-left: 15px;
+  }
+
+  .controlTree > a > i {
+    margin-right: 3px;
+  }
+
+  .controlTree > a:hover {
+    color: #d33a31;
+  }
 </style>
 
 <template>
@@ -240,7 +260,13 @@
     <Content>
       <div id="playTree">
         <div class="title">节目分组</div>
-        <el-tree :data="playTree" node-key="id" @node-click="handleNodeClick" :expand-on-click-node="false" default-expand-all></el-tree>
+        <div class="controlTree">
+          <a @click="NewTree"><i class="el-icon-plus"></i>新建</a>
+          <a @click="EditTree"><i class="el-icon-edit"></i>编辑</a>
+          <a @click="delTree"><i class="el-icon-delete"></i>删除</a>
+        </div>
+        <el-tree :data="playTree" node-key="id" @node-click="handleNodeClick" show-checkbox :highlight-current="true"
+                 :check-strictly="true" default-expand-all ref="tree" :expand-on-click-node="false"></el-tree>
       </div>
       <div id="playList">
         <div class="title">节目列表</div>
@@ -255,26 +281,16 @@
               </el-select>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="searchName">
                 <template slot="prepend">节目名称</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">所属部门</template>
-              </el-input>
-            </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="searchResolution">
                 <template slot="prepend">分辨率</template>
               </el-input>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">终端类型</template>
-              </el-input>
-            </div>
-            <el-button>搜索</el-button>
+            <el-button @click="queryPlayList">搜索</el-button>
           </div>
           <div class="control">
             <a @click="newPlay"><i class="el-icon-plus"></i>新建</a>
@@ -336,7 +352,8 @@
       <div class="temDialog">
         <div id="templateTree">
           <div class="title">模板管理</div>
-          <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" :expand-on-click-node="false" default-expand-all></el-tree>
+          <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" :expand-on-click-node="false"
+                   default-expand-all></el-tree>
         </div>
         <div id="templateList">
           <div class="controlBox">
@@ -401,6 +418,32 @@
         <el-button type="primary" @click="selectTem">确 定</el-button>
   </span>
     </el-dialog><!--选择模板-->
+    <el-dialog :title="treeTitle" ref="TreeDialog" :visible.sync="openTreeDialog" width="27.5%">
+      <el-dialog width="30%" title="选择分组上级" :visible.sync="openSuperG" append-to-body>
+        <el-tree :data="groupSuper" node-key="id" :check-strictly="true" show-checkbox
+                 default-expand-all ref="groupSuper"></el-tree>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="openSuperG = false">取 消</el-button>
+          <el-button type="primary" @click="selectSuperGroup">确 定</el-button>
+        </div>
+      </el-dialog>            <!--上级分组选择-->
+      <el-form :model="treeForm">
+        <el-form-item label="分组名称" :label-width="LabelWidth">
+          <el-input v-model="treeForm.groupName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="上级分组" :label-width="LabelWidth">
+          <input v-model="treeForm.superiorGroup" class="el-input__inner" auto-complete="off"
+                 style="cursor: pointer" @click="openSuperG = true" readonly="readonly"/>
+        </el-form-item>
+        <el-form-item label="分组描述" :label-width="LabelWidth">
+          <el-input type="textarea" v-model="treeForm.groupDesc" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="openTreeDialog = false">取 消</el-button>
+        <el-button type="primary" @click="groupSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -449,7 +492,25 @@
         tPageCount: 12,     //每页显示数目
         tPageNo: 1,          //当前页
         tTotal: 0,            //总数目
-        temName: ''
+        temName: '',          //模板名
+        //树操作
+        openTreeDialog: false,
+        openTreeG: false,
+        treeTitle: '',
+        groupSuper: [],         //分组上级选择
+        superId: '',             //分组上级ID
+        openSuperG: false,
+        creator: '',
+        currentGroupId: '',       //当前组ID
+        LabelWidth: '70px',
+        treeForm: {
+          groupName: '',
+          superiorGroup: '',
+          groupDesc: ''
+        },
+        ids: [],                //存储选中节目ID
+        searchName:'',
+        searchResolution:'',
       }
     },
     components: {
@@ -471,7 +532,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.playTree = response.data.cust.trees
+            _this.groupSuper = _this.playTree = response.data.cust.trees
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -487,7 +548,7 @@
         this.plays = [];
         this.$http({
           method: 'get',
-          url: 'program/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount,
+          url: 'program/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount+ '&name='+this.searchName + '&resolution=' +this.searchResolution,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -517,12 +578,12 @@
       handleNodeClick(val) {
         val.id != 30 ? this.treeId = val.id : this.treeId = 31;
         this.queryPlayList()
-      },          //点击树回调
+      },            //点击树回调
       selected(e) {
-        this.check = !this.check
-        let id = e.currentTarget.id
+        this.check = !this.check;
+        let id = e.currentTarget.id;
         let playName = e.currentTarget.children[2].innerHTML;
-        let target = e.currentTarget
+        let target = e.currentTarget;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
           dom = e.target.offsetParent.id
           target = e.target.offsetParent
@@ -535,28 +596,39 @@
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
           this.playName = playName;
-          this.id = id
+          this.ids.push(id)
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
           this.playName = '';
-          this.id = ''
+          for (let i = 0; i < this.ids.length; i++) {
+            if (this.ids[i] == id) this.ids.splice(i, 1)
+          }       //取消则从ids删除该元素
         }
-      },                    //单击选择文件
+      },                     //单击选择文件
       newPlay() {
         this.setTem = true;
         this.queryTemList();
         this.getTemTree()
       },
       delPlay() {
-
+        let ids = this.ids.join(' ');
+        if (ids == '') {
+          this.$message({
+            message: '未选择节目！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
         this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
         }).then(() => {
           this.$http({
             method: 'delete',
-            url: 'program/delete?ids=' + this.id,
+            url: 'program/delete?ids=' + ids,
             withCredentials: true,
             headers: {
               token: sessionStorage.getItem('token'),
@@ -564,13 +636,13 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.queryPlayList()
+              this.queryPlayList();
               this.$message({
                 message: '删除成功！',
                 showClose: true,
                 center: true,
                 type: 'success'
-              })
+              });
               this.check = false
             } else {
               this.$message({
@@ -584,13 +656,14 @@
         })
       },
       editPlay(name) {
-        if(name==''){
+        if (name == '') {
           this.$message({
-            message: '请选择模板进行修改！',
+            message: '请选择一个节目进行修改！',
             showClose: true,
             center: true,
             type: 'warning'
           });
+          return false
         }
         this.$router.push({path: '/programMack', query: {name: this.playName, groupId: this.treeId, type: 1}})
       },
@@ -622,15 +695,15 @@
             });
           }
         })
-      },              //获取模板列表
+      },                  //获取模板列表
       temTreeClick(val) {
         this.tTreeId = val.id;
         this.queryTemList()
-      },          //点击模板树回调
+      },               //点击模板树回调
       temChange(val) {
         this.tPageNo = val
         this.queryTemList()
-      },        //模板翻页回调
+      },                  //模板翻页回调
       getTemTree() {
         let _this = this
         this.$http({
@@ -653,7 +726,7 @@
             });
           }
         })
-      },                //查询模板树
+      },                    //查询模板树
       selectedTem(e) {
         this.check = !this.check
         let dom = e.currentTarget.children[2].innerHTML;
@@ -668,11 +741,158 @@
           target.style.backgroundColor = "white";
           this.temName = ''
         }
-      },                    //单击选择文件
+      },                  //单击选择文件
       selectTem() {
         this.setTem = false
         this.$router.push({path: '/programMack', query: {name: this.temName, groupId: this.tTreeId, type: 0}})
-      },                //新建模板
+      },                     //新建模板
+
+      NewTree() {
+        this.treeForm.groupName = '';
+        this.treeForm.superiorGroup = '';
+        this.treeTitle = "新建分组";
+        this.openTreeDialog = true
+      },                       //新建节目分组
+      EditTree() {
+        this.treeTitle = "编辑分组";
+        let tree = this.$refs.tree.getCheckedNodes();
+        if (tree.length > 1 || tree.length == 0) {
+          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        this.creator = tree[0].creator;
+        this.currentGroupId = tree[0].id;
+        this.treeForm.groupName = tree[0].label;
+        this.superId = tree[0].parentId;
+        this.treeForm.superiorGroup = tree[0].parentName;
+        this.openTreeDialog = true;
+      },                      //选择上级分组
+      delTree() {
+        let tree = this.$refs.tree.getCheckedNodes();
+        if (tree.length > 1 || tree.length == 0) {
+          this.$message({message: '只能选择一个分组！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        let id = tree[0].id;
+        this.$confirm('此操作将永久删除该分组, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            method: 'delete',
+            url: 'tree/delete?id=' + id,
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == '0000') {
+              this.$message({
+                message: '删除成功！',
+                showClose: true,
+                center: true,
+                type: 'success'
+              });
+              this.getTree()
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        })
+      },                       //编辑节目分组
+      selectSuperGroup() {
+        let tree = this.$refs.groupSuper.getCheckedNodes();
+        if (tree.length > 1 || tree.length == 0) {
+          this.$message({message: '请选择一个分组作为上级！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        this.superId = tree[0].id;
+        this.treeForm.superiorGroup = tree[0].label;
+        this.openSuperG = false
+      },              //确认修改节目分组
+      groupSubmit() {
+        if (this.treeForm.groupName == '') {
+          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        if (this.treeForm.superiorGroup == '') {
+          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        if (this.treeTitle == '新建分组') {
+          let _this = this;
+          let data = {
+            parentId: this.superId,
+            label: this.treeForm.groupName,
+            creator: sessionStorage.getItem('name')
+          };
+          this.$http({
+            method: 'post',
+            url: 'tree/create',
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            },
+            data: data
+          }).then(response => {
+            if (response.data.code == '0000') {
+              _this.getTree();
+              this.$message({message: '新建分组成功！', showClose: true, center: true, type: 'success'});
+              this.openTreeDialog = false
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        } else {
+          let _this = this;
+          let data = {
+            id: this.currentGroupId,          //当前ID
+            parentId: this.superId,
+            label: this.treeForm.groupName,
+            creator: this.creator,          //创建人
+            updaterCreator: sessionStorage.getItem('name'),
+            treeId: this.targetId        //目标树ID
+          };
+          this.$http({
+            method: 'put',
+            url: 'tree/update',
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            },
+            data: data
+          }).then(response => {
+            if (response.data.code == '0000') {
+              _this.getTree();
+              _this.$message({message: '编辑分组成功！', showClose: true, center: true, type: 'success'});
+              this.openTreeDialog = false
+              _this.treeForm.superiorGroup = '';
+              _this.treeForm.groupName = ''
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        }
+      },                   //删除节目分组
     }
   }
 </script>

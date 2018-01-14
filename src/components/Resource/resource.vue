@@ -160,13 +160,14 @@
       <div id="resourceTree">
         <div class="title">资源管理</div>
         <div class="controlTree">
-          <a><i class="el-icon-plus"></i>新建</a>
-          <a><i class="el-icon-refresh"></i>刷新</a>
+          <!--<a><i class="el-icon-plus"></i>新建</a>-->
+          <a @click="getTree"><i class="el-icon-refresh"></i>刷新</a>
         </div>
-        <el-tree :data="resourceTree" default-expand-all :expand-on-click-node="false" @node-click="handleNodeClick"></el-tree>
+        <el-tree :data="resourceTree" default-expand-all :expand-on-click-node="false" :highlight-current="true"
+                 @node-click="handleNodeClick"></el-tree>
       </div>
       <div id="resourceList">
-        <div class="title">资源列表</div>
+        <div class="title">{{treeName}}</div>
         <div class="controlBox">
           <div class="search">
             <div style="width: 110px">
@@ -178,21 +179,11 @@
               </el-select>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">名称</template>
+              <el-input placeholder="请输入内容" v-model="resName">
+                <template slot="prepend">资源名称</template>
               </el-input>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">部门</template>
-              </el-input>
-            </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">上传者</template>
-              </el-input>
-            </div>
-            <el-button>搜索</el-button>
+            <el-button @click="resourceQuery">搜索</el-button>
           </div>
           <div class="control">
             <a @click="upload"><i class="el-icon-upload"></i>上传</a>
@@ -241,7 +232,7 @@
         <el-dialog
           :title="title + '上传'"
           :visible.sync="dialog"
-          width="21%">
+          width="400px">
           <el-upload
             class="upload-demo"
             drag
@@ -287,7 +278,7 @@
 
   export default {
     mounted: function () {
-      this.getTree()
+      this.getTree();
       this.resourceQuery()
     },
     data() {
@@ -309,7 +300,7 @@
         downloadUrl: '',          //下载地址
         downloadName: '',         //下载名称
         view: false,              //双击预览显示
-        id: '',
+        ids:[],
         select: [
           {
             value: 1,
@@ -324,7 +315,8 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         check: false,          //选中资源的变量
-        format: ''               //资源格式
+        format: '',               //资源格式
+        resName:''                //资源名称
       }
     },
     computed: {
@@ -387,8 +379,8 @@
         } else if (audio.indexOf(val.treeType) != -1) {
           this.accept = audio;
           this.directions = '仅允许上传音频文件。'
-        }else {
-          this.accept ='*'
+        } else {
+          this.accept = '*'
           this.directions = '不允许上传任何文件。'
         }
         this.resourceQuery()
@@ -426,8 +418,9 @@
         }
       },          //上传成功的回调
       del() {
+        let ids = '';
         if (this.value == '2') {
-          let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
+          ids = this.row.map(item => item.id).join(' ');      //列表模式的id
           if (ids == '') {
             this.$message({
               message: '未选择资源！',
@@ -436,9 +429,9 @@
             });
             return false
           }
-          this.id = ids
         } else {
-          if (this.id == '') {
+          ids = this.ids.join(' ');
+          if (ids == '') {
             this.$message({
               message: '未选择资源！',
               center: true,
@@ -453,7 +446,7 @@
         }).then(() => {
           this.$http({
             method: 'delete',
-            url: 'resource/delete?ids=' + this.id,
+            url: 'resource/delete?ids=' + ids,
             withCredentials: true,
             headers: {
               token: sessionStorage.getItem('token'),
@@ -509,21 +502,25 @@
 
           this.downloadUrl = "http://" + document.getElementById(target.id).getAttribute("url")
           this.downloadName = target.children[2].innerText;
-          this.id = dom
+          this.ids.push(dom)
+          debugger
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
           this.downloadUrl = '';
           this.downloadName = '';
-          this.id = ''
+          for (let i = 0; i < this.ids.length; i++) {
+            if (this.ids[i] == dom) this.ids.splice(i, 1)
+          }    //取消则从ids删除该元素
+          debugger
         }
       },                             //单击选择文件
       resourceQuery() {
-        let _this = this
+        let _this = this;
         this.resources = [];
         this.$http({
           method: 'get',
-          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&name=" +this.resName,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -578,7 +575,7 @@
       tableSelect(row) {
         this.row = row
       },                        //表格选择
-      viewClose(){
+      viewClose() {
 
       }
     }

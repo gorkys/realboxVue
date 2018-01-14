@@ -14,8 +14,6 @@
   }
 
   .controlTree {
-    height: 40px;
-    line-height: 40px;
     text-align: right;
     padding: 10px;
     border-bottom: 1px solid #dedede;
@@ -101,12 +99,12 @@
         <div class="title">{{treeTitle}}</div>
         <div class="controlTree">
           <div style="width: 120px">
-            <el-select v-model="elSelect" @change="selectChange">
+            <!--<el-select v-model="elSelect" @change="selectChange">
               <el-option v-for="item in select"
                          :key="item.value"
                          :label="item.label"
                          :value="item.value"></el-option>
-            </el-select>
+            </el-select>-->
           </div>
           <div><a><i class="el-icon-refresh"></i>刷新</a></div>
         </div>
@@ -120,16 +118,16 @@
         <div class="controlBox">
           <div class="search">
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="terName">
                 <template slot="prepend">终端名称</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="terCode">
                 <template slot="prepend">终端编号</template>
               </el-input>
             </div>
-            <el-button>搜索</el-button>
+            <el-button @click="queryTerminalList">搜索</el-button>
           </div>
           <div class="control">
             <a @click="delTerminal"><i class="el-icon-delete"></i>删除</a>
@@ -210,7 +208,9 @@
         value: true,        //当前选择树的值
         groupId: '',       //终端分组ID
         depfId: '',         //所属部门ID
-        treeTitle: '企业部门',        //树标题
+        treeTitle: '终端分组',        //树标题
+        terName: '',               //终端名称
+        terCode: '',               //终端编号
       }
     },
     components: {
@@ -222,7 +222,7 @@
     methods: {
       getTree() {
         let _this = this, id = 0;
-        this.value? id = 60 : id = 40;
+        this.value ? id = 60 : id = 40;
         this.$http({
           method: 'get',
           url: 'tree/query?id=' + id,
@@ -249,7 +249,7 @@
         this.terminals = [];
         this.$http({
           method: 'get',
-          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.groupId + '&depfId=' + _this.depfId,
+          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.groupId + '&depfId=' + _this.depfId + '&name=' + this.terName,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -306,7 +306,7 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '删除成功！',showClose: true, center: true, type: 'success'});
+              this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
               this.queryTerminalList()
             } else {
               this.$message({
@@ -319,7 +319,7 @@
           })
         })
       },                      //删除终端
-      selectChange(val) {
+      /*selectChange(val) {
         if (val != 1) {
           this.treeTitle = '终端分组';
           this.value = false
@@ -328,7 +328,7 @@
           this.value = true
         }
         this.getTree()
-      },                  //终端部门切换
+      },                  //终端部门切换*/
       treeClick(val) {
         this.value ? this.depfId = val.id : this.groupId = val.id;
         this.queryTerminalList()

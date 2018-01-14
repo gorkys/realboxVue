@@ -128,28 +128,23 @@
           <a @click="delTree"><i class="el-icon-delete"></i>删除</a>
         </div>
         <el-tree :data="userTree" node-key="id" default-expand-all show-checkbox
-                 ref="tree" :check-strictly="true"></el-tree>
+                 ref="tree" :check-strictly="true" :highlight-current="true"></el-tree>
       </div>
       <div id="userList">
         <div class="title">用户列表</div>
         <div class="controlBox">
           <div class="search">
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="searchName">
                 <template slot="prepend">用户名</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">所属部门</template>
-              </el-input>
-            </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容">
+              <el-input placeholder="请输入内容" v-model="searchType">
                 <template slot="prepend">用户类型</template>
               </el-input>
             </div>
-            <el-button>搜索</el-button>
+            <el-button @click="queryUserList">搜索</el-button>
           </div>
           <div class="control">
             <a @click="New"><i class="el-icon-plus"></i>新建</a>
@@ -255,7 +250,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openG = false">取 消</el-button>
+        <el-button @click="openDialog = false">取 消</el-button>
         <el-button type="primary" @click="submit">确 定</el-button>
       </div>
     </el-dialog>
@@ -298,7 +293,7 @@
 
   export default {
     mounted() {
-      this.getTree()
+      this.getTree();
       this.queryUserList()
     },
     data() {
@@ -361,8 +356,10 @@
         superId: '',             //分组上级ID
         openSuperG:false,
         creator:'',
-        currentGroupId:''       //当前组ID
+        currentGroupId:'',       //当前组ID
 
+        searchName:'',
+        searchType:'',
       }
     },
     components: {
@@ -395,11 +392,11 @@
         })
       },                          //用户分组树
       queryUserList() {
-        let _this = this
-        let t = []
+        let _this = this;
+        let t = [];
         this.$http({
           method: 'get',
-          url: 'user/query?treeId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: 'user/query?treeId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&name='+this.searchName+'&type='+this.searchType,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -407,10 +404,10 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let users = response.data.cust.users
-            _this.total = response.data.cust.pages.count
+            let users = response.data.cust.users;
+            _this.total = response.data.cust.pages.count;
             for (let i = 0; i < users.length; i++) {
-              t.push(users[i])
+              t.push(users[i]);
               _this.users = t
             }
 
@@ -422,15 +419,15 @@
             });
           }
         })
-      },                //查询列表
+      },                    //查询列表
       handleCurrentChange() {
         this.pageNo = val
         this.getRoleList()
-      },            //当前页翻页
+      },              //当前页翻页
       New() {
         this.openDialog = true
         this.title = '新建用户'
-      },                                //新建
+      },                              //新建
       openDepartment() {
         this.openD = true
 
@@ -454,7 +451,7 @@
             });
           }
         })
-      },            //打开选择部门对话框
+      },                   //打开选择部门对话框
       openRole() {
         this.openR = true
 
@@ -479,7 +476,7 @@
             });
           }
         })
-      },                  //打开选择角色对话框
+      },                         //打开选择角色对话框
       openGroup() {
         this.openG = true
 
@@ -503,9 +500,10 @@
             });
           }
         })
-      },                 //打开选择分组对话框
+      },                        //打开选择分组对话框
 
       submit() {
+        debugger
         if (this.form.userName == '') {
           this.$message({message: '请填写用户名称！', center: true, type: 'warning'});
           return false
@@ -519,7 +517,6 @@
             this.$message({message: '两次输入的密码不匹配！', center: true, type: 'warning'});
             return false
           }
-          return false
         }
         if (this.form.department == '') {
           this.$message({message: '请选择所属部门！', center: true, type: 'warning'});
@@ -599,11 +596,11 @@
             }
           })
         }
-      },                         //新建与编辑用户
+      },                           //新建与编辑用户
       handleRolePage() {
         this.rolePageNo = val
         this.openGroup()
-      },                //选择角色列表的分页
+      },                   //选择角色列表的分页
 
       roleSelect() {
         if (this.roleRow.length > 1 || this.roleRow.length == 0) {
@@ -617,10 +614,10 @@
           this.form.role = this.roleRow[0].name
           this.openR = false
         }
-      },                //选择角色
+      },                       //选择角色
       roleSelectRow(selection) {
         this.roleRow = selection
-      },    //选择角色列表的选中行数据
+      },           //选择角色列表的选中行数据
       departmentSelect() {
         let tree = this.$refs.departmentTree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
@@ -630,7 +627,7 @@
         this.departmentId = tree[0].id
         this.form.department = tree[0].label
         this.openD = false
-      },         //选择所属部门
+      },                 //选择所属部门
       groupSelect() {
         let tree = this.$refs.groupTree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
@@ -640,7 +637,7 @@
         this.groupId = tree[0].id
         this.form.group = tree[0].label
         this.openG = false
-      },              //选择用户组
+      },                      //选择用户组
 
       Edit() {
         this.openDialog = true
@@ -654,10 +651,10 @@
         this.roleId = this.userRow[0].roleId
         this.groupId = this.userRow[0].groupId
         this.userId = this.userRow[0].id
-      },                    //编辑
+      },                             //编辑
       SelectRow(selection) {
         this.userRow = selection
-      },         //用户列表选中行数据
+      },               //用户列表选中行数据
 
       delUser() {
         var ids = this.userRow.map(item => item.id).join(' ')
@@ -688,35 +685,38 @@
             }
           })
         })
-      },              //删除用户
+      },                          //删除用户
 
       NewTree() {
+        this.treeForm.groupName = '';
+        this.treeForm.superiorGroup = '';
+        this.treeTitle = "新建分组";
         this.openTreeDialog = true
-        this.treeTitle = "新建分组"
-      },
+      },                          //新建节目分组
       selectSuperGroup() {
-        let tree = this.$refs.groupSuper.getCheckedNodes()
+        let tree = this.$refs.groupSuper.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
           this.$message({message: '请选择一个分组作为上级！',showClose: true, center: true, type: 'warning'});
           return false
         }
-        this.superId = tree[0].id
-        this.treeForm.superiorGroup = tree[0].label
+        this.superId = tree[0].id;
+        this.treeForm.superiorGroup = tree[0].label;
         this.openSuperG = false
-      },
+      },                 //选择上级分组
       EditTree() {
-        this.openTreeDialog = true
-        this.treeTitle = "编辑分组"
-        let tree = this.$refs.tree.getCheckedNodes()
+        this.treeTitle = "编辑分组";
+        let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
           this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
-        this.creator = tree[0].creator
-        this.currentGroupId = tree[0].id
-        this.treeForm.groupName = tree[0].label
-        this.superId = tree[0].parentId
-      },
+        this.creator = tree[0].creator;
+        this.currentGroupId = tree[0].id;
+        this.treeForm.groupName = tree[0].label;
+        this.superId = tree[0].parentId;
+        this.treeForm.superiorGroup = tree[0].parentName;
+        this.openTreeDialog = true;
+      },                         //编辑节目分组
       groupSubmit() {
         if (this.treeForm.groupName == '') {
           this.$message({message: '请填写分组名称！',showClose: true, center: true, type: 'warning'});
@@ -727,12 +727,12 @@
           return false
         }
         if (this.treeTitle == '新建分组') {
-          let _this = this
+          let _this = this;
           let data = {
             parentId: this.superId,
             label: this.treeForm.groupName,
             creator: sessionStorage.getItem('name')
-          }
+          };
           this.$http({
             method: 'post',
             url: 'tree/create',
@@ -744,7 +744,7 @@
             data: data
           }).then(response => {
             if (response.data.code == '0000') {
-              _this.getTree()
+              _this.getTree();
               this.$message({message: '新建分组成功！',showClose: true, center: true, type: 'success'});
               this.openTreeDialog = false
             } else {
@@ -757,7 +757,7 @@
             }
           })
         } else {
-          let _this = this
+          let _this = this;
           let data = {
             id:this.currentGroupId,          //当前ID
             parentId: this.superId,
@@ -765,7 +765,7 @@
             creator:this.creator,          //创建人
             updaterCreator: sessionStorage.getItem('name'),
             treeId:this.targetId        //目标树ID
-          }
+          };
           this.$http({
             method: 'put',
             url: 'tree/update',
@@ -779,7 +779,7 @@
             if (response.data.code == '0000') {
               _this.getTree();
               _this.$message({message: '编辑分组成功！',showClose: true, center: true, type: 'success'});
-              _this.openDialog = false;
+              this.openTreeDialog = false
               _this.treeForm.superiorGroup = '';
               _this.treeForm.groupName = ''
             } else {
@@ -792,7 +792,7 @@
             }
           })
         }
-      },
+      },                      //确认修改节目分组
       delTree() {
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
@@ -832,7 +832,7 @@
             }
           })
         })
-      }
+      }                           //删除节目分组
     }
   }
 </script>

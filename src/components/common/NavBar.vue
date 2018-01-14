@@ -49,7 +49,7 @@
             用户管理<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="departmentSet">部门设置</el-dropdown-item>
+              <el-dropdown-item @click.native="departmentSet">终端设置</el-dropdown-item>
               <el-dropdown-item @click.native="userSet">用户设置</el-dropdown-item>
               <el-dropdown-item @click.native="roleSet">角色管理</el-dropdown-item>
             </el-dropdown-menu>

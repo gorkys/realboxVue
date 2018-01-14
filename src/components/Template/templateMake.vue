@@ -279,7 +279,7 @@
     <div class="area">
       <div class="title">区域</div>
       <ul class="areaList">
-        <li @click="setBg = true"><i class="iconfont icon-beijing"></i><b>背景</b></li>
+        <!--<li @click="setBg = true"><i class="iconfont icon-beijing"></i><b>背景</b></li>-->
         <li @click="add('image',true)"><i class="iconfont icon-tupian"></i><b>图片</b></li>
         <li @click="add('video',true)"><i class="iconfont icon-shipin"></i><b>视频</b></li>
         <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>文本</b></li>
@@ -292,7 +292,8 @@
       <div class="editBox">
         <div id="edit" :style="{width : temWidth * PP + 'px',height : temHeight * PP + 'px'}">
           <vue-draggable-resizable v-if="revert" v-for="(item,index) in elements" :key="index"
-                                   :w="item.width * PP" :h="item.height * PP" :x="item.x" :y="item.y" :minw="50" :minh="50"
+                                   :w="item.width * PP" :h="item.height * PP" :x="item.x * PP" :y="item.y * PP"
+                                   :minw="50" :minh="50"
                                    @dragging="onDrag" @resizing="onResize" :parent="true" :name="item.name"
                                    :conflictCheck="item.conflictCheck" :id="item.id">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
@@ -447,6 +448,11 @@
     mounted() {
       this.resourceQuery();
       this.temEdit();
+      /*根据模板高度设置缩放比例*/
+      if (this.temHeight == '1080') this.PP = 0.4;
+      if (this.temHeight == '720') this.PP = 0.7;
+      if (this.temHeight == '1280') this.PP = 0.6;
+      if (this.temHeight == '1920') this.PP = 0.4
     },
     data() {
       return {
@@ -458,7 +464,7 @@
         show: false,
         id: 1,
         //模板属性
-        PP: 0.7,                                                         //百分比
+        PP: 1,                                                         //百分比
         temName: sessionStorage.getItem('temName'),                     //模板名称
         terminalType: '安卓',                                           //终端类型
         temType: sessionStorage.getItem('temType'),                     //模板类型
@@ -495,17 +501,17 @@
     components: {},
     methods: {
       onResize: function (left, top, width, height) {
-        this.x = left
-        this.y = top
-        this.width = width
+        this.x = left;
+        this.y = top;
+        this.width = width;
         this.height = height
       },    //调整大小的回调
       onDrag: function (left, top) {
-        this.x = left
+        this.x = left;
         this.y = top
       },                     //移动的回调
       showDel(e) {
-        this.show = true
+        this.show = true;
         e.currentTarget
       },
       add: function (content, status) {
@@ -519,10 +525,11 @@
       exportImage(value) {
         let vm = this;
         let table = $('#edit');
-
+        let treeId = 0;                                      //树ID
+        this.temType == '用户模板' ? treeId = 22 : treeId = 21;
         let html = $('.editBox').html();                      //模板代码
         let creator = sessionStorage.getItem('name');         //创建人
-        let treeId = 22;                                      //树ID
+
         let Array = [];                                       //区域块的属性值
         let queryUrl = '';                                    //区分新建与编辑的请求地址
         let method = '';                                      //区分新建与编辑的请求方式
@@ -559,7 +566,7 @@
             vm.preview = url;
 
             if (table.html() == "") {
-              vm.$message({message: '请加入区域块！',showClose: true, center: true, type: 'warning'});
+              vm.$message({message: '请加入区域块！', showClose: true, center: true, type: 'warning'});
             } else {
               //区分新建与编辑
               if (query.name == undefined && query.groupId == undefined) {
@@ -608,7 +615,7 @@
               data: data
             }).then(response => {
               if (response.data.code == '0000') {
-                vm.$message({message: '保存成功！',showClose: true, center: true, type: 'success'});
+                vm.$message({message: '保存成功！', showClose: true, center: true, type: 'success'});
                 if (value == 'use') {
                   vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
                 }
@@ -625,7 +632,7 @@
         });
 
 
-      },                               //导出图片
+      },                               //保存模板
 
       resourceQuery() {
         let _this = this;
@@ -656,20 +663,20 @@
         })
       },                                  //查询资源列表
       handleCurrentChange(val) {
-        this.pageNo = val
+        this.pageNo = val;
         this.resourceQuery()
       },                         //当前页翻页
       selectChange(val) {
-        val == '2' ? this.pageCount = 5 : this.pageCount = 21
+        val == '2' ? this.pageCount = 5 : this.pageCount = 21;
         this.resourceQuery()
       },                                //选择显示模式
       tableSelect(row, val) {
         this.row = row
       },                            //表格选择
       selected(e) {
-        this.check = !this.check
+        this.check = !this.check;
         let dom = e.currentTarget.id;
-        let target = e.currentTarget
+        let target = e.currentTarget;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
           dom = e.target.offsetParent.id
           target = e.target.offsetParent
@@ -711,14 +718,14 @@
           if (response.data.code == '0000') {
             let elements = response.data.cust.templates[0].temItems;
             let template = response.data.cust.templates[0];
-            _this.temId = template.id
+            _this.temId = template.id;
             _this.temName = template.name;
             _this.terminalType = template.terminalType;
             _this.temType = template.type;
             _this.desc = template.desc;
             _this.resolution = template.resolution;
             elements.forEach(item => {
-              let data = {}                       //这个需要定义在循环内部
+              let data = {};                       //这个需要定义在循环内部
               data['width'] = item.width;
               data['height'] = item.height;
               data['x'] = item.x;
@@ -726,27 +733,27 @@
               data['name'] = item.id;                     //元素的唯一标识
               if (item.type == 'image') {
                 data['content'] = item.type;
-                data['conflictCheck'] = true
+                data['conflictCheck'] = true;
                 data['id'] = 'check'
               }
               if (item.type == 'video') {
                 data['content'] = item.type;
-                data['conflictCheck'] = true
+                data['conflictCheck'] = true;
                 data['id'] = 'check'
               }
               if (item.type == 'txt') {
                 data['content'] = item.type;
-                data['conflictCheck'] = false
+                data['conflictCheck'] = false;
                 data['id'] = 'Uncheck'
               }
               if (item.type == 'scroll') {
                 data['content'] = item.type;
-                data['conflictCheck'] = false
+                data['conflictCheck'] = false;
                 data['id'] = 'Uncheck'
               }
               if (item.type == 'audio') {
                 data['content'] = item.type;
-                data['conflictCheck'] = false
+                data['conflictCheck'] = false;
                 data['id'] = 'Uncheck'
               }
               _this.elements.push(data)
