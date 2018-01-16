@@ -10,11 +10,11 @@ import VueDraggableResizable from '@/components/common/vue-draggable-resizable' 
 Vue.component('vue-draggable-resizable', VueDraggableResizable)
 
 import Axios from 'axios'
-Axios.defaults.baseURL = 'http://192.168.1.6:8081/'; //AXIOS请求时默认URL
+Axios.defaults.baseURL = 'http://192.168.1.8:8081/'; //AXIOS请求时默认URL
 Vue.prototype.$http = Axios; //将AXIOS转为原型链
 
-Vue.config.productionTip = false
-Vue.use(ElementUI)
+Vue.config.productionTip = false;
+Vue.use(ElementUI);
 
 	/* eslint-disable no-new */
 new Vue({

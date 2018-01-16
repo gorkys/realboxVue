@@ -162,7 +162,7 @@
             <el-table-column prop="name" align="center" label="用户名"></el-table-column>
             <el-table-column prop="name" align="center" label="角色"></el-table-column>
             <el-table-column prop="groupName" align="center" label="用户分组"></el-table-column>
-            <el-table-column prop="deptName" align="center" label="所属部门"></el-table-column>
+            <el-table-column prop="deptName" align="center" label="终端分组"></el-table-column>
             <el-table-column prop="address" align="center" label="终端总数"></el-table-column>
             <el-table-column prop="desc" align="center" label="备注"></el-table-column>
             <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
@@ -181,7 +181,7 @@
     </Content>
     <footer-bar></footer-bar>
     <el-dialog :title="title" :visible.sync="openDialog" width="27.5%">
-      <el-dialog width="30%" title="选择所属部门" :visible.sync="openD" append-to-body>
+      <el-dialog width="30%" title="选择终端分组" :visible.sync="openD" append-to-body>
         <el-tree
           :data="departmentTree" show-checkbox default-expand-all :check-strictly="true"
           node-key="id" ref="departmentTree" highlight-current>
@@ -233,7 +233,7 @@
         <el-form-item v-if="title!='编辑用户'" label="确认密码" :label-width="LabelWidth">
           <el-input type="password" v-model="form.password" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="所属部门" :label-width="LabelWidth">
+        <el-form-item label="终端分组" :label-width="LabelWidth">
           <input v-model="form.department" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openDepartment" readonly="readonly"/>
         </el-form-item>
@@ -519,7 +519,7 @@
           }
         }
         if (this.form.department == '') {
-          this.$message({message: '请选择所属部门！', center: true, type: 'warning'});
+          this.$message({message: '请选择所属分组！', center: true, type: 'warning'});
           return false
         }
         if (this.form.role == '') {
@@ -621,7 +621,7 @@
       departmentSelect() {
         let tree = this.$refs.departmentTree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个部门！', center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
           return false
         }
         this.departmentId = tree[0].id

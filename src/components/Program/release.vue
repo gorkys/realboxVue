@@ -174,7 +174,7 @@
   <div id="release">
     <div class="left">
       <div class="terminalBox">
-        <div class="title">部门/终端</div>
+        <div class="title">终端分组</div>
         <div class="controlBox">
           <div style="width: 120px">
             <el-select v-model="terSelect" size="mini" placeholder="终端分组" @change="getTree">
@@ -345,7 +345,7 @@
         </div>
       </div>
       <div class="checked">
-        <div class="title">选中的部门/终端</div>
+        <div class="title">选中终端</div>
         <div class="controlBox">
           <a><i class="el-icon-delete"></i>删除</a>
         </div>
@@ -356,7 +356,7 @@
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
             <el-table-column prop="date" align="center" label="类型"></el-table-column>
-            <el-table-column prop="name" align="center" label="终端/部门"></el-table-column>
+            <el-table-column prop="name" align="center" label="终端"></el-table-column>
             <el-table-column prop="type" align="center" label="终端类型"></el-table-column>
             <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
           </el-table>
@@ -722,6 +722,7 @@
         let disType = _this.releaseType == '1' ? 'now' : 'plan';
         let releasePloy = _this.releasePloy == '1' ? 'append' : 'overwrite';
         let date = _this.timingMode == '1' ? _this.playDate.toString() : _this.checkedWeeks.toString();
+        let type = _this.timingMode == '1' ? 'date' : 'week';
         let data = {
           invalidTime: _this.failTime,	                              //失效时间
           playMode: playMode,	                                        //播放类型
@@ -733,7 +734,8 @@
           time: _this.playTime.toString(),	                          //播放时间
           terminalId: terId,                                          //终端ID
           makeTime: _this.reservationDate,                            //预约时间
-          disStrategy: releasePloy                                    //发布策略
+          disStrategy: releasePloy,                                    //发布策略
+          type: type                                                   //按日期还是星期
         };
         this.$http({
           method: 'post',

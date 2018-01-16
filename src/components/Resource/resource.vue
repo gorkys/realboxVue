@@ -202,7 +202,7 @@
             </el-table-column>
             <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
             <el-table-column prop="size" align="center" label="大小(kb)"></el-table-column>
-            <el-table-column prop="orgId" align="center" label="所属部门"></el-table-column>
+            <el-table-column prop="orgId" align="center" label="终端分组"></el-table-column>
             <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
             <el-table-column prop="uploadtime" align="center" label="更新时间"></el-table-column>
           </el-table>

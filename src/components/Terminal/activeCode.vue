@@ -137,7 +137,7 @@
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="20%">
       <el-dialog
         width="20%"
-        title="选择企业部门"
+        title="选择企业终端分组"
         :visible.sync="openEntDep"
         append-to-body>
         <el-tree :data="departmentTree" node-key="id" ref="departmentTree"
@@ -154,19 +154,19 @@
         <el-tree :data="terminalTree" node-key="id" ref="terminalTree" show-checkbox
                  :check-strictly="true" default-expand-all highlight-current></el-tree>
         <!--分组树-->
-        <div slot="footer" class="dialog-footer">
+        <!--<div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="selectGroup">确 定</el-button>
-        </div>
+        </div>-->
       </el-dialog>            <!--选择终端分组-->
       <el-form :model="form">
-        <el-form-item label="企业部门" :label-width="LabelWidth">
+        <el-form-item label="终端分组" :label-width="LabelWidth">
           <input v-model="form.entDep" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="clickEntDep" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="终端分组" :label-width="LabelWidth">
+        <!--<el-form-item label="终端分组" :label-width="LabelWidth">
           <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="clickTerGroup" readonly="readonly"/>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item v-if="isBatch" label="生成数量" :label-width="LabelWidth">
           <el-input-number v-model="form.num" :min="1" :max="999"></el-input-number>
         </el-form-item>
@@ -223,7 +223,7 @@
       generate() {
         this.$http({
           method: 'get',
-          url: 'activate/create?number=' + this.form.num + '&depfId=' + this.depfId + '&groupId=' + this.groupId,
+          url: 'activate/create?number=' + this.form.num + '&depfId=' + this.depfId /*+ '&groupId=' + this.groupId*/,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -278,7 +278,7 @@
         })
       },                              //查询激活码
       delCode() {
-        var ids = this.rowId.map(item => item.id).join(' ')
+        let ids = this.rowId.map(item => item.id).join(' ');
         this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -299,7 +299,7 @@
                 showClose: true,
                 center: true,
                 type: 'success'
-              })
+              });
               this.activeQuery()
             } else {
               this.$message({
@@ -333,12 +333,12 @@
         this.openEntDep = true;
         this.value = 1;
         this.getTree()
-      },                              //弹出选择企业部门对话框
-      clickTerGroup() {
+      },                              //弹出选择终端分组对话框
+      /*clickTerGroup() {
         this.openTerGroup = true;
         this.value = 2;
         this.getTree()
-      },                            //弹出选择终端分组对话框
+      },                            //弹出选择终端分组对话框*/
       selectDep() {
         let tree = this.$refs.departmentTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
@@ -349,7 +349,7 @@
         this.form.entDep = tree[0].label;
         this.openEntDep = false
       },                                //选择企业部门
-      selectGroup() {
+      /*selectGroup() {
         let tree = this.$refs.terminalTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
           this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
@@ -358,7 +358,7 @@
         this.groupId = tree[0].id;
         this.form.terGroup = tree[0].label;
         this.openTerGroup = false
-      },                              //选择终端分组
+      },                              //选择终端分组*/
       getTree() {
         let _this = this, id = 0;
         this.value == 1 ? id = 60 : id = 40;
@@ -390,9 +390,37 @@
         })
       },                                //导出激活码
       unbundled(){
-        this.$confirm('功能正在开发中...', '提示', {
+        let ids = this.rowId.map(item => item.id).join(' ');
+        this.$confirm('激活码将与终端解除绑定，是否继续', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
+        }).then(() => {
+          this.$http({
+            method: 'get',
+            url: 'activate/unbundled?ids=' + ids,
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == '0000') {
+              this.$message({
+                message: '解绑成功！',
+                showClose: true,
+                center: true,
+                type: 'success'
+              });
+              this.activeQuery()
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
         })
       }                                     //解绑激活码
     }

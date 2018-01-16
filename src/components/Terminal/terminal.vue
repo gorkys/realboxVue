@@ -14,6 +14,8 @@
   }
 
   .controlTree {
+    height: 40px;
+    line-height: 40px;
     text-align: right;
     padding: 10px;
     border-bottom: 1px solid #dedede;
@@ -99,7 +101,7 @@
         <div class="title">{{treeTitle}}</div>
         <div class="controlTree">
           <div style="width: 120px">
-            <!--<el-select v-model="elSelect" @change="selectChange">
+           <!-- <el-select v-model="elSelect" @change="selectChange">
               <el-option v-for="item in select"
                          :key="item.value"
                          :label="item.label"
@@ -131,9 +133,9 @@
           </div>
           <div class="control">
             <a @click="delTerminal"><i class="el-icon-delete"></i>删除</a>
-            <el-dropdown>
+            <!--<el-dropdown>
           <span class="el-dropdown-link" style="cursor: pointer">
-            <i class="el-icon-edit" style="margin-right: 5px"></i>批量操作<i class="el-icon-arrow-down el-icon--right"></i>
+            <i class="el-icon-edit" style="margin-right: 5px"></i>批量操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
           </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item @click.native="">开机时间</el-dropdown-item>
@@ -141,7 +143,7 @@
                 <el-dropdown-item @click.native="">音量设置</el-dropdown-item>
                 <el-dropdown-item @click.native="">系统设置</el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>
+            </el-dropdown>-->
           </div>
         </div>
         <div class="tableList">
@@ -194,7 +196,7 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         row: '',              //行数据
-        elSelect: '企业部门',
+        /*elSelect: '企业部门',
         select: [
           {
             value: 1,
@@ -204,7 +206,7 @@
             value: 2,
             label: '终端分组'
           }
-        ],
+        ],*/
         value: true,        //当前选择树的值
         groupId: '',       //终端分组ID
         depfId: '',         //所属部门ID

@@ -88,7 +88,7 @@
           </div>
           <div style="width:200px;">
             <el-input placeholder="请输入内容" v-model="input3">
-              <template slot="prepend">所属部门</template>
+              <template slot="prepend">终端分组</template>
             </el-input>
           </div>
           <div style="width:200px;">
@@ -119,7 +119,7 @@
           style="width: 100%">
           <el-table-column prop="date" align="center" label="操作类型"></el-table-column>
           <el-table-column prop="name" align="center" label="操作人"></el-table-column>
-          <el-table-column prop="address" align="center" label="所属部门"></el-table-column>
+          <el-table-column prop="address" align="center" label="终端分组"></el-table-column>
           <el-table-column prop="address" align="center" label="操作IP"></el-table-column>
           <el-table-column prop="address" align="center" label="操作时间"></el-table-column>
           <el-table-column prop="address" align="center" label="操作状态"></el-table-column>
