@@ -160,10 +160,9 @@
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
             <el-table-column prop="name" align="center" label="用户名"></el-table-column>
-            <el-table-column prop="name" align="center" label="角色"></el-table-column>
+            <el-table-column prop="roleName" align="center" label="角色"></el-table-column>
             <el-table-column prop="groupName" align="center" label="用户分组"></el-table-column>
-            <el-table-column prop="deptName" align="center" label="终端分组"></el-table-column>
-            <el-table-column prop="address" align="center" label="终端总数"></el-table-column>
+            <el-table-column prop="terName" align="center" label="终端分组"></el-table-column>
             <el-table-column prop="desc" align="center" label="备注"></el-table-column>
             <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
             <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
@@ -183,14 +182,14 @@
     <el-dialog :title="title" :visible.sync="openDialog" width="27.5%">
       <el-dialog width="30%" title="选择终端分组" :visible.sync="openD" append-to-body>
         <el-tree
-          :data="departmentTree" show-checkbox default-expand-all :check-strictly="true"
-          node-key="id" ref="departmentTree" highlight-current>
+          :data="terGroupTree" show-checkbox default-expand-all :check-strictly="true"
+          node-key="id" ref="terGroupTree" highlight-current>
         </el-tree>
         <div slot="footer" class="dialog-footer">
           <el-button @click="openD = false">取 消</el-button>
-          <el-button type="primary" @click="departmentSelect">确 定</el-button>
+          <el-button type="primary" @click="terGroupSelect">确 定</el-button>
         </div>
-      </el-dialog>            <!--所属部门选择-->
+      </el-dialog>            <!--终端分组选择-->
       <el-dialog width="30%" title="选择用户角色" :visible.sync="openR" append-to-body>
         <el-table
           :data="roleList"
@@ -234,8 +233,8 @@
           <el-input type="password" v-model="form.password" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="终端分组" :label-width="LabelWidth">
-          <input v-model="form.department" class="el-input__inner" auto-complete="off"
-                 style="cursor: pointer" @click="openDepartment" readonly="readonly"/>
+          <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
+                 style="cursor: pointer" @click="openTerGroup" readonly="readonly"/>
         </el-form-item>
         <el-form-item label="用户角色" :label-width="LabelWidth">
           <input v-model="form.role" class="el-input__inner" auto-complete="off"
@@ -320,7 +319,7 @@
           userName: '',
           userPass: '',
           password: '',
-          department: '',
+          terGroup: '',
           role: '',
           group: '',
           desc: ''
@@ -331,17 +330,17 @@
           groupDesc: ''
         },
         LabelWidth: '70px',
-        openD: false,          //打开选择部门对话框
+        openD: false,          //打开选择终端分组对话框
         openR: false,          //打开选择角色对话框
         openG: false,         //打开选择分组对话框
 
-        departmentTree: [],         //部门树
+        terGroupTree: [],         //终端分组树
         roleList: [],         //角色列表
         groupTree: [],          //分组树
 
-        departmentId: '',        //部门ID
+        terGroupId: '',        //终端分组ID
         roleId: '',        //角色ID
-        groupId: '',       //分组ID
+        terId: '',       //终端ID
         userId: '',        //用户ID
 
         rolePageCount: 5,         //角色列表分页
@@ -354,12 +353,12 @@
         treeTitle: '',
         groupSuper: [],         //分组上级选择
         superId: '',             //分组上级ID
-        openSuperG:false,
-        creator:'',
-        currentGroupId:'',       //当前组ID
+        openSuperG: false,
+        creator: '',
+        currentGroupId: '',       //当前组ID
 
-        searchName:'',
-        searchType:'',
+        searchName: '',
+        searchType: '',
       }
     },
     components: {
@@ -370,7 +369,7 @@
     },
     methods: {
       getTree() {
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: 'tree/query?id=50',
@@ -393,10 +392,10 @@
       },                          //用户分组树
       queryUserList() {
         let _this = this;
-        let t = [];
+        _this.users = [];
         this.$http({
           method: 'get',
-          url: 'user/query?treeId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&name='+this.searchName+'&type='+this.searchType,
+          url: 'user/query?treeId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&name=' + this.searchName + '&type=' + this.searchType,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -406,11 +405,9 @@
           if (response.data.code == '0000') {
             let users = response.data.cust.users;
             _this.total = response.data.cust.pages.count;
-            for (let i = 0; i < users.length; i++) {
-              t.push(users[i]);
-              _this.users = t
+            for (let user of users) {
+              _this.users.push(user)
             }
-
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -421,20 +418,20 @@
         })
       },                    //查询列表
       handleCurrentChange() {
-        this.pageNo = val
+        this.pageNo = val;
         this.getRoleList()
       },              //当前页翻页
       New() {
-        this.openDialog = true
+        this.openDialog = true;
         this.title = '新建用户'
       },                              //新建
-      openDepartment() {
-        this.openD = true
+      openTerGroup() {
+        this.openD = true;
 
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
-          url: 'tree/query?id=60',
+          url: 'tree/query?id=40',
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -442,7 +439,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.departmentTree = response.data.cust.trees
+            _this.terGroupTree = response.data.cust.trees
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -451,11 +448,11 @@
             });
           }
         })
-      },                   //打开选择部门对话框
+      },                   //打开选择终端分组对话框
       openRole() {
-        this.openR = true
+        this.openR = true;
 
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: '/role/query?pageCount=' + _this.rolePageCount + '&pageNo=' + _this.rolePageNo,
@@ -466,7 +463,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.roleList = response.data.cust.roles
+            _this.roleList = response.data.cust.roles;
             _this.roleTotal = response.data.cust.pages.count
           } else {
             this.$message({
@@ -478,9 +475,9 @@
         })
       },                         //打开选择角色对话框
       openGroup() {
-        this.openG = true
+        this.openG = true;
 
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: 'tree/query?id=50',
@@ -503,7 +500,6 @@
       },                        //打开选择分组对话框
 
       submit() {
-        debugger
         if (this.form.userName == '') {
           this.$message({message: '请填写用户名称！', center: true, type: 'warning'});
           return false
@@ -518,8 +514,8 @@
             return false
           }
         }
-        if (this.form.department == '') {
-          this.$message({message: '请选择所属分组！', center: true, type: 'warning'});
+        if (this.form.terGroup == '') {
+          this.$message({message: '请选择终端分组！', center: true, type: 'warning'});
           return false
         }
         if (this.form.role == '') {
@@ -530,72 +526,57 @@
           this.$message({message: '请选择用户分组！', center: true, type: 'warning'});
           return false
         }
+        let data = {}, url = '', method = '', msg = '';
         if (this.title == '新建用户') {
-          let data = {
+          data = {
             creator: sessionStorage.getItem('name'),
             desc: this.form.desc,
             name: this.form.userName,
             password: this.form.password,
-            deptId: this.departmentId,         //部门ID
+            terId: this.terGroupId,         //终端分组ID
             roleId: this.roleId,         //角色ID
-            groupId: this.groupId,         //分组ID
-          }
-          this.$http({
-            method: 'post',
-            url: 'user/create',
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            },
-            data: data
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({message: '新建用户成功！', center: true, type: 'success'});
-              this.openDialog = false
-              this.queryUserList()
-            } else {
-              this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
-                center: true,
-                type: 'error'
-              });
-            }
-          })
+            groupId: this.groupId,         //终端树ID
+          };
+          url = 'user/create';
+          method = 'post';
+          msg = '新建用户成功'
         }
         else {
-          let data = {
+          data = {
             creator: sessionStorage.getItem('name'),
             id: this.userId,
             desc: this.form.desc,
             name: this.form.userName,
-            deptId: this.departmentId,         //部门ID
+            terId: this.terGroupId,         //终端分组ID
             roleId: this.roleId,         //角色ID
             groupId: this.groupId,         //分组ID
-          }
-          this.$http({
-            method: 'put',
-            url: 'user/update',
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            },
-            data: data
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({message: '编辑用户成功！', center: true, type: 'success'});
-              this.openDialog = false
-              this.queryUserList()
-            } else {
-              this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
-                center: true,
-                type: 'error'
-              });
-            }
-          })
+          };
+          url = 'user/update';
+          method = 'put';
+          msg = '编辑用户成功'
         }
+        this.$http({
+          method: method,
+          url: url,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          },
+          data: data
+        }).then(response => {
+          if (response.data.code == '0000') {
+            this.$message({message: msg, center: true, type: 'success'});
+            this.openDialog = false;
+            this.queryUserList()
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              center: true,
+              type: 'error'
+            });
+          }
+        })
       },                           //新建与编辑用户
       handleRolePage() {
         this.rolePageNo = val
@@ -610,46 +591,46 @@
             type: 'warning'
           });
         } else {
-          this.roleId = this.roleRow[0].id
-          this.form.role = this.roleRow[0].name
+          this.roleId = this.roleRow[0].id;
+          this.form.role = this.roleRow[0].name;
           this.openR = false
         }
       },                       //选择角色
       roleSelectRow(selection) {
         this.roleRow = selection
       },           //选择角色列表的选中行数据
-      departmentSelect() {
-        let tree = this.$refs.departmentTree.getCheckedNodes()
+      terGroupSelect() {
+        let tree = this.$refs.terGroupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
           this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
           return false
         }
-        this.departmentId = tree[0].id
-        this.form.department = tree[0].label
+        this.terGroupId = tree[0].id;
+        this.form.terGroup = tree[0].label;
         this.openD = false
-      },                 //选择所属部门
+      },                 //选择终端分组
       groupSelect() {
-        let tree = this.$refs.groupTree.getCheckedNodes()
+        let tree = this.$refs.groupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        this.groupId = tree[0].id
-        this.form.group = tree[0].label
+        this.groupId = tree[0].id;
+        this.form.group = tree[0].label;
         this.openG = false
       },                      //选择用户组
 
       Edit() {
-        this.openDialog = true
-        this.title = '编辑用户'
-        this.form.userName = this.userRow[0].name
-        this.form.department = this.userRow[0].deptName
-        this.form.role = this.userRow[0].roleName
-        this.form.group = this.userRow[0].groupName
-        this.form.desc = this.userRow[0].desc
-        this.departmentId = this.userRow[0].deptId
-        this.roleId = this.userRow[0].roleId
-        this.groupId = this.userRow[0].groupId
+        this.openDialog = true;
+        this.title = '编辑用户';
+        this.form.userName = this.userRow[0].name;
+        this.form.terGroup = this.userRow[0].terName;
+        this.form.role = this.userRow[0].roleName;
+        this.form.group = this.userRow[0].groupName;
+        this.form.desc = this.userRow[0].desc;
+        this.terGroupId = this.userRow[0].terId;
+        this.roleId = this.userRow[0].roleId;
+        this.groupId = this.userRow[0].groupId;
         this.userId = this.userRow[0].id
       },                             //编辑
       SelectRow(selection) {
@@ -673,7 +654,7 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '删除成功！',showClose: true, center: true, type: 'success'});
+              this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
               this.queryUserList()
             } else {
               this.$message({
@@ -696,7 +677,7 @@
       selectSuperGroup() {
         let tree = this.$refs.groupSuper.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组作为上级！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组作为上级！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.superId = tree[0].id;
@@ -707,7 +688,7 @@
         this.treeTitle = "编辑分组";
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.creator = tree[0].creator;
@@ -719,11 +700,11 @@
       },                         //编辑节目分组
       groupSubmit() {
         if (this.treeForm.groupName == '') {
-          this.$message({message: '请填写分组名称！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.treeForm.superiorGroup == '') {
-          this.$message({message: '请填写上级分组！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.treeTitle == '新建分组') {
@@ -745,7 +726,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               _this.getTree();
-              this.$message({message: '新建分组成功！',showClose: true, center: true, type: 'success'});
+              this.$message({message: '新建分组成功！', showClose: true, center: true, type: 'success'});
               this.openTreeDialog = false
             } else {
               this.$message({
@@ -759,12 +740,12 @@
         } else {
           let _this = this;
           let data = {
-            id:this.currentGroupId,          //当前ID
+            id: this.currentGroupId,          //当前ID
             parentId: this.superId,
             label: this.treeForm.groupName,
-            creator:this.creator,          //创建人
+            creator: this.creator,          //创建人
             updaterCreator: sessionStorage.getItem('name'),
-            treeId:this.targetId        //目标树ID
+            treeId: this.targetId        //目标树ID
           };
           this.$http({
             method: 'put',
@@ -778,7 +759,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               _this.getTree();
-              _this.$message({message: '编辑分组成功！',showClose: true, center: true, type: 'success'});
+              _this.$message({message: '编辑分组成功！', showClose: true, center: true, type: 'success'});
               this.openTreeDialog = false
               _this.treeForm.superiorGroup = '';
               _this.treeForm.groupName = ''
@@ -796,7 +777,7 @@
       delTree() {
         let tree = this.$refs.tree.getCheckedNodes()
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '只能选择一个分组！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '只能选择一个分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id

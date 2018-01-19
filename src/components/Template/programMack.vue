@@ -203,6 +203,21 @@
     background-size: 100% 100%;
   }
 
+  /*快速预览*/
+  #proPreview {
+    position: relative;
+  }
+
+  #proPreview > div {
+    position: absolute;
+
+  }
+
+  #proPreview > div > div {
+    width: 100%;
+    height: 100%;
+  }
+
   /*模板样式END*/
 </style>
 <template>
@@ -242,7 +257,7 @@
           </div>
         </div>
         <div class="control">
-          <!--<a @click="view = true"><i class="el-icon-view"></i> 快速预览</a>-->
+          <a @click="quickPreview"><i class="el-icon-view"></i> 快速预览</a>
           <a @click="save"><i class="iconfont icon-iconset0237"></i> 保存</a>
           <a @click="exit"><i class="iconfont icon-lingcunwei"></i> 返回</a>
 
@@ -259,10 +274,23 @@
     <el-dialog
       title="快速预览"
       :visible.sync="view"
-
+      top="3vh"
+      :before-close="viewClose"
     >
-      <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
-        <div v-html="template" class="template"></div>
+      <div style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden">
+        <div id="proPreview" :style="{width : proPreview.width * PP + 'px',height : proPreview.height * PP + 'px'}"
+             style="background-color: black">
+          <div v-for="item in proPreview.temItems"
+               :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px'}">
+            <div :name="item.type" :id="item.id">
+              <video preload="metadata" v-if="item.type ==='video'" id="myVideo" width="100%" height="100%" loop
+                     autoplay>
+                <source id="video" :src="item.url" type="video/mp4">
+              </video>
+              <img v-if="item.type==='image'" style="width: 100%;height: 100%;" :src="item.url">
+            </div>
+          </div>
+        </div>
       </div>
     </el-dialog><!--预览-->
   </div>
@@ -278,51 +306,10 @@
 
       this.queryList();
       this.getTree();
-      this.resourceQuery()
-    },
-    updated: function () {
-      this.$nextTick(function () {
-        //为模板添加移动事件
-        let img = $('.move>img')
-        $('div').remove('.handle');
-        $('div').remove('.action');
-        $('.vdr').on('mousemove', function () {
-          $(this).css('border', '1px solid red');
-          if (img.attr('type') == $(this).children().attr('class')) {
-            $(".move>i").removeClass('icon-iconforbidden')
-            $(".move>i").addClass('icon-yunxu')
-            $(".move>i").css("color", "#33cc1e")
-          }           //判断当前移动文件类型与模板元素的类型是否一致
-        });       //移动到目标位置的样式更改
-        $('.vdr').on('mouseup', function (event) {
-          if (img.attr('type') == $(this).children().attr('class')) {               //判断当前移动文件类型与模板元素的类型是否一致
-            let src = img.attr('src');
-            let name = img.attr('name');
-            let id = img.attr('id');
-            $(this).children('.' + img.attr('type')).children('img').remove();
-            $(this).children('.' + img.attr('type')).html("<img name='" + name + "' id='" + id + "' src='" + src + "'>")
-          }
-          this.isDown = false;
-          $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
-        });
-        //还原节目资源
-        if (this.$route.query.type == 1) {
-          if (document.getElementById('edit') != null && document.getElementById('edit').children != null) {
-            let edit = document.getElementById('edit').children;
-            for (let item of this.res) {
-              for (let i = 0; i < edit.length; i++) {
-                if (item.name == edit[i].getAttribute('name')) {
-                  edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
-                }
-              }
-            }
-          }
-        }
-
-      })
+      this.resourceQuery();
     },
     beforeDestroy: function () {
-      document.documentElement.removeEventListener('mousemove', this.handleMove, true)
+      document.documentElement.removeEventListener('mousemove', this.handleMove, true);
       document.documentElement.removeEventListener('mouseup', this.handleUp, true)
     },
     computed: {},
@@ -354,7 +341,9 @@
         /*还原资源*/
         res: [],          //还原时资源的容器
         proId: '',
-        groupId: ''
+        groupId: '',
+        PP: '',
+        proPreview: ''
       }
     },
     components: {},
@@ -473,9 +462,8 @@
 
       queryList() {
         let _this = this;
-        let url = '';
         let type = _this.$route.query.type;
-        type != 0 && type != undefined ? url = 'program/query' : url = 'template/query';   //根据类型判断是新增还是编辑，0为新建1为编辑
+        let url = type != 0 && type != undefined ? 'program/query' : 'template/query';   //根据类型判断是新增还是编辑，0为新建1为编辑
         this.$http({
           method: 'get',
           url: url + '?groupId=' + _this.$route.query.groupId + '&name=' + _this.$route.query.name + '&pageNo=1&pageCount=1',
@@ -501,6 +489,46 @@
                 _this.res.push({name: item.itemsId, url: item.url, thumbnail: item.thumbnail})
               })
             }
+            //数据渲染后为还原数据绑定事件
+            _this.$nextTick(function () {
+              //为模板添加移动事件
+              let img = $('.move>img');
+              $('div').remove('.handle');
+              $('div').remove('.action');
+              $('.vdr').on('mousemove', function () {
+                $(this).css('border', '1px solid red');
+                if (img.attr('type') == $(this).children().attr('class')) {
+                  $(".move>i").removeClass('icon-iconforbidden');
+                  $(".move>i").addClass('icon-yunxu');
+                  $(".move>i").css("color", "#33cc1e")
+                }           //判断当前移动文件类型与模板元素的类型是否一致
+              });       //移动到目标位置的样式更改
+              $('.vdr').on('mouseup', function (event) {
+                if (img.attr('type') == $(this).children().attr('class')) {               //判断当前移动文件类型与模板元素的类型是否一致
+                  let src = img.attr('src');
+                  let name = img.attr('name');
+                  let id = img.attr('id');
+                  $(this).children('.' + img.attr('type')).children('img').remove();
+                  $(this).children('.' + img.attr('type')).html("<img name='" + name + "' id='" + id + "' src='" + src + "'>")
+                }
+                this.isDown = false;
+                $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
+              });
+              //还原节目资源
+              if (this.$route.query.type == 1) {
+                if (document.getElementById('edit') != null && document.getElementById('edit').children != null) {
+                  let edit = document.getElementById('edit').children;
+                  for (let item of this.res) {
+                    for (let i = 0; i < edit.length; i++) {
+                      if (item.name == edit[i].getAttribute('name')) {
+                        edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
+                      }
+                    }
+                  }
+                }
+              }
+
+            })
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -512,7 +540,6 @@
         })
       },                                //获取模板列表
       save(type) {
-
         let _this = this;
         let table = $('#edit');
         /* 这部分代码用来解决生成的图片不清晰的问题 */
@@ -578,7 +605,7 @@
               data: data
             }).then(response => {
               if (response.data.code == '0000') {
-                _this.$message({message: '保存成功！',showClose: true, center: true, type: 'success'});
+                _this.$message({message: '保存成功！', showClose: true, center: true, type: 'success'});
                 if (type == 'release') {
                   _this.$router.push({path: '/release', query: {name: _this.proName}})
                 }
@@ -609,6 +636,64 @@
       exit() {
         this.$router.go(-1);
       },                                     //返回
+      quickPreview() {
+        this.$http({
+          method: 'get',
+          url: 'template/query?id=' + this.temId + '&pageNo=1&pageCount=1',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let template = response.data.cust.templates[0];
+            this.proPreview = template;                       //快速预览
+
+            let items = this.proPreview.temItems;
+            let table = $('#edit');
+            /*根据模板高度设置缩放比例*/
+            if (this.proPreview.height == '1080') this.PP = 0.4;
+            if (this.proPreview.height == '720') this.PP = 0.7;
+            if (this.proPreview.height == '1280') this.PP = 0.6;
+            if (this.proPreview.height == '1920') this.PP = 0.4;
+            /*取节目资源地址*/
+            for (let item of items) {
+              table.children().map(function () {
+                let itemsId = $(this).attr('name');                                //元素ID
+                let url = $(this).children().children().attr('name');         //资源地址
+                if (item.id == itemsId) {
+                  item['url'] = url
+                }
+              });
+            }
+            this.view = true;
+            let myVideo = document.getElementById('myVideo');
+            myVideo.load();
+            myVideo.play();
+            debugger
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
+              center: true,
+              type: 'error'
+            });
+          }
+        });
+
+      },                                  //快速预览
+      viewClose(done) {
+        let myVideo = document.getElementById('myVideo');
+        myVideo.currentTime = 0;                            //将视频当前时间初始化
+        myVideo.pause();
+        done();
+      }                               //快速预览窗口关闭
+    },
+    watch:{
+      template:function () {
+
+      }
     }
   }
 </script>

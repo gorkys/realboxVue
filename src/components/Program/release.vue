@@ -186,9 +186,7 @@
           </div>
         </div>
         <div class="terminalList">
-          <el-tree v-if="terSelect == 1" :data="depTree" show-checkbox :check-strictly="true" @check-change="depCheck"
-                   default-expand-all :expand-on-click-node="false" ref="depTree"></el-tree>
-          <el-tree v-else :data="terTree" show-checkbox :check-strictly="true" @check-change="terCheck"
+          <el-tree :data="terTree" show-checkbox :check-strictly="true" @check-change="terTree"
                    default-expand-all :expand-on-click-node="false" ref="terTree"></el-tree>
         </div>
       </div>
@@ -434,10 +432,8 @@
     },
     data() {
       return {
-        depTree: [],              //部门树数据
         terTree: [],              //终端树数据
         terminals: [],             //终端列表
-        tree: true,               //区分部门与终端树
         terSelect: 1,
         terSelects: [{
           value: 1,
@@ -559,11 +555,10 @@
         this.$router.go(-1);
       },                               //返回
       getTree() {
-        let _this = this, id = 0;
-        this.terSelect == 1 ? id = 60 : id = 40;
+        let _this = this;
         this.$http({
           method: 'get',
-          url: 'tree/query?id=' + id,
+          url: 'tree/query?id=40',
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -571,7 +566,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.terSelect == 1 ? _this.depTree = response.data.cust.trees : _this.terTree = response.data.cust.trees;
+            _this.terTree = response.data.cust.trees;
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -581,35 +576,19 @@
           }
         })
       },                            //获取树资源
-      depCheck() {
-        this.tree = true;
-        this.getTerList(this.tree)
-      },                           //选中企业部门树节点
-      terCheck() {
-        this.tree = false;
-        this.getTerList(this.tree)
-      },                           //选中终端分组树节点
-      getTerList(type) {
-        if (type) {
-          let tree = this.$refs.depTree.getCheckedNodes();
-          if (tree.length > 1) {
-            this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
-            return false
-          }
-          this.depfId = tree[0].id
-        } else {
-          let tree = this.$refs.terTree.getCheckedNodes();
-          if (tree.length > 1) {
-            this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
-            return false
-          }
-          this.groupId = tree[0].id
+      getTerList() {
+        let tree = this.$refs.terTree.getCheckedNodes();
+        if (tree.length > 1) {
+          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          return false
         }
+        this.groupId = tree[0].id;
+
         let _this = this;
         this.terminals = [];
         this.$http({
           method: 'get',
-          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.groupId + '&depfId=' + _this.depfId,
+          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.groupId,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -617,8 +596,8 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let terminals = response.data.cust.terminals
-            _this.total = response.data.cust.pages.count
+            let terminals = response.data.cust.terminals;
+            _this.total = response.data.cust.pages.count;
             for (let terminal of terminals) {
               _this.terminals.push(terminal)
             }

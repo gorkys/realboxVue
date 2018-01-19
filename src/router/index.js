@@ -8,7 +8,7 @@ import resource from '@/components/Resource/resource'         //资源管理
 import userLog from '@/components/Log/userLog'                //系统设置
 import operatingLog from '@/components/Log/operatingLog'
 import generalSet from '@/components/SystemSet/generalSet'    //系统设置
-import departmentSet from '@/components/SystemSet/departmentSet'
+import departmentSet from '@/components/SystemSet/terGroupSet'
 import userSet from '@/components/SystemSet/userSet'
 import roleSet from '@/components/SystemSet/roleSet'
 import terminal from '@/components/Terminal/terminal'         //终端管理
@@ -65,8 +65,8 @@ export default new Router({
       component: generalSet
     },
     {
-      path: '/departmentSet',
-      name: 'DepartmentSet',
+      path: '/terGroupSet',
+      name: '终端组设置',
       component: departmentSet
     },
     {

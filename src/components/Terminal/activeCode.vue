@@ -118,10 +118,9 @@
           <el-table-column type="selection" align="center" width="55"></el-table-column>
           <el-table-column prop="code" align="center" label="激活码"></el-table-column>
           <el-table-column prop="name" align="center" label="所属终端"></el-table-column>
-          <el-table-column prop="address" align="center" label="激活状态"></el-table-column>
-          <el-table-column prop="address" align="center" label="生成时间"></el-table-column>
-          <el-table-column prop="address" align="center" label="创建者"></el-table-column>
+          <el-table-column prop="creator" align="center" label="创建者"></el-table-column>
           <el-table-column prop="used" align="center" label="可用状态"></el-table-column>
+          <el-table-column prop="time" align="center" label="生成时间"></el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -137,36 +136,21 @@
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="20%">
       <el-dialog
         width="20%"
-        title="选择企业终端分组"
+        title="选择终端分组"
         :visible.sync="openEntDep"
         append-to-body>
-        <el-tree :data="departmentTree" node-key="id" ref="departmentTree"
+        <el-tree :data="terGroupTree" node-key="id" ref="terGroupTree"
                  show-checkbox :check-strictly="true" default-expand-all highlight-current></el-tree>       <!--部门树-->
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="selectDep">确 定</el-button>
         </div>
-      </el-dialog>            <!--选择企业部门-->
-      <el-dialog
-        width="20%"
-        title="选择终端分组"
-        :visible.sync="openTerGroup"
-        append-to-body>
-        <el-tree :data="terminalTree" node-key="id" ref="terminalTree" show-checkbox
-                 :check-strictly="true" default-expand-all highlight-current></el-tree>
-        <!--分组树-->
-        <!--<div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="selectGroup">确 定</el-button>
-        </div>-->
       </el-dialog>            <!--选择终端分组-->
+
       <el-form :model="form">
         <el-form-item label="终端分组" :label-width="LabelWidth">
-          <input v-model="form.entDep" class="el-input__inner" auto-complete="off"
+          <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="clickEntDep" readonly="readonly"/>
         </el-form-item>
-        <!--<el-form-item label="终端分组" :label-width="LabelWidth">
-          <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
-                 style="cursor: pointer" @click="clickTerGroup" readonly="readonly"/>
-        </el-form-item>-->
         <el-form-item v-if="isBatch" label="生成数量" :label-width="LabelWidth">
           <el-input-number v-model="form.num" :min="1" :max="999"></el-input-number>
         </el-form-item>
@@ -199,19 +183,18 @@
         openDialog: false,
         openEntDep: false,
         openTerGroup: false,
-        depfId: '',                     //部门ID
+        terId: '',                     //部门ID
         groupId: '',                    //分组ID
         title: '',
         LabelWidth: '70px',
         form: {
-          entDep: '',                 // 企业部门
           terGroup: '',               //终端分组
           num: 1                      //生成数量
         },
         value: 0,                     //生成与批量生成区分值
-        departmentTree: [],           //部门树
-        terminalTree: [],             //分组树
-        isBatch: false                //是否批量生成
+        terGroupTree: [],           //终端分组树
+        isBatch: false,                //是否批量生成
+        creator:sessionStorage.getItem('name')
       }
     },
     components: {
@@ -223,7 +206,7 @@
       generate() {
         this.$http({
           method: 'get',
-          url: 'activate/create?number=' + this.form.num + '&depfId=' + this.depfId /*+ '&groupId=' + this.groupId*/,
+          url: 'activate/create?number=' + this.form.num + '&terId=' + this.terId +'&creator=' + this.creator,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -331,40 +314,24 @@
       },                                     //批量生成
       clickEntDep() {
         this.openEntDep = true;
-        this.value = 1;
         this.getTree()
       },                              //弹出选择终端分组对话框
-      /*clickTerGroup() {
-        this.openTerGroup = true;
-        this.value = 2;
-        this.getTree()
-      },                            //弹出选择终端分组对话框*/
       selectDep() {
-        let tree = this.$refs.departmentTree.getCheckedNodes();
+        let tree = this.$refs.terGroupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个部门！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个终端分组！',showClose: true, center: true, type: 'warning'});
           return false
         }
-        this.depfId = tree[0].id;
-        this.form.entDep = tree[0].label;
-        this.openEntDep = false
-      },                                //选择企业部门
-      /*selectGroup() {
-        let tree = this.$refs.terminalTree.getCheckedNodes();
-        if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！',showClose: true, center: true, type: 'warning'});
-          return false
-        }
-        this.groupId = tree[0].id;
+        this.terId = tree[0].id;
         this.form.terGroup = tree[0].label;
-        this.openTerGroup = false
-      },                              //选择终端分组*/
+        this.openEntDep = false
+      },                                //选择终端分组
+
       getTree() {
-        let _this = this, id = 0;
-        this.value == 1 ? id = 60 : id = 40;
+        let _this = this;
         this.$http({
           method: 'get',
-          url: 'tree/query?id=' + id,
+          url: 'tree/query?id=40',
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -372,7 +339,7 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.value == 1 ? _this.departmentTree = response.data.cust.trees : _this.terminalTree = response.data.cust.trees;
+            _this.terGroupTree = response.data.cust.trees
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',

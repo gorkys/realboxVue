@@ -255,12 +255,13 @@
           :title="title + '预览'"
           :visible.sync="view"
           width="30%"
+          top="3vh"
           @close="viewClose"
         >
           <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
             <img v-if="format==='image'" style="width: 100%;height: 100%;" :src="url">
-            <video preload="metadata" v-if="format ==='video'" width="520" height="320" controls>
-              <source id="video" :src="url" type="video/mp4">
+            <video preload="metadata" v-if="format ==='video'" id="myVideo" width="520" height="320" controls>
+              <source :src="url" type="video/mp4">
             </video>
           </div>
         </el-dialog><!--预览-->
@@ -476,18 +477,22 @@
         this.url = "http://" + document.getElementById(e.currentTarget.id).getAttribute("url")
         this.title = this.treeName.slice(0, 2);
         if (this.url.indexOf('mp4') != '-1') {
-          this.format = 'video'
+          this.format = 'video';
         } else if (this.url.indexOf('png') != '-1' || this.url.indexOf('jpg') != '-1' || this.url.indexOf('jpeg') != '-1') {
           this.format = 'image'
         } else {
           return false
         }
-        if (!this.view) this.view = true
+        this.view = true;
+        if(this.format == 'video'){
+          let myVideo = document.getElementById('myVideo');
+          myVideo.load();
+        }
       },                              //双击预览
       selected(e) {
-        this.check = !this.check
+        this.check = !this.check;
         let dom = e.currentTarget.id;
-        let target = e.currentTarget
+        let target = e.currentTarget;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
           dom = e.target.offsetParent.id
           target = e.target.offsetParent
@@ -503,7 +508,6 @@
           this.downloadUrl = "http://" + document.getElementById(target.id).getAttribute("url")
           this.downloadName = target.children[2].innerText;
           this.ids.push(dom)
-          debugger
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
@@ -512,12 +516,11 @@
           for (let i = 0; i < this.ids.length; i++) {
             if (this.ids[i] == dom) this.ids.splice(i, 1)
           }    //取消则从ids删除该元素
-          debugger
         }
       },                             //单击选择文件
       resourceQuery() {
         let _this = this;
-        this.resources = [];
+        _this.resources = [];
         this.$http({
           method: 'get',
           url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&name=" +this.resName,
@@ -576,7 +579,9 @@
         this.row = row
       },                        //表格选择
       viewClose() {
-
+        let myVideo = document.getElementById('myVideo');
+        myVideo.currentTime = 0;
+        myVideo.pause();
       }
     }
   }

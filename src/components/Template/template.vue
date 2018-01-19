@@ -267,7 +267,7 @@
         pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
-        treeId: 22,
+        treeId: 21,
         check: false,          //选中资源的变量
 
         openDialog: false,       //新建对话框
@@ -293,7 +293,7 @@
           label: '720×1280'
         }],                     //分辨率
         temName: '',            //模板名
-        treeName:'用户模板',
+        treeName:'系统模板',
         ids:[],                  //存储选中节目ID
         searchName:'',              //搜索名称
         searchResolution:'',              //搜索分辨率

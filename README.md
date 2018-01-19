@@ -69,6 +69,30 @@ npm run mock
         └── login       登录
 ```
 ## 填坑之旅
+#### 13.如何在页面渲染完后去操作dom，而且只执行一次？
+解决办法：使用场景：节目编辑时还原节目素材;</br>
+最初使用`update`生命周期，后来发现会在数据每次更新后执行一次，更改后使用第一种方法。
+
+1.在接口请求成功的回调里使用
+  
+  ```
+  this.$nextTick(() =>{
+    // 在这里面去获取DOM
+  })
+  ```
+  2.把watch和nextTick组合一起
+ 
+    watch:{    
+       showList:function(){ 
+           this.$nextTick(function(){
+                // 在这里面去获取DOM
+                })
+           }
+        }
+    showList对应页面的绑定变量
+    <tr v-for="(item,index) in showList">
+    
+
 #### 12.js截取某个符号前后的字符串
 解决方法：
 ```html
@@ -127,6 +151,7 @@ add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Ag
       3.后台设置完后前端需要清理一下缓存。
 ```
 #### 9.切换弹窗时视频存在缓存问题
+解决方法：使用`load()`重新加载视频元素，视频的暂停与播放方法为`play()`,`pause()`,设置当前视频播放位置`currentTime`。
 #### 8.MP4在网页上播放需要特定编码
 解决方法：由后台去转码
 #### 7.如何选择资源时切换选中状态

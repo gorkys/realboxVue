@@ -126,7 +126,7 @@
         LabelWidth: '70px',
         departmentTree: [],
         superiorId: '',                     //上级分组ID
-        treeId: 60,                         //树ID
+        treeId: 40,                         //终端树ID
         creator: '',                         //创建人
         departmentId: '',                    //分组ID  编辑用
         targetId: ''                  //编辑时需要移动到的目标树ID
