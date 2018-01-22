@@ -186,7 +186,7 @@
           </div>
         </div>
         <div class="terminalList">
-          <el-tree :data="terTree" show-checkbox :check-strictly="true" @check-change="terTree"
+          <el-tree :data="terTree" show-checkbox :check-strictly="true" @check-change="terCheck"
                    default-expand-all :expand-on-click-node="false" ref="terTree"></el-tree>
         </div>
       </div>
@@ -554,6 +554,15 @@
       exit() {
         this.$router.go(-1);
       },                               //返回
+      terCheck(){
+        let tree = this.$refs.terTree.getCheckedNodes();
+        if (tree.length > 1) {
+          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          return false
+        }
+        this.groupId = tree[0].id;
+        this.getTerList()
+      },                            //选中终端分组树节点
       getTree() {
         let _this = this;
         this.$http({
@@ -577,13 +586,6 @@
         })
       },                            //获取树资源
       getTerList() {
-        let tree = this.$refs.terTree.getCheckedNodes();
-        if (tree.length > 1) {
-          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
-          return false
-        }
-        this.groupId = tree[0].id;
-
         let _this = this;
         this.terminals = [];
         this.$http({
@@ -683,6 +685,7 @@
       delPro() {
         this.playImgs.splice(this.index, 1)
       },                             //删除节目
+
 
       terChange(val) {
         this.pageNo = val;

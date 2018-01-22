@@ -364,6 +364,7 @@
         }
       },
       handleUp: function (e) {
+        this.$emit('active')                //松开鼠标回调事件
         this.handle = null
         if (this.resizing) {
           //停止改变大小后进行冲突检测

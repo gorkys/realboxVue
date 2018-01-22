@@ -2,20 +2,27 @@
   #programMack {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
     background-color: #d2d2d2;
     padding: 0 10px;
     height: 100%;
   }
 
   #material {
-    width: 49%;
-    height: 98%;
+    width: 40.5%;
+    height: 80%;
     background-color: white;
   }
 
   #templateBox {
-    width: 49%;
-    height: 98%;
+    width: 59%;
+    height: 80%;
+    background-color: white;
+  }
+
+  #setAttr {
+    width: 100%;
+    height: 170px;
     background-color: white;
   }
 
@@ -62,7 +69,8 @@
   .resourceList {
     display: flex;
     flex-wrap: wrap;
-    height: 787px;
+    height: 616px;
+    align-content: flex-start;
   }
 
   .resourceList li {
@@ -72,7 +80,7 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 0 9px 10px;
+    margin: 0 9px 50px;
     cursor: pointer;
     padding: 10px 5px;
     border-radius: 5px;
@@ -138,12 +146,62 @@
     max-height: 130px;
   }
 
+  /*快速预览*/
+  #proPreview, #editTxt {
+    position: relative;
+  }
+
+  #proPreview > div, #editTxt > div {
+    position: absolute;
+
+  }
+
+  #proPreview > div > div, #editTxt > div > div {
+    width: 100%;
+    height: 100%;
+  }
+
+  #editTxt textarea {
+    border: 0;
+    position: absolute;
+    background-color: rgb(211, 249, 162);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    resize: none
+  }
+
+  .styleBox {
+    display: flex;
+  }
+
+  .fontStyle, .alignStyle {
+    display: flex;
+    justify-content: space-around;
+    width: 50%;
+  }
+
+  .fontStyle > li, .alignStyle > li {
+    cursor: pointer;
+    padding: 1px 8px;
+  }
+
+  .fontStyle > li:hover, .alignStyle > li:hover {
+    background-color: #5d5d5d3b;
+    border-radius: 5px;
+  }
+
+  .active {
+    background-color: #5d5d5d3b;
+    border-radius: 5px;
+  }
+
 </style>
 <style>
   /*模板样式*/
   #edit {
-    width: 600px;
-    height: 800px;
     background-color: #000;
     position: relative;
     display: flex;
@@ -203,21 +261,6 @@
     background-size: 100% 100%;
   }
 
-  /*快速预览*/
-  #proPreview {
-    position: relative;
-  }
-
-  #proPreview > div {
-    position: absolute;
-
-  }
-
-  #proPreview > div > div {
-    width: 100%;
-    height: 100%;
-  }
-
   /*模板样式END*/
 </style>
 <template>
@@ -226,7 +269,7 @@
       <div class="title">素材</div>
       <el-tabs type="border-card" @tab-click="handleClick">
         <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id">
-          <span slot="label"></i>{{resourceTitle.label}}</span>
+          <span slot="label">{{resourceTitle.label}}</span>
           <ul class="resourceList">
             <li v-for="(resource,id) in resources" :key="id" :id="resource.id" :name="resource.url"
                 :type="resource.type"
@@ -264,7 +307,81 @@
           <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
         </div>
       </div>
-      <div v-html="template" class="template"></div>
+      <div v-html="template.body" class="template"></div>
+    </div>
+    <div id="setAttr">
+      <el-tabs v-model="activeName" type="card" @tab-click="areaHandleClick">
+        <el-tab-pane v-for="item in template.temItems" v-if="item.type.indexOf('txt') == -1" :label="item.name"
+                     :name="item.name">
+          <el-form v-if="item.type=='scroll'" v-model="form" label-width="100px">
+            <el-form-item label="字幕内容" style="margin-bottom: 5px">
+              <el-input v-model="form.scrollContent" type="textarea" placeholder="请输入文本内容..."
+                        :autosize="{ minRows: 1, maxRows: 1}" style="width: 98%" resize="none">
+              </el-input>
+            </el-form-item>
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="字体颜色" size="mini" style="margin-bottom: 5px;">
+                  <el-color-picker v-model="form.scrollColor" size="mini"></el-color-picker>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="字幕滚动" size="mini" style="margin-bottom: 5px;">
+                  <el-select v-model="form.scrollDirection" placeholder="请选择滚动方向" style="width: 150px">
+                    <el-option v-for="item in form.scrollDirections" :label="item.direction"
+                               :value="item.value"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="字体大小" size="mini" style="margin-bottom: 5px;">
+                  <el-select v-model="form.scrollFontSize" placeholder="请选择字体大小" style="width: 150px">
+                    <el-option v-for="item in form.scrollFontSizes" :label="item.size" :value="item.size"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="字体类型" size="mini" style="margin-bottom: 5px;">
+                  <el-select v-model="form.scrollFontFamily" placeholder="请选择字体类型" style="width: 150px">
+                    <el-option v-for="item in form.scrollFontFamilys" :label="item.font" :value="item.font"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="背景颜色" size="mini">
+                  <el-color-picker v-model="form.scrollBGColor" size="mini"></el-color-picker>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="滚动速度" size="mini">
+                  <el-select v-model="form.scrollSpeed" placeholder="请选择滚动速度" style="width: 150px">
+                    <el-option v-for="item in form.scrollSpeeds" :label="item.speed" :value="item.value"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="背景透明度" size="mini">
+                  <el-select v-model="form.scrollBGTransparency" placeholder="请选择透明度" style="width: 150px">
+                    <el-option v-for="item in form.scrollBGTransparencys" :label="item.transparency"
+                               :value="item.transparency"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="持续时间" size="mini">
+                  <el-time-picker
+                    v-model="form.scrollDuration"
+                    placeholder="任意时间点">
+                  </el-time-picker>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+
     </div>
     <div class="move">
       <img src="">
@@ -275,7 +392,7 @@
       title="快速预览"
       :visible.sync="view"
       top="3vh"
-      :before-close="viewClose"
+      :close="viewClose"
     >
       <div style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden">
         <div id="proPreview" :style="{width : proPreview.width * PP + 'px',height : proPreview.height * PP + 'px'}"
@@ -293,13 +410,76 @@
         </div>
       </div>
     </el-dialog><!--预览-->
+    <el-dialog
+      title="文本编辑"
+      :visible.sync="editTxt"
+      :fullscreen="true"
+    >
+      <div
+        style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden;position: relative">
+        <div
+          style="width: 200px;height: 500px;left: 20px;top: 50px;position: absolute;z-index: 9999">
+          <div class="styleBox">
+            <ul class="fontStyle">
+              <li @click="setB" :class="{'active':SB === true}">
+                <i class="iconfont icon-bold"></i></li>
+              <li @click="setI" :class="{'active':SI === true}">
+                <i class="iconfont icon-qingxie"></i></li>
+              <li @click="setU" :class="{'active':SU === true}">
+                <i class="iconfont icon-underline"></i></li>
+            </ul>
+            <ul class="alignStyle">
+              <li :class="{'active':alignActive === 'left'}" @click="setAlign('left')">
+                <i class="iconfont icon-icon--"></i></li>
+              <li :class="{'active':alignActive === 'center'}" @click="setAlign('center')">
+                <i class="iconfont icon--juzhongduiqi"></i></li>
+              <li :class="{'active':alignActive === 'right'}" @click="setAlign('right')">
+                <i class="iconfont icon-youduiqi"></i></li>
+            </ul>
+          </div>
+
+          <el-form style="margin-top: 20px">
+            <el-form-item label="字体" size="mini">
+              <el-select v-model="fontSize" placeholder="请选择字体" style="width: 150px">
+                <el-option v-for="item in fontSizes" :label="item.size" :value="item.size"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="字号" size="mini">
+              <el-select v-model="font" placeholder="请选择字体大小" style="width: 150px">
+                <el-option v-for="item in fonts" :label="item.font" :value="item.font"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="颜色">
+              <el-color-picker v-model="fontColor"></el-color-picker>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div id="editTxt" :style="{width : txtSize.width + 'px',height : txtSize.height + 'px'}"
+             style="background-color: black">
+          <div v-for="item in txtSize.temItems"
+               :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px'}">
+            <div :name="item.type" :id="item.id" style="overflow: hidden;opacity: 0.7;">
+              <textarea v-if="item.type == 'txt'" placeholder="请输入文本内容..."
+                        :style="{fontSize:fontSize,fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
+              </textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </el-dialog><!--编辑文本-->
   </div>
 </template>
 <script>
   import $ from 'jquery'
   import html2canvas from 'html2canvas';
+  import ElRow from "element-ui/packages/row/src/row";
+  import ElCol from "element-ui/packages/col/src/col";
 
   export default {
+    components: {
+      ElCol,
+      ElRow
+    },
     mounted: function () {
       document.documentElement.addEventListener('mousemove', this.handleMove, true);          //给window绑定鼠标移动事件
       document.documentElement.addEventListener('mouseup', this.handleUp, true);
@@ -307,6 +487,21 @@
       this.queryList();
       this.getTree();
       this.resourceQuery();
+      //字体大小列表
+      for (let i = 12; i <= 100; i++) {
+        let a = {};
+        a['size'] = i + 'px';
+        this.fontSizes.push(a);
+        this.form.scrollFontSizes.push(a);
+      }
+      //end
+      //透明度列表
+      for (let i = 0; i <= 100; i++) {
+        let a = {};
+        a['transparency'] = i + '%';
+        this.form.scrollBGTransparencys.push(a)
+      }
+      //end
     },
     beforeDestroy: function () {
       document.documentElement.removeEventListener('mousemove', this.handleMove, true);
@@ -318,7 +513,7 @@
         template: '',
         resources: [],
         treeId: 1,
-        pageCount: 20,          //每页显示数目
+        pageCount: 12,          //每页显示数目
         pageNo: 1,              //当前页
         total: 0,               //总数目
         resourceTitles: '',     //资源标题
@@ -343,10 +538,112 @@
         proId: '',
         groupId: '',
         PP: '',
-        proPreview: ''
+        proPreview: '',
+        /*文本与动态文本*/
+        editTxt: false,
+        txtSize: '',
+        font: 'Arial',                                //字体
+        fonts: [
+          {font: 'Arial'},
+          {font: 'Book Antiqua'},
+          {font: 'Bookman Old Style'},
+          {font: 'Bradley Hand ITC'},
+          {font: 'Calisto MT'},
+          {font: 'Castellar'},
+          {font: 'Curlz MT'},
+          {font: 'Elephant'},
+          {font: 'Forte'},
+          {font: 'Garamond'},
+          {font: 'Georgia'},
+          {font: 'Gigi'},
+          {font: 'Goudy Stout'},
+          {font: 'Haettenschweiler'},
+          {font: 'Impact'},
+          {font: 'Monotype Corsiva'},
+          {font: 'Papyrus'},
+          {font: 'Pristina'},
+          {font: 'Rage Italic'},
+          {font: 'Rockwell'},
+          {font: 'Script MT Bold'},
+          {font: 'Sylfaen'},
+          {font: 'Tahoma'},
+          {font: '黑体'}
+        ],                                 //字体列表
+        fontSize: '12px',                             //字体大小
+        fontSizes: [],                                //字体大小列表
+        fontColor: '#000000',                         //颜色
+        align: '',                                    //对齐方式
+        alignActive: 'left',                           //对齐选中样式
+        bold: '',                                      //加粗
+        italic: '',                                    //斜杠
+        underline: '',                                 //下划线
+        SB: false,
+        SI: false,
+        SU: false,
+        form: {
+          scrollContent: '',                             // 字幕内容
+          scrollColor: '#000000',                               //字体颜色
+          scrollDirection: '',                           //滚动方向
+          scrollDirections: [
+            {
+              direction: '从右到左',
+              value: 1
+            },
+            {
+              direction: '从右到左',
+              value: 0
+            }
+          ],                               //滚动方向列表
+          scrollFontSize: '',                            //字体大小
+          scrollFontSizes: [],                                //字体大小列表
+          scrollFontFamily: '',                          //字体
+          scrollFontFamilys: [
+            {font: 'Arial'},
+            {font: 'Book Antiqua'},
+            {font: 'Bookman Old Style'},
+            {font: 'Bradley Hand ITC'},
+            {font: 'Calisto MT'},
+            {font: 'Castellar'},
+            {font: 'Curlz MT'},
+            {font: 'Elephant'},
+            {font: 'Forte'},
+            {font: 'Garamond'},
+            {font: 'Georgia'},
+            {font: 'Gigi'},
+            {font: 'Goudy Stout'},
+            {font: 'Haettenschweiler'},
+            {font: 'Impact'},
+            {font: 'Monotype Corsiva'},
+            {font: 'Papyrus'},
+            {font: 'Pristina'},
+            {font: 'Rage Italic'},
+            {font: 'Rockwell'},
+            {font: 'Script MT Bold'},
+            {font: 'Sylfaen'},
+            {font: 'Tahoma'},
+            {font: '黑体'}
+          ],                              //字体列表
+          scrollBGColor: '#ffffff',                             //背景颜色
+          scrollSpeed: '',                               //滚动速度
+          scrollSpeeds: [
+            {
+              speed: '慢',
+              value: 0
+            }, {
+              speed: '普通',
+              value: 1
+            }, {
+              speed: '快',
+              value: 2
+            }
+          ],                                   //滚动速度列表
+          scrollBGTransparency: '',                      //背景透明度
+          scrollBGTransparencys: [],                          //透明度列表
+          scrollDuration: '',                            //持续时间
+        },
+        activeName:''                                     //当前激活的区域块标签
       }
     },
-    components: {},
     methods: {
       prohibited(e) {
         // 阻止默认事件的触发
@@ -399,7 +696,7 @@
         this.resources = [];
         this.$http({
           method: 'get',
-          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + _this.pageCount + "&pageNo=" + _this.pageNo,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -476,11 +773,11 @@
           if (response.data.code == '0000') {
             if (type == 0 || type == undefined) {
               let template = response.data.cust.templates[0];
-              _this.template = template.body;
+              _this.template = template;
               _this.temId = template.id
             } else {
               let program = response.data.cust.programs[0];
-              _this.template = program.body;
+              _this.template = program;
               _this.temId = program.modelId;
               _this.proName = program.name;
               _this.proId = program.id;
@@ -527,10 +824,40 @@
                   }
                 }
               }
+              //为文本与动态文本绑定编辑事件
+              $('.txt').on('click', function () {
 
+                _this.$http({
+                  method: 'get',
+                  url: 'template/query?id=' + _this.temId + '&pageNo=1&pageCount=1',
+                  withCredentials: true,
+                  headers: {
+                    token: sessionStorage.getItem('token'),
+                    name: sessionStorage.getItem('name')
+                  }
+                }).then(response => {
+                  if (response.data.code == '0000') {
+                    let template = response.data.cust.templates[0];
+                    _this.txtSize = template;                       //快速预览
+                    _this.editTxt = true
+                  } else {
+                    this.$message({
+                      message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                      showClose: true,
+                      center: true,
+                      type: 'error'
+                    });
+                  }
+                });
+
+              })
+              $('.scroll').on('click',function () {
+                _this.activeName=$(this).parent().attr('area-name')
+                debugger
+              })
             })
           } else {
-            this.$message({
+            _this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
               showClose: true,
               center: true,
@@ -632,7 +959,7 @@
       },                                 //保存
       release() {
         this.save('release');
-      },                                   //发布
+      },                                  //发布
       exit() {
         this.$router.go(-1);
       },                                     //返回
@@ -671,7 +998,6 @@
             let myVideo = document.getElementById('myVideo');
             myVideo.load();
             myVideo.play();
-            debugger
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -682,18 +1008,30 @@
           }
         });
 
-      },                                  //快速预览
-      viewClose(done) {
+      },                             //快速预览
+      viewClose() {
         let myVideo = document.getElementById('myVideo');
         myVideo.currentTime = 0;                            //将视频当前时间初始化
         myVideo.pause();
-        done();
-      }                               //快速预览窗口关闭
-    },
-    watch:{
-      template:function () {
+      },                                //快速预览窗口关闭
 
-      }
+      setAlign(val) {
+        if (val == 'left') this.alignActive = this.align = val;
+        if (val == 'center') this.alignActive = this.align = val;
+        if (val == 'right') this.alignActive = this.align = val;
+      },                                //设置文本对其方式
+      setB() {
+        this.SB = !this.SB;
+        this.bold = this.SB ? 'bold' : 'normal';
+      },                                      //设置文本加粗
+      setI() {
+        this.SI = !this.SI;
+        this.italic = this.SI ? 'italic' : 'normal';
+      },                                      //设置文本倾斜
+      setU() {
+        this.SU = !this.SU;
+        this.underline = this.SU ? 'underline' : 'none'
+      }                                       //设置文本下划线
     }
   }
 </script>

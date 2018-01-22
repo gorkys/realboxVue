@@ -87,11 +87,6 @@
             </el-input>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchStatus">
-              <template slot="prepend">发布状态</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
             <el-input placeholder="请输入内容" v-model="searchProStatus">
               <template slot="prepend">节目状态</template>
             </el-input>
@@ -153,7 +148,6 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         searchName: '',
-        searchStatus: '',
         searchProStatus: '',
       }
     },
@@ -168,7 +162,7 @@
         this.publish = [];
         this.$http({
           method: 'get',
-          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&status=未审核" /*+ "&proName=" + this.searchName + "&status=" + this.searchStatus + "&proStatus=" + this.searchProStatus*/,
+          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&status=未审核" + "&proName=" + this.searchName + "&proStatus=" + this.searchProStatus,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),

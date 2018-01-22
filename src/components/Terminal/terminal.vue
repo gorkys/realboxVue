@@ -188,7 +188,7 @@
         total: 0,            //总数目
         row: '',              //行数据
 
-        terId: '',       //终端分组ID
+        terId: '41',                //终端分组ID
         treeTitle: '终端分组',        //树标题
         terName: '',               //终端名称
         terCode: '',               //终端编号
@@ -229,7 +229,7 @@
         this.terminals = [];
         this.$http({
           method: 'get',
-          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&terId=' + _this.terId+ '&name=' + this.terName,
+          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.terId+ '&name=' + this.terName + '&code=' + this.terCode,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -237,8 +237,8 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let terminals = response.data.cust.terminals
-            _this.total = response.data.cust.pages.count
+            let terminals = response.data.cust.terminals;
+            _this.total = response.data.cust.pages.count;
             for (let terminal of terminals) {
               _this.terminals.push(terminal)
             }

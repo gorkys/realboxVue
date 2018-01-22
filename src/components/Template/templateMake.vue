@@ -163,13 +163,13 @@
     background-size: 100% 100%;
   }
 
-  .audio {
+  /*.audio {
     height: 100%;
     width: 100%;
     background: url("../../assets/imgs/template/audio.png") no-repeat 100% 100%;
     background-size: 100% 100%;
   }
-
+*/
   .title {
     height: 40px;
     background-color: #d33a31;
@@ -284,7 +284,7 @@
         <li @click="add('video',true)"><i class="iconfont icon-shipin"></i><b>视频</b></li>
         <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>文本</b></li>
         <li @click="add('scroll',false)"><i class="iconfont icon-wenben"></i><b>动态文本</b></li>
-        <li @click="add('audio',false)"><i class="iconfont icon-yinle"></i><b>音乐</b></li>
+        <!--<li @click="add('audio',false)"><i class="iconfont icon-yinle"></i><b>音乐</b></li>-->
       </ul>
     </div>
     <div id="editBox">
@@ -293,9 +293,9 @@
         <div id="edit" :style="{width : temWidth * PP + 'px',height : temHeight * PP + 'px'}">
           <vue-draggable-resizable v-if="revert" v-for="(item,index) in elements" :key="index"
                                    :w="item.width * PP" :h="item.height * PP" :x="item.x * PP" :y="item.y * PP"
-                                   :minw="50" :minh="50"
+                                   :minw="50" :minh="50" @active="activated" @activated="onResize"
                                    @dragging="onDrag" @resizing="onResize" :parent="true" :name="item.name"
-                                   :conflictCheck="item.conflictCheck" :id="item.id">
+                                   :conflictCheck="item.conflictCheck" :id="item.id" :area-name="item.areaName">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
               <div class="action" v-show="show">
                 <span @click="elements.splice(index,1)"><i class="el-icon-delete"></i></span>
@@ -306,7 +306,8 @@
           <vue-draggable-resizable v-for="(item,index) in items" :key="item.key"
                                    :w="189" :h="142" :minw="50" :minh="50"
                                    @dragging="onDrag" @resizing="onResize" :parent="true"
-                                   :conflictCheck="item.conflictCheck" :name="item.name" :id="item.id">
+                                   :conflictCheck="item.conflictCheck" :area-name="item.areaName" :name="item.name"
+                                   :id="item.id" @active="activated" @activated="onResize">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
               <div class="action" v-show="show">
                 <span @click="items.splice(index,1)"><i class="el-icon-delete"></i></span>
@@ -329,7 +330,7 @@
       <div class="areaInfo">
         <div class="title" style="margin-bottom: 10px;">区域信息</div>
         <div class="areaBox">
-          <span>区域名称：</span><input type="text">
+          <span>区域名称：</span><input v-model="areaName" type="text">
         </div>
       </div>
       <div class="parameterSet">
@@ -495,7 +496,11 @@
         //还原模板元素
         revert: false,                                                   //是否需要还原
         elements: [],
-        temId: ''
+        temId: '',
+        image: 0,
+        txt: 0,
+        scroll: 0,
+        areaName:''                                                      //区域名称
       }
     },
     components: {},
@@ -512,12 +517,31 @@
       },                     //移动的回调
       showDel(e) {
         this.show = true;
-        e.currentTarget
       },
       add: function (content, status) {
         let id = '';
+        let areaName = '';
+        if (content == 'image') {
+          this.image++;
+          areaName = content + this.image
+        } else if (content == 'txt') {
+          this.txt++;
+          areaName = content + this.txt
+        } else if (content == 'scroll') {
+          this.scroll++;
+          areaName = content + this.scroll
+        } else {
+          areaName = content;
+        }
         status ? id = 'check' : id = 'Uncheck';      //判断是否检查，用来给不检查的元素赋ID值
-        this.items.push({key: this.id++, content: content, conflictCheck: status, id: id, name: new Date().getTime()})
+        this.items.push({
+          key: this.id++,
+          content: content,
+          conflictCheck: status,
+          id: id,
+          name: new Date().getTime(),
+          areaName: areaName
+        })
       },                  //添加区域块
       exit: function () {
         this.$router.go(-1);
@@ -544,7 +568,8 @@
           let x = $(this).position().left / vm.PP;
           let y = $(this).position().top / vm.PP;
           let type = $(this).children().last().attr('class');
-          Array.push({height, width, x, y, type, id});
+          let name = $(this).attr('area-name');
+          Array.push({height, width, x, y, type, id, name});
         });
         let elements = Array;    //end
         /* 这部分代码用来解决生成的图片不清晰的问题 */
@@ -731,6 +756,7 @@
               data['x'] = item.x;
               data['y'] = item.y;
               data['name'] = item.id;                     //元素的唯一标识
+              data['areaName'] = item.name;
               if (item.type == 'image') {
                 data['content'] = item.type;
                 data['conflictCheck'] = true;
@@ -768,6 +794,9 @@
           }
         })
       },                                        //模板编辑
+      activated(){
+        this.areaName = $('.active').attr('area-name')
+      },                                          //激活区域块
     }
   }
 </script>

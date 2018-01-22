@@ -183,8 +183,8 @@
         openDialog: false,
         openEntDep: false,
         openTerGroup: false,
-        terId: '',                     //部门ID
-        groupId: '',                    //分组ID
+        terId: '',                    //部门ID
+        groupId: '',                  //分组ID
         title: '',
         LabelWidth: '70px',
         form: {
@@ -192,8 +192,8 @@
           num: 1                      //生成数量
         },
         value: 0,                     //生成与批量生成区分值
-        terGroupTree: [],           //终端分组树
-        isBatch: false,                //是否批量生成
+        terGroupTree: [],             //终端分组树
+        isBatch: false,               //是否批量生成
         creator:sessionStorage.getItem('name')
       }
     },
