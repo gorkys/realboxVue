@@ -62,9 +62,11 @@
   .control a:hover {
     color: #d33a31;
   }
-  .logList{
+
+  .logList {
     height: 620px;
   }
+
   .page {
     text-align: right;
     padding-right: 20px;
@@ -81,22 +83,7 @@
         <div class="search">
           <div style="width:200px;">
             <el-input placeholder="请输入内容" v-model="input3">
-              <template slot="prepend">终端名称</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
-              <template slot="prepend">终端编号</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
-              <template slot="prepend">终端分组</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
-              <template slot="prepend">操作类型</template>
+              <template slot="prepend">操作人</template>
             </el-input>
           </div>
           <div style="width:200px;">
@@ -112,25 +99,20 @@
       </div>
       <div class="logList">
         <el-table
-          :data="tableData"
-          border
+          :data="logs"
           style="width: 100%">
-          <el-table-column prop="date" align="center" label="终端名称"></el-table-column>
-          <el-table-column prop="name" align="center" label="终端编号"></el-table-column>
-          <el-table-column prop="address" align="center" label="终端分组"></el-table-column>
-          <el-table-column prop="address" align="center" label="操作类型"></el-table-column>
-          <el-table-column prop="address" align="center" label="操作时间"></el-table-column>
+          <el-table-column prop="id" align="center" label="ID"></el-table-column>
+          <el-table-column prop="operator" align="center" label="操作人"></el-table-column>
+          <el-table-column prop="desc" align="center" label="操作内容"></el-table-column>
+          <el-table-column prop="time" align="center" label="操作时间"></el-table-column>
         </el-table>
       </div>
       <div class="page">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage4"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
+          @current-change="pageChange"
+          :page-size="pageCount"
+          layout="total, prev, pager, next, jumper"
+          :total="total">
         </el-pagination>
       </div>
     </div>
@@ -144,13 +126,49 @@
 
   export default {
     data() {
-      return {}
+      return {
+        pageCount: 11,     //每页显示数目
+        pageNo: 1,          //当前页
+        total: 0,            //总数目
+        logs: []
+      }
     },
     components: {
       NavBar,
       FooterBar,
       Breadcrumb
     },
-    methods: {}
+    mounted() {
+      this.getUserLog()
+    },
+    methods: {
+      getUserLog() {
+        this.$http({
+          method: 'get',
+          url: "log/query/system?pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            this.logs = response.data.cust.logs;
+            this.total = response.data.cust.pages.count;
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },
+      pageChange(val) {
+        this.pageNo = val;
+        this.getUserLog()
+      },                    //分页
+    }
   }
 </script>

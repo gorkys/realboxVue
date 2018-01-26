@@ -67,6 +67,8 @@
   .action {
     text-align: end;
     padding-top: 5px;
+    position: absolute;
+    right: 0;
   }
 
   .action > span > i {
@@ -147,6 +149,7 @@
     width: 100%;
     background: url("../../assets/imgs/template/video.png") no-repeat 100% 100%;
     background-size: 100% 100%;
+    position: relative;
   }
 
   .txt {
@@ -154,6 +157,7 @@
     width: 100%;
     background: url("../../assets/imgs/template/txt.png") no-repeat 100% 100%;
     background-size: 100% 100%;
+    position: relative;
   }
 
   .scroll {
@@ -161,15 +165,20 @@
     width: 100%;
     background: url("../../assets/imgs/template/scroll.png") no-repeat 100% 100%;
     background-size: 100% 100%;
+    position: relative;
   }
 
-  /*.audio {
+  .BG {
     height: 100%;
     width: 100%;
-    background: url("../../assets/imgs/template/audio.png") no-repeat 100% 100%;
-    background-size: 100% 100%;
+    position: relative;
   }
-*/
+
+  .BG img {
+    height: 100%;
+    width: 100%;
+  }
+
   .title {
     height: 40px;
     background-color: #d33a31;
@@ -279,11 +288,17 @@
     <div class="area">
       <div class="title">区域</div>
       <ul class="areaList">
-        <!--<li @click="setBg = true"><i class="iconfont icon-beijing"></i><b>背景</b></li>-->
+        <li @click="openSetBG"><i :style="{color:BG?'#5ea2d3':'rgb(195, 195, 195)'}"
+                                  class="iconfont icon-beijing"></i><b
+          :style="{color:BG?'#000':'rgb(195, 195, 195)'}">背景</b></li>
         <li @click="add('image',true)"><i class="iconfont icon-tupian"></i><b>图片</b></li>
-        <li @click="add('video',true)"><i class="iconfont icon-shipin"></i><b>视频</b></li>
+        <li @click="add('video',true)"><i :style="{color:video?'#5ea2d3':'rgb(195, 195, 195)'}"
+                                          class="iconfont icon-shipin"></i><b
+          :style="{color:video?'#000':'rgb(195, 195, 195)'}">视频</b></li>
         <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>文本</b></li>
-        <li @click="add('scroll',false)"><i class="iconfont icon-wenben"></i><b>动态文本</b></li>
+        <li @click="add('scroll',false)"><i :style="{color:scroll?'#5ea2d3':'rgb(195, 195, 195)'}"
+                                            class="iconfont icon-wenben"></i><b
+          :style="{color:scroll?'#000':'rgb(195, 195, 195)'}">动态文本</b></li>
         <!--<li @click="add('audio',false)"><i class="iconfont icon-yinle"></i><b>音乐</b></li>-->
       </ul>
     </div>
@@ -291,6 +306,7 @@
       <div class="title">编辑区</div>
       <div class="editBox">
         <div id="edit" :style="{width : temWidth * PP + 'px',height : temHeight * PP + 'px'}">
+          <!--还原-->
           <vue-draggable-resizable v-if="revert" v-for="(item,index) in elements" :key="index"
                                    :w="item.width * PP" :h="item.height * PP" :x="item.x * PP" :y="item.y * PP"
                                    :minw="50" :minh="50" @active="activated" @activated="onResize"
@@ -302,7 +318,20 @@
               </div>
             </div>
           </vue-draggable-resizable>
-
+          <!--还原背景-->
+          <vue-draggable-resizable v-for="(item,index) in zBGImg" :key="item.key" :w="item.width * PP"
+                                   :h="item.height * PP"
+                                   :parent="true" :conflictCheck="false" :area-name="item.name" :name="item.id"
+                                   id="Uncheck"
+                                   @active="activated" :draggable='false' :resizable='false' :zIndex=1>
+            <div :class="{[item.type]:true}" @mouseover="showDel($event)" @mouseout="show = false">
+              <div class="action" v-show="show">
+                <span @click="BGDel(index,'edit')"><i class="el-icon-delete"></i></span>
+              </div>
+              <img :name="item.backGround" :src="item.backGround" :id="item.resId">
+            </div>
+          </vue-draggable-resizable>
+          <!--新建-->
           <vue-draggable-resizable v-for="(item,index) in items" :key="item.key"
                                    :w="189" :h="142" :minw="50" :minh="50"
                                    @dragging="onDrag" @resizing="onResize" :parent="true"
@@ -310,8 +339,20 @@
                                    :id="item.id" @active="activated" @activated="onResize">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
               <div class="action" v-show="show">
-                <span @click="items.splice(index,1)"><i class="el-icon-delete"></i></span>
+                <span @click="temDel(index)"><i class="el-icon-delete"></i></span>
               </div>
+            </div>
+          </vue-draggable-resizable>
+          <!--背景-->
+          <vue-draggable-resizable v-for="(item,index) in BGImg" :key="item.key" :w="temWidth * PP" :h="temHeight * PP"
+                                   :parent="true" :conflictCheck="false" :area-name="item.areaName" :name="item.name"
+                                   id="Uncheck"
+                                   @active="activated" :draggable='false' :resizable='false' :zIndex=1>
+            <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
+              <div class="action" v-show="show">
+                <span @click="BGDel(index,'new')"><i class="el-icon-delete"></i></span>
+              </div>
+              <img :name="item.BGUrl" :src="item.BGUrl" :id="item.resId">
             </div>
           </vue-draggable-resizable>
         </div>
@@ -435,8 +476,8 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="setBg = false">确 定</el-button>
-  </span>
+        <el-button type="primary" @click="setBGImg">确 定</el-button>
+       </span>
     </el-dialog><!--选择背景-->
   </div>
 </template>
@@ -474,9 +515,13 @@
         preview: '',                                                    //预览图
         temWidth: sessionStorage.getItem('resolution').split('×')[0],  //模板宽
         temHeight: sessionStorage.getItem('resolution').split('×')[1],  //模板高
-        //弹出框
+        //背景弹出框
         resources: [],
         value: "",
+        BG: true,
+        BGUrl: '',
+        BGId: '',
+        BGImg: [],
         setBg: false,                                                    //选择背景对话框
         pageCount: 12,                                                   //每页显示数目
         pageNo: 1,                                                       //当前页
@@ -499,8 +544,10 @@
         temId: '',
         image: 0,
         txt: 0,
-        scroll: 0,
-        areaName:''                                                      //区域名称
+        scroll: true,
+        video: true,                                                      //视频只允许添加一次，如果被添加则赋值为false,添加按钮不可点击
+        areaName: '',                                                     //区域名称
+        zBGImg: [],                                                        //模板还原时的背景容器
       }
     },
     components: {},
@@ -519,20 +566,30 @@
         this.show = true;
       },
       add: function (content, status) {
+        if (content == 'video' && !this.video) return false;
         let id = '';
         let areaName = '';
         if (content == 'image') {
           this.image++;
           areaName = content + this.image
         } else if (content == 'txt') {
+          if (this.BG) {
+            this.$message({message: '使用文本请先加入背景！', showClose: true, center: true, type: 'warning'});
+            return false
+          }
           this.txt++;
           areaName = content + this.txt
-        } else if (content == 'scroll') {
-          this.scroll++;
-          areaName = content + this.scroll
+        } else if (content === 'scroll') {
+          if (this.BG) {
+            this.$message({message: '使用文本请先加入背景！', showClose: true, center: true, type: 'warning'});
+            return false
+          }
+          this.scroll = false;
+          areaName = content
         } else {
           areaName = content;
         }
+        if (content === 'video' && this.video) this.video = false;
         status ? id = 'check' : id = 'Uncheck';      //判断是否检查，用来给不检查的元素赋ID值
         this.items.push({
           key: this.id++,
@@ -543,6 +600,11 @@
           areaName: areaName
         })
       },                  //添加区域块
+      temDel(index) {
+        if (this.items[index].content == 'video') this.video = true;
+        if (this.items[index].content == 'scroll') this.scroll = true;
+        this.items.splice(index, 1);
+      },                                     //模板删除
       exit: function () {
         this.$router.go(-1);
       },                                //后退
@@ -569,7 +631,19 @@
           let y = $(this).position().top / vm.PP;
           let type = $(this).children().last().attr('class');
           let name = $(this).attr('area-name');
-          Array.push({height, width, x, y, type, id, name});
+          let BGUrl = name === 'BG' ? $(this).children().find('img').attr('src') : '';
+          let resId = $(this).children().last().attr('id');
+          Array.push({
+            height: height,
+            width: width,
+            x: x,
+            y: y,
+            type: type,
+            id: id,
+            name: name,
+            backGround: BGUrl,
+            bgId: resId
+          });
         });
         let elements = Array;    //end
         /* 这部分代码用来解决生成的图片不清晰的问题 */
@@ -585,6 +659,7 @@
         // context.scale(2, 2);
         /* 这部分代码用来解决生成的图片不清晰的问题 */
         html2canvas(table, {
+          useCORS: true,
           onrendered(image) {
             let url = image.toDataURL();
             document.getElementById('exportedImage').src = url;
@@ -714,15 +789,13 @@
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 
-          this.downloadUrl = "http://" + document.getElementById(target.id).getAttribute("url")
-          this.downloadName = target.children[2].innerText;
-          this.id = dom
+          this.BGUrl = "http://" + document.getElementById(target.id).getAttribute("url");
+          this.BGId = dom
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
-          this.downloadUrl = '';
-          this.downloadName = '';
-          this.id = ''
+          this.BGUrl = '';
+          this.BGId = ''
         }
       },                                      //单击选择文件
 
@@ -750,6 +823,11 @@
             _this.desc = template.desc;
             _this.resolution = template.resolution;
             elements.forEach(item => {
+              if (item.type === 'BG') {
+                _this.zBGImg.push(item);
+                _this.BG = false;
+                return false
+              }
               let data = {};                       //这个需要定义在循环内部
               data['width'] = item.width;
               data['height'] = item.height;
@@ -757,27 +835,24 @@
               data['y'] = item.y;
               data['name'] = item.id;                     //元素的唯一标识
               data['areaName'] = item.name;
-              if (item.type == 'image') {
+              if (item.type === 'image') {
                 data['content'] = item.type;
                 data['conflictCheck'] = true;
                 data['id'] = 'check'
               }
-              if (item.type == 'video') {
+              if (item.type === 'video') {
                 data['content'] = item.type;
                 data['conflictCheck'] = true;
-                data['id'] = 'check'
+                data['id'] = 'check';
+                _this.video = false
               }
-              if (item.type == 'txt') {
+              if (item.type === 'txt') {
                 data['content'] = item.type;
                 data['conflictCheck'] = false;
-                data['id'] = 'Uncheck'
+                data['id'] = 'Uncheck';
+                _this.scroll = false
               }
-              if (item.type == 'scroll') {
-                data['content'] = item.type;
-                data['conflictCheck'] = false;
-                data['id'] = 'Uncheck'
-              }
-              if (item.type == 'audio') {
+              if (item.type === 'scroll') {
                 data['content'] = item.type;
                 data['conflictCheck'] = false;
                 data['id'] = 'Uncheck'
@@ -794,9 +869,32 @@
           }
         })
       },                                        //模板编辑
-      activated(){
+      activated() {
         this.areaName = $('.active').attr('area-name')
-      },                                          //激活区域块
+      },                                      //激活区域块
+      openSetBG() {
+        if (this.BG) this.setBg = true
+      },                                      //打开背景选择对话框
+      setBGImg() {
+        this.BGImg.push({
+          key: this.id++,
+          content: 'BG',
+          resId: this.BGId,
+          BGUrl: this.BGUrl,
+          name: new Date().getTime(),
+          areaName: 'BG'
+        });
+        this.BG = false;
+        this.setBg = false
+      },                                       //确认设置背景图片
+      BGDel(index, val) {
+        this.BG = true;
+        if (val === 'new') {
+          this.BGImg.splice(index, 1);
+        } else {
+          this.zBGImg.splice(index, 1);
+        }
+      }                                 //删除背景图片
     }
   }
 </script>

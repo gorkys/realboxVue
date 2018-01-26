@@ -93,6 +93,9 @@
       },
       conflictCheck: {
         type: Boolean, default: true
+      },
+      zIndex:{
+        type:Number, default:100
       }
     },
     created: function () {
@@ -158,7 +161,6 @@
         active: false,
         opacity: 1,
         handle: null,
-        zIndex: 1,
         restoreY: 0,
         restoreX: 0,
         restoreW: 0,

@@ -4,13 +4,13 @@
       <img src="../../assets/imgs/logo1.png" alt="">
     </div>
     <div class="navBox">
-      <ul class="navList">
+      <!--<ul class="navList">
         <li @click="index">首页</li>
         <li @click="toResource">资源管理</li>
         <li>
           <el-dropdown>
           <span class="el-dropdown-link">
-            终端管理<i class="el-icon-arrow-down el-icon--right"></i>
+            终端管理<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item @click.native="goTerminal">终端管理</el-dropdown-item>
@@ -23,7 +23,7 @@
         <li>
           <el-dropdown>
           <span class="el-dropdown-link">
-            节目管理<i class="el-icon-arrow-down el-icon--right"></i>
+            节目管理<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item @click.native="goPlay ">节目列表</el-dropdown-item>
@@ -35,7 +35,7 @@
         <li>
           <el-dropdown>
           <span class="el-dropdown-link">
-            日志管理<i class="el-icon-arrow-down el-icon--right"></i>
+            日志管理<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item @click.native="userLog">用户日志</el-dropdown-item>
@@ -46,7 +46,7 @@
         <li>
           <el-dropdown>
           <span class="el-dropdown-link">
-            用户管理<i class="el-icon-arrow-down el-icon--right"></i>
+            用户管理<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
           </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item @click.native="terGroupSet">终端设置</el-dropdown-item>
@@ -56,7 +56,38 @@
           </el-dropdown>
         </li>
         <li @click="generalSet">系统设置</li>
-      </ul>
+      </ul>-->
+      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect"
+               background-color="#d33a31" text-color="#fff" active-text-color="#ffd04b" :router="true">
+        <el-menu-item index="/index">首页</el-menu-item>
+        <el-menu-item index="/resource">资源管理</el-menu-item>
+        <el-submenu index="3">
+          <template slot="title">终端管理</template>
+          <el-menu-item index="/terminal">终端管理</el-menu-item>
+          <el-menu-item index="">终端列表</el-menu-item>
+          <el-menu-item index="/activeCode">激活码管理</el-menu-item>
+        </el-submenu>
+
+        <el-menu-item index="/template">模板管理</el-menu-item>
+        <el-submenu index="5">
+          <template slot="title">节目管理</template>
+          <el-menu-item index="/play">节目列表</el-menu-item>
+          <el-menu-item index="/programList">发布管理</el-menu-item>
+          <el-menu-item index="/auditList">审核列表</el-menu-item>
+        </el-submenu>
+        <el-submenu index="6">
+          <template slot="title">日志管理</template>
+          <el-menu-item index="/userLog">用户日志</el-menu-item>
+          <el-menu-item index="/operatingLog">系统日志</el-menu-item>
+        </el-submenu>
+        <el-submenu index="7">
+          <template slot="title">用户管理</template>
+          <el-menu-item index="/terGroupSet">终端设置</el-menu-item>
+          <el-menu-item index="/userSet">用户设置</el-menu-item>
+          <el-menu-item index="/roleSet">角色管理</el-menu-item>
+        </el-submenu>
+        <el-menu-item index="/generalSet">系统设置</el-menu-item>
+      </el-menu>
     </div>
     <div class="user">
       <i class="iconfont icon-guanliyuan"></i>
@@ -78,7 +109,9 @@
   export default {
     data() {
       return {
-        name: sessionStorage.getItem('name')
+        name: sessionStorage.getItem('name'),
+        activeIndex: '1',
+        activeIndex2: '1'
       }
     },
     methods: {
@@ -87,56 +120,6 @@
         sessionStorage.removeItem("name");
         this.$router.push('/')
       },
-      //资源管理
-      toResource: function () {
-        this.$router.push('/resource')
-      },
-      //日志管理
-      userLog: function () {
-        this.$router.push('/userLog')
-      },
-      operatingLog: function () {
-        this.$router.push('/operatingLog')
-      },
-      //首页
-      index: function () {
-        this.$router.push('/index')
-      },
-      //系统设置
-      generalSet: function () {
-        this.$router.push('/generalSet')
-      },
-      terGroupSet: function () {
-        this.$router.push('/terGroupSet')
-      },
-      userSet: function () {
-        this.$router.push('/userSet')
-      },
-      roleSet: function () {
-        this.$router.push('/roleSet')
-      },
-      //end
-      //终端管理
-      goTerminal: function () {
-        this.$router.push('/terminal')
-      },
-      goActiveCode:function () {
-        this.$router.push('/activeCode')
-      },
-      //模板管理
-      goTemplate: function () {
-        this.$router.push('/template')
-      },
-      //节目管理
-      goPlay:function () {
-        this.$router.push('/play')
-      },
-      goProgram:function () {
-        this.$router.push('/programList')
-      },
-      goAudit:function () {
-        this.$router.push('/auditList')
-      }
     }
   }
 </script>
@@ -164,6 +147,9 @@
   .navBox {
     width: 60%;
     padding: 0 5%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
   }
 
   .navList {

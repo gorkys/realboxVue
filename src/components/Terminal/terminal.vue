@@ -125,6 +125,7 @@
           </div>
           <div class="control">
             <a @click="delTerminal"><i class="el-icon-delete"></i>删除</a>
+            <a @click="synTerminal"><i class="el-icon-sort"></i>强制同步</a>
             <!--<el-dropdown>
           <span class="el-dropdown-link" style="cursor: pointer">
             <i class="el-icon-edit" style="margin-right: 5px"></i>批量操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
@@ -298,6 +299,44 @@
           })
         })
       },                      //删除终端
+      synTerminal(){
+        let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
+        if (ids == '') {
+          this.$message({
+            message: '未选择资源！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
+        this.$confirm('此操作将服务器强制终端同步, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            method: 'get',
+            url: 'terminal/syn?ids=' + ids,
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == '0000') {
+              this.$message({message: '强制同步成功！', showClose: true, center: true, type: 'success'});
+              this.queryTerminalList()
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        })
+      },                          //强制同步
       treeClick(val) {
         this.terId = val.id;
         this.queryTerminalList()

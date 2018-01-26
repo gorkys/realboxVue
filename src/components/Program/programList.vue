@@ -71,6 +71,21 @@
     padding-right: 20px;
   }
 
+  /*快速预览*/
+  #proPreview {
+    position: relative;
+  }
+
+  #proPreview > div {
+    position: absolute;
+
+  }
+
+  #proPreview > div > div {
+    width: 100%;
+    height: 100%;
+  }
+
 </style>
 
 <template>
@@ -119,6 +134,14 @@
           <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
           <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
           <el-table-column prop="proStatus" align="center" label="节目状态"></el-table-column>
+          <el-table-column prop="proPreview" align="center" label="节目预览">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                @click="proPreview(scope.$index, scope.row)">节目预览
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -131,12 +154,57 @@
       </div>
     </div>
     <footer-bar></footer-bar>
+    <el-dialog
+      title="快速预览"
+      :visible.sync="view"
+      top="3vh"
+      :before-close="viewClose"
+    >
+      <div style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden">
+        <div id="proPreview" :style="{width : template.width * PP + 'px',height : template.height * PP + 'px'}">
+          <div v-for="item in items" style=""
+               :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px'}">
+            <!--背景-->
+            <div style="z-index: 1;position: absolute" v-if="item.type=='BG'" :name="item.type" :id="item.id">
+              <img  style="width: 100%;height: 100%" :src="item.url">
+            </div>
+            <!--静态文本-->
+            <div v-if="item.type=='txt'" :name="item.type" :id="item.id" style="z-index: 10;position: absolute;width: 100%;height: 100px"
+                 :style="{textAlign:item.align}">
+              <p style="position: relative"
+                 :style="{fontSize:item.fontSize,fontFamily:item.font,color:item.fontColor,fontWeight: item.bold,fontStyle: item.italic,textDecoration: item.underline}">
+                {{item.url}}
+              </p>
+            </div>
+            <!--动态文本-->
+            <div style="z-index: 10;position: absolute;display: flex;justify-content: flex-start;align-items: center" v-if="item.type=='scroll'"
+                 :style="{color:item.scrollColor,fontSize:item.scrollFontSize + 'px',fontFamily:item.scrollFontFamily}">
+              <vue-marquee :BGOpacity="item.scrollBGTransparency" :open="openScroll" :BGColor="item.scrollBGColor"
+                           :fontOpacity="item.scrollTransparency" :speed="item.scrollSpeed"
+                           :direction="item.scrollDirection" :content="item.url"></vue-marquee>
+            </div>
+            <!--视频图片-->
+            <div style="z-index: 10;position: absolute" :name="item.type" :id="item.id">
+              <!--视频-->
+              <video preload="metadata" v-if="item.type ==='video'" id="myVideo" width="100%" height="100%" loop
+                     autoplay>
+                <source id="video" :src="item.url" type="video/mp4">
+              </video>
+              <!--图片-->
+              <img v-if="item.type=='image'" style="width: 100%;height: 100%;" :src="item.url">
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </el-dialog><!--预览-->
   </div>
 </template>
 <script>
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import vueMarquee from "@/components/common/Marquee.vue"
 
   export default {
     mounted() {
@@ -150,15 +218,23 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         row: '',              //行数据
-        searchName:'',
-        searchStatus:'',
-        searchProStatus:'',
+        searchName: '',
+        searchStatus: '',
+        searchProStatus: '',
+        /*节目预览*/
+        view: false,             //预览弹出框
+        template: '',             //模板
+        program: '',               //节目
+        PP: '',                    //比例
+        items: [],                  //预览渲染参数
+        openScroll: false           //打开滚动
       }
     },
     components: {
       NavBar,
       FooterBar,
-      Breadcrumb
+      Breadcrumb,
+      vueMarquee
     },
     methods: {
       New: function () {
@@ -169,7 +245,7 @@
         this.publish = [];
         this.$http({
           method: 'get',
-          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo+ '&proName='+this.searchName + '&status=' +this.searchStatus+ '&proStatus=' +this.searchProStatus,
+          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&proName=' + this.searchName + '&status=' + this.searchStatus + '&proStatus=' + this.searchProStatus,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -225,7 +301,7 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              _this.$message({message: '删除成功！',showClose: true, center: true, type: 'success'});
+              _this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
               _this.queryPublishList()
             } else {
               _this.$message({
@@ -238,6 +314,112 @@
           })
         })
       },                      //删除节目
+
+      viewClose(done) {
+        let myVideo = document.getElementById('myVideo');
+        if (myVideo != undefined) {
+          myVideo.currentTime = 0;                            //将视频当前时间初始化
+          myVideo.pause();
+        }
+        this.openScroll = false;
+        done()
+      },                                //快速预览窗口关闭
+      proPreview(index, data) {
+        let _this = this;
+        _this.template = '';
+        _this.program = '';
+        _this.items = [];
+        this.$http({
+          method: 'get',
+          url: 'program/query?id=' + data.proId + '&pageNo=1&pageCount=1',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+            if (response.data.code == '0000') {
+              _this.program = response.data.cust.programs[0];
+
+              _this.$nextTick(function () {
+                  _this.$http({
+                    method: 'get',
+                    url: 'template/query?id=' + _this.program.modelId + '&pageNo=1&pageCount=1',
+                    withCredentials: true,
+                    headers: {
+                      token: sessionStorage.getItem('token'),
+                      name: sessionStorage.getItem('name')
+                    }
+                  }).then(response => {
+                    if (response.data.code == '0000') {
+                      _this.template = response.data.cust.templates[0];
+                      /*根据模板高度设置缩放比例*/
+                      if (_this.template.height == '1080') _this.PP = 0.4;
+                      if (_this.template.height == '720') _this.PP = 0.7;
+                      if (_this.template.height == '1280') _this.PP = 0.6;
+                      if (_this.template.height == '1920') _this.PP = 0.4;
+
+                      for (let i of _this.program.proItems) {
+                        for (let y of _this.template.temItems) {
+                          if (i.itemsId === y.id) {
+                            _this.items.push({
+                              id: y.id,
+                              type: y.type,
+                              height: y.height,
+                              width: y.width,
+                              x: y.x,
+                              y: y.y,
+                              url: i.url,
+                              scrollContent: i.scrollContent,
+                              scrollColor: i.scrollColor,
+                              scrollDirection: i.scrollDirection,
+                              scrollFontSize: i.scrollFontSize,
+                              scrollFontFamily: i.scrollFontFamily,
+                              scrollBGColor: i.scrollBGColor,
+                              scrollSpeed: i.scrollSpeed,
+                              scrollBGTransparency: i.scrollBGTransparency,
+                              scrollDuration: i.scrollDuration,
+                              justify: i.justify,
+                              txtContent: i.txtContent,
+                              font: i.font,
+                              fontSize: i.fontSize,
+                              fontColor: i.fontColor,
+                              align: i.align,
+                              bold: i.bold,
+                              italic: i.italic,
+                              underline: i.underline
+                            })
+                          }
+                        }
+                      }
+                      _this.items
+                      debugger
+                    } else {
+                      this.$message({
+                        message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                        showClose: true,
+                        center: true,
+                        type: 'error'
+                      });
+                    }
+                  })
+                }
+              )
+            }
+            else {
+              _this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          }
+        );
+        this.openScroll = true;
+        this.view = true;
+      }            //节目预览
+
     }
   }
 </script>

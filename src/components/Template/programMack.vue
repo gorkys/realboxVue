@@ -200,6 +200,7 @@
 
 </style>
 <style>
+
   /*模板样式*/
   #edit {
     background-color: #000;
@@ -261,6 +262,17 @@
     background-size: 100% 100%;
   }
 
+  .BG {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  .BG img {
+    height: 100%;
+    width: 100%;
+  }
+
   /*模板样式END*/
 </style>
 <template>
@@ -310,8 +322,8 @@
       <div v-html="template.body" class="template"></div>
     </div>
     <div id="setAttr">
-      <el-tabs v-model="activeName" type="card" @tab-click="areaHandleClick">
-        <el-tab-pane v-for="item in template.temItems" v-if="item.type.indexOf('txt') == -1" :label="item.name"
+      <el-tabs v-model="activeName" type="card">
+        <el-tab-pane v-for="item in temItems" v-if="item.type.indexOf('txt') == -1" :label="item.name"
                      :name="item.name">
           <el-form v-if="item.type=='scroll'" v-model="form" label-width="100px">
             <el-form-item label="字幕内容" style="margin-bottom: 5px">
@@ -336,7 +348,7 @@
               <el-col :span="6">
                 <el-form-item label="字体大小" size="mini" style="margin-bottom: 5px;">
                   <el-select v-model="form.scrollFontSize" placeholder="请选择字体大小" style="width: 150px">
-                    <el-option v-for="item in form.scrollFontSizes" :label="item.size" :value="item.size"></el-option>
+                    <el-option v-for="item in form.scrollFontSizes" :label="item.size" :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -365,7 +377,7 @@
                 <el-form-item label="背景透明度" size="mini">
                   <el-select v-model="form.scrollBGTransparency" placeholder="请选择透明度" style="width: 150px">
                     <el-option v-for="item in form.scrollBGTransparencys" :label="item.transparency"
-                               :value="item.transparency"></el-option>
+                               :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -379,9 +391,13 @@
               </el-col>
             </el-row>
           </el-form>
+          <div style="display: flex;justify-content: flex-start" v-if="item.type=='image'"
+               :style="{color:form.scrollColor,fontSize:form.scrollFontSize,fontFamily:form.scrollFontFamily}">
+            <vue-marquee :BGOpacity="form.scrollBGTransparency" :BGColor="form.scrollBGColor"
+                         :fontOpacity="form.scrollTransparency" content="我在没在滚动啊"></vue-marquee>
+          </div>
         </el-tab-pane>
       </el-tabs>
-
     </div>
     <div class="move">
       <img src="">
@@ -392,20 +408,38 @@
       title="快速预览"
       :visible.sync="view"
       top="3vh"
-      :close="viewClose"
+      :before-close="viewClose"
     >
       <div style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden">
         <div id="proPreview" :style="{width : proPreview.width * PP + 'px',height : proPreview.height * PP + 'px'}"
              style="background-color: black">
-          <div v-for="item in proPreview.temItems"
+          <div v-for="item in proPreview.temItems" style=""
                :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px'}">
+            <!--静态文本-->
+            <div v-if="item.type=='txt'" :name="item.type" :id="item.id" style="width: 100%;height: 100px"
+                 :style="{textAlign:item.align}">
+              <p style="position: relative"
+                 :style="{fontSize:item.fontSize,fontFamily:item.font,color:item.fontColor,fontWeight: item.bold,fontStyle: item.italic,textDecoration: item.underline}">
+                {{item.txtContent}}
+              </p>
+            </div>
+            <!--动态文本-->
+            <div style="display: flex;justify-content: flex-start;align-items: center" v-if="item.type=='scroll'"
+                 :style="{color:form.scrollColor,fontSize:form.scrollFontSize + 'px',fontFamily:form.scrollFontFamily}">
+              <vue-marquee :BGOpacity="form.scrollBGTransparency" :open="openScroll" :BGColor="form.scrollBGColor"
+                           :fontOpacity="form.scrollTransparency" :speed="form.scrollSpeed"
+                           :direction="form.scrollDirection" :content="form.scrollContent"></vue-marquee>
+            </div>
             <div :name="item.type" :id="item.id">
+              <!--视频-->
               <video preload="metadata" v-if="item.type ==='video'" id="myVideo" width="100%" height="100%" loop
                      autoplay>
                 <source id="video" :src="item.url" type="video/mp4">
               </video>
-              <img v-if="item.type==='image'" style="width: 100%;height: 100%;" :src="item.url">
+              <!--图片-->
+              <img v-if="item.type=='image'||item.type=='BG'" style="width: 100%;height: 100%;" :src="item.url">
             </div>
+
           </div>
         </div>
       </div>
@@ -418,7 +452,7 @@
       <div
         style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden;position: relative">
         <div
-          style="width: 200px;height: 500px;left: 20px;top: 50px;position: absolute;z-index: 9999">
+          style="width: 200px;height: 500px;left: 20px;top: 50px;background-color:#efefef;padding:10px;position: absolute;right:0;z-index: 9999">
           <div class="styleBox">
             <ul class="fontStyle">
               <li @click="setB" :class="{'active':SB === true}">
@@ -439,12 +473,12 @@
           </div>
 
           <el-form style="margin-top: 20px">
-            <el-form-item label="字体" size="mini">
-              <el-select v-model="fontSize" placeholder="请选择字体" style="width: 150px">
-                <el-option v-for="item in fontSizes" :label="item.size" :value="item.size"></el-option>
+            <el-form-item label="字号" size="mini">
+              <el-select v-model="fontSize" placeholder="请选择字体大小" style="width: 150px">
+                <el-option v-for="item in fontSizes" :label="item.size" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="字号" size="mini">
+            <el-form-item label="字体" size="mini">
               <el-select v-model="font" placeholder="请选择字体大小" style="width: 150px">
                 <el-option v-for="item in fonts" :label="item.font" :value="item.font"></el-option>
               </el-select>
@@ -453,15 +487,18 @@
               <el-color-picker v-model="fontColor"></el-color-picker>
             </el-form-item>
           </el-form>
+          <el-button size="mini" @click="editTxt=false">取 消</el-button>
+          <el-button size="mini" type="primary" @click="saveTxt">保 存</el-button>
         </div>
         <div id="editTxt" :style="{width : txtSize.width + 'px',height : txtSize.height + 'px'}"
              style="background-color: black">
           <div v-for="item in txtSize.temItems"
                :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px'}">
             <div :name="item.type" :id="item.id" style="overflow: hidden;opacity: 0.7;">
-              <textarea v-if="item.type == 'txt'" placeholder="请输入文本内容..."
-                        :style="{fontSize:fontSize,fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
+              <textarea v-if="item.type == 'txt'" v-model="txtContent" placeholder="请输入文本内容..."
+                        :style="{fontSize:fontSize+'px',fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
               </textarea>
+              <img v-if="item.type=='BG'" style="width: 100%;height: 100%;" :src="item.backGround">
             </div>
           </div>
         </div>
@@ -474,11 +511,13 @@
   import html2canvas from 'html2canvas';
   import ElRow from "element-ui/packages/row/src/row";
   import ElCol from "element-ui/packages/col/src/col";
+  import vueMarquee from "@/components/common/Marquee.vue"
 
   export default {
     components: {
       ElCol,
-      ElRow
+      ElRow,
+      vueMarquee
     },
     mounted: function () {
       document.documentElement.addEventListener('mousemove', this.handleMove, true);          //给window绑定鼠标移动事件
@@ -491,14 +530,17 @@
       for (let i = 12; i <= 100; i++) {
         let a = {};
         a['size'] = i + 'px';
+        a['value'] = i;
         this.fontSizes.push(a);
         this.form.scrollFontSizes.push(a);
       }
       //end
       //透明度列表
-      for (let i = 0; i <= 100; i++) {
-        let a = {};
-        a['transparency'] = i + '%';
+      for (let i = 0; i < 101; i++) {
+        let a = {
+          transparency: i + '%',
+          value: i / 100
+        };
         this.form.scrollBGTransparencys.push(a)
       }
       //end
@@ -511,6 +553,7 @@
     data() {
       return {
         template: '',
+        temItems: '',                //模板元素LIST
         resources: [],
         treeId: 1,
         pageCount: 12,          //每页显示数目
@@ -540,8 +583,12 @@
         PP: '',
         proPreview: '',
         /*文本与动态文本*/
+        openScroll: true,                                     //是否开起滚动字幕，默认false
         editTxt: false,
-        txtSize: '',
+        txtSize: '',                                   //渲染编辑文本的容器
+        txtId: '',
+        txtArray: [],                                  //静态文本保存容器
+        txtContent: '',
         font: 'Arial',                                //字体
         fonts: [
           {font: 'Arial'},
@@ -569,10 +616,10 @@
           {font: 'Tahoma'},
           {font: '黑体'}
         ],                                 //字体列表
-        fontSize: '12px',                             //字体大小
+        fontSize: 12,                             //字体大小
         fontSizes: [],                                //字体大小列表
         fontColor: '#000000',                         //颜色
-        align: '',                                    //对齐方式
+        align: 'left',                                    //对齐方式
         alignActive: 'left',                           //对齐选中样式
         bold: '',                                      //加粗
         italic: '',                                    //斜杠
@@ -583,20 +630,21 @@
         form: {
           scrollContent: '',                             // 字幕内容
           scrollColor: '#000000',                               //字体颜色
-          scrollDirection: '',                           //滚动方向
+          scrollTransparency: 1,                      //背景透明度
+          scrollDirection: 1,                           //滚动方向
           scrollDirections: [
             {
               direction: '从右到左',
               value: 1
             },
             {
-              direction: '从右到左',
+              direction: '从左到右',
               value: 0
             }
           ],                               //滚动方向列表
-          scrollFontSize: '',                            //字体大小
+          scrollFontSize: 12,                                 //字体大小
           scrollFontSizes: [],                                //字体大小列表
-          scrollFontFamily: '',                          //字体
+          scrollFontFamily: 'Arial',                          //字体
           scrollFontFamilys: [
             {font: 'Arial'},
             {font: 'Book Antiqua'},
@@ -624,7 +672,7 @@
             {font: '黑体'}
           ],                              //字体列表
           scrollBGColor: '#ffffff',                             //背景颜色
-          scrollSpeed: '',                               //滚动速度
+          scrollSpeed: 1,                               //滚动速度
           scrollSpeeds: [
             {
               speed: '慢',
@@ -637,11 +685,12 @@
               value: 2
             }
           ],                                   //滚动速度列表
-          scrollBGTransparency: '',                      //背景透明度
+          scrollBGTransparency: 1,                      //背景透明度
           scrollBGTransparencys: [],                          //透明度列表
-          scrollDuration: '',                            //持续时间
+          scrollDuration: '10',                            //持续时间
         },
-        activeName:''                                     //当前激活的区域块标签
+        activeName: '',                                     //当前激活的区域块标签
+
       }
     },
     methods: {
@@ -753,7 +802,7 @@
         })
       },                                  //获取树资源
       handleClick(tab, event) {
-        this.treeId = tab.label
+        this.treeId = tab.label;
         this.resourceQuery()
       },                    //标签页切换
 
@@ -774,6 +823,7 @@
             if (type == 0 || type == undefined) {
               let template = response.data.cust.templates[0];
               _this.template = template;
+              _this.temItems = template.temItems;
               _this.temId = template.id
             } else {
               let program = response.data.cust.programs[0];
@@ -783,8 +833,9 @@
               _this.proId = program.id;
               _this.groupId = program.groupId;
               program.proItems.forEach(item => {
-                _this.res.push({name: item.itemsId, url: item.url, thumbnail: item.thumbnail})
-              })
+                _this.res.push({name: item.resId, itemsId: item.itemsId, url: item.url, thumbnail: item.thumbnail})
+              });
+              _this.getTemplate()
             }
             //数据渲染后为还原数据绑定事件
             _this.$nextTick(function () {
@@ -817,7 +868,8 @@
                   let edit = document.getElementById('edit').children;
                   for (let item of this.res) {
                     for (let i = 0; i < edit.length; i++) {
-                      if (item.name == edit[i].getAttribute('name')) {
+                      if (item.itemsId == edit[i].getAttribute('name')) {
+                        if (item.thumbnail == null) return false;
                         edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
                       }
                     }
@@ -839,6 +891,9 @@
                   if (response.data.code == '0000') {
                     let template = response.data.cust.templates[0];
                     _this.txtSize = template;                       //快速预览
+                    for (let item of template.temItems) {
+                      if (item.type === 'txt') _this.txtId = item.id
+                    }
                     _this.editTxt = true
                   } else {
                     this.$message({
@@ -850,10 +905,9 @@
                   }
                 });
 
-              })
-              $('.scroll').on('click',function () {
-                _this.activeName=$(this).parent().attr('area-name')
-                debugger
+              });
+              $('.vdr').on('click', function () {
+                _this.activeName = $(this).attr('area-name')
               })
             })
           } else {
@@ -892,11 +946,75 @@
             let queryUrl = '', method = '';
             //获取区域块的属性值
             table.children().map(function () {
-              let itemsId = $(this).attr('name');                                //元素ID
+              let itemsId = $(this).attr('name');                            //元素ID
               let thumbnail = $(this).children().children().attr('src');    //资源缩略图
               let url = $(this).children().children().attr('name');         //资源地址
               let resId = $(this).children().children().attr('id');         //资源ID
-              _this.proItems.push({itemsId, resId, thumbnail, url});
+              let type = $(this).children().attr('class');                    //类型
+              let scrollBGTransparency = '';
+              let scrollColor = '';
+              let scrollDirection = '';
+              let scrollDuration = '';
+              let scrollFontFamily = '';
+              let scrollFontSize = '';
+              let scrollFontTransparency = '';
+              let scrollSpeed = '';
+              let scrollBGColor = '';
+              let font = '';
+              let fontSize = '';
+              let fontColor = '';
+              let align = '';
+              let bold = '';
+              let italic = '';
+              let underline = '';
+              if (type === 'scroll') {
+                scrollBGTransparency = _this.form.scrollBGTransparency;
+                scrollColor = _this.form.scrollColor;
+                scrollDirection = _this.form.scrollDirection;
+                scrollDuration = _this.form.scrollDuration;
+                scrollFontFamily = _this.form.scrollFontFamily;
+                scrollFontSize = _this.form.scrollFontSize;
+                scrollFontTransparency = _this.form.scrollFontTransparency;
+                scrollSpeed = _this.form.scrollSpeed;
+                scrollBGColor = _this.form.scrollBGColor;
+                url = _this.form.scrollContent
+              }
+              if (type === 'txt') {
+                for (let item of _this.txtArray) {
+                  if (itemsId == item.id) {
+                    url = item.url;
+                    font = item.font;
+                    fontSize = item.fontSize;
+                    fontColor = item.fontColor;
+                    align = item.align;
+                    bold = item.bold;
+                    italic = item.italic;
+                    underline = item.underline
+                  }
+                }
+              }
+              _this.proItems.push({
+                itemsId,
+                resId,
+                thumbnail,
+                url,
+                scrollBGTransparency,
+                scrollColor,
+                scrollDirection,
+                scrollDuration,
+                scrollFontFamily,
+                scrollFontSize,
+                scrollFontTransparency,
+                scrollSpeed,
+                scrollBGColor,
+                font,
+                fontSize,
+                fontColor,
+                align,
+                bold,
+                italic,
+                underline
+              });
             });
             let data = {};
             if (_this.$route.query.type == 0 || _this.$route.query.type == undefined) {
@@ -963,8 +1081,25 @@
       exit() {
         this.$router.go(-1);
       },                                     //返回
+      getTemplate() {
+        let _this = this;
+        _this.$http({
+          method: 'get',
+          url: 'template/query?id=' + this.temId + '&pageNo=1&pageCount=1',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            _this.temItems = response.data.cust.templates[0].temItems
+          }
+        })
+      },                               //获取模板
       quickPreview() {
-        this.$http({
+        let _this = this;
+        _this.$http({
           method: 'get',
           url: 'template/query?id=' + this.temId + '&pageNo=1&pageCount=1',
           withCredentials: true,
@@ -975,31 +1110,58 @@
         }).then(response => {
           if (response.data.code == '0000') {
             let template = response.data.cust.templates[0];
-            this.proPreview = template;                       //快速预览
+            _this.proPreview = template;                       //快速预览
 
-            let items = this.proPreview.temItems;
+            let items = _this.proPreview.temItems;
             let table = $('#edit');
             /*根据模板高度设置缩放比例*/
-            if (this.proPreview.height == '1080') this.PP = 0.4;
-            if (this.proPreview.height == '720') this.PP = 0.7;
-            if (this.proPreview.height == '1280') this.PP = 0.6;
-            if (this.proPreview.height == '1920') this.PP = 0.4;
+            if (_this.proPreview.height == '1080') _this.PP = 0.4;
+            if (_this.proPreview.height == '720') _this.PP = 0.7;
+            if (_this.proPreview.height == '1280') _this.PP = 0.6;
+            if (_this.proPreview.height == '1920') _this.PP = 0.4;
             /*取节目资源地址*/
+
             for (let item of items) {
               table.children().map(function () {
                 let itemsId = $(this).attr('name');                                //元素ID
+                let type = $(this).children().attr('class');
                 let url = $(this).children().children().attr('name');         //资源地址
-                if (item.id == itemsId) {
-                  item['url'] = url
+                if (item.id === itemsId) {
+                  item['url'] = url;
+                  if (type === 'scroll') {
+                    item['scrollContent'] = _this.form.scrollContent;
+                    item['scrollColor'] = _this.form.scrollColor;
+                    item['scrollDirection'] = _this.form.scrollDirection === 0 ? 'right' : 'left';
+                    item['scrollFontSize'] = _this.form.scrollFontSize;
+                    item['scrollFontFamily'] = _this.form.scrollFontFamily;
+                    item['scrollBGColor'] = _this.form.scrollBGColor;
+                    item['scrollSpeed'] = _this.form.scrollSpeed + '1s';
+                    item['scrollBGTransparency'] = _this.form.scrollBGTransparency;
+                    item['scrollDuration'] = _this.form.scrollDuration;
+                    item['justify'] = _this.form.scrollDirection === 'left-right' ? 'flex-end' : 'flex-start'
+                  }
+                  if (type === 'txt') {
+                    item['txtContent'] = _this.txtContent;
+                    item['font'] = _this.font;
+                    item['fontSize'] = _this.fontSize;
+                    item['fontColor'] = _this.fontColor;
+                    item['align'] = _this.align;
+                    item['bold'] = _this.bold;
+                    item['italic'] = _this.italic;
+                    item['underline'] = _this.underline;
+                  }
                 }
               });
             }
-            this.view = true;
+            _this.view = true;
+            _this.openScroll = true;
             let myVideo = document.getElementById('myVideo');
-            myVideo.load();
-            myVideo.play();
+            if (myVideo != undefined) {
+              myVideo.load();
+              myVideo.play();
+            }
           } else {
-            this.$message({
+            _this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
               showClose: true,
               center: true,
@@ -1009,17 +1171,21 @@
         });
 
       },                             //快速预览
-      viewClose() {
+      viewClose(done) {
         let myVideo = document.getElementById('myVideo');
-        myVideo.currentTime = 0;                            //将视频当前时间初始化
-        myVideo.pause();
+        if (myVideo != undefined) {
+          myVideo.currentTime = 0;                            //将视频当前时间初始化
+          myVideo.pause();
+        }
+        this.openScroll = false;
+        done()
       },                                //快速预览窗口关闭
 
       setAlign(val) {
         if (val == 'left') this.alignActive = this.align = val;
         if (val == 'center') this.alignActive = this.align = val;
         if (val == 'right') this.alignActive = this.align = val;
-      },                                //设置文本对其方式
+      },                               //设置文本对其方式
       setB() {
         this.SB = !this.SB;
         this.bold = this.SB ? 'bold' : 'normal';
@@ -1031,7 +1197,30 @@
       setU() {
         this.SU = !this.SU;
         this.underline = this.SU ? 'underline' : 'none'
-      }                                       //设置文本下划线
+      },                                      //设置文本下划线
+      saveTxt() {
+        let object = {
+          id: this.txtId,
+          url: this.txtContent,
+          font: this.font,
+          fontSize: this.fontSize,
+          fontColor: this.fontColor,
+          align: this.align,
+          bold: this.bold,
+          italic: this.italic,
+          underline: this.underline
+        };
+        /*判断是否编辑的同一文本，如果是，删除之前的再进行添加*/
+        if (this.txtArray.length != 0) {
+          for (let i = 0; i <= this.txtArray.length; i++) {
+            if (this.txtArray[i].id == this.txtId) {
+              this.txtArray.splice(i, 1)
+            }
+          }
+        }
+        this.txtArray.push(object);
+        this.editTxt = false
+      },                                     //保存文本
     }
   }
 </script>

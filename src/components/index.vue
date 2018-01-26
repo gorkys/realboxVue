@@ -5,34 +5,34 @@
     <div class="content">
       <ul class="fastNav">
         <li>
-          <a @click="toTemplateMake">
+          <router-link to="auditList">
             <i class="iconfont icon-server-kuaisufabu"></i>
             <b>快速发布</b>
-          </a>
+          </router-link>
         </li>
         <li>
-          <a @click="toAudit">
+          <router-link to="auditList">
             <i class="iconfont icon-shenhe"></i>
             <b>审核列表</b>
-          </a>
+          </router-link>
         </li>
         <li>
-          <a @click="toPlay">
+          <router-link to="play">
             <i class="iconfont icon-jiemu"></i>
             <b>节目列表</b>
-          </a>
+          </router-link>
         </li>
         <li>
-          <a @click="toTerminal">
+          <router-link to="terminal">
             <i class="iconfont icon-zhongduan"></i>
             <b>终端管理</b>
-          </a>
+          </router-link>
         </li>
         <li>
-          <a @click="toResource">
+          <router-link to="resource">
             <i class="iconfont icon-ziyuanguanli"></i>
             <b>资源管理</b>
-          </a>
+          </router-link>
         </li>
       </ul>
       <div style="font-size: 2rem;padding-left: 100px;margin-bottom: 20px;">发布步骤：</div>
@@ -64,18 +64,6 @@
     methods: {
       toTemplateMake: function () {
         this.$router.push('/templateMake')
-      },
-      toResource: function () {
-        this.$router.push('/resource')
-      },
-      toPlay:function () {
-        this.$router.push('/play')
-      },
-      toTerminal:function () {
-        this.$router.push('/terminal')
-      },
-      toAudit:function () {
-        this.$router.push('/auditList')
       }
     }
   }

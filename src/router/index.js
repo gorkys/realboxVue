@@ -26,7 +26,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'login',
+      name: '登录',
       component: Login
     },
     {
@@ -41,59 +41,63 @@ export default new Router({
     },
     {
       path: '/programMack',
-      name: 'ProgramMack',
+      name: '节目制作',
       component: programMack
     },
     {
       path: '/resource',
-      name: 'Resource',
+      name: '资源管理',
       component: resource
     },
     {
       path: '/userLog',
-      name: 'UserLog',
+      name: '用户日志',
       component: userLog
     },
     {
       path: '/operatingLog',
-      name: 'OperatingLog',
+      name: '系统日志',
       component: operatingLog
     },
     {
       path: '/generalSet',
-      name: 'GeneralSet',
+      name: '系统设置',
       component: generalSet
     },
+    //用户设置
     {
       path: '/terGroupSet',
-      name: '终端组设置',
+      name: '终端设置',
       component: departmentSet
     },
     {
       path: '/userSet',
-      name: 'UserSet',
+      name: '用户设置',
       component: userSet
     },
     {
       path: '/roleSet',
-      name: 'RoleSet',
+      name: '角色设置',
       component: roleSet
     },
+    //终端管理
     {
       path: '/terminal',
-      name: 'Terminal',
+      name: '终端管理',
       component: terminal
     },
     {
       path: '/activeCode',
-      name: 'ActiveCode',
+      name: '激活码管理',
       component: activeCode
     },
+    //
     {
       path: '/template',
-      name: 'Template',
+      name: '模板管理',
       component: template
     },
+    //节目管理
     {
       path: '/play',
       name: '节目列表',
@@ -101,17 +105,17 @@ export default new Router({
     },
     {
       path: '/programList',
-      name: 'ProgramList',
+      name: '发布管理',
       component: programList
     },
     {
       path: '/auditList',
-      name: 'AuditList',
+      name: '审核列表',
       component: auditList
     },
     {
       path: '/release',
-      name: 'Release',
+      name: '节目发布',
       component: release
     }
 
