@@ -314,7 +314,7 @@
         <div class="control">
           <a @click="quickPreview"><i class="el-icon-view"></i> 快速预览</a>
           <a @click="save"><i class="iconfont icon-iconset0237"></i> 保存</a>
-          <a @click="exit"><i class="iconfont icon-lingcunwei"></i> 返回</a>
+          <router-link to="play"><i class="iconfont icon-lingcunwei"></i> 返回</router-link>
 
           <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
         </div>
@@ -1078,9 +1078,6 @@
       release() {
         this.save('release');
       },                                  //发布
-      exit() {
-        this.$router.go(-1);
-      },                                     //返回
       getTemplate() {
         let _this = this;
         _this.$http({
@@ -1119,6 +1116,7 @@
             if (_this.proPreview.height == '720') _this.PP = 0.7;
             if (_this.proPreview.height == '1280') _this.PP = 0.6;
             if (_this.proPreview.height == '1920') _this.PP = 0.4;
+            if (_this.proPreview.height== '200') this.PP = 0.5;
             /*取节目资源地址*/
 
             for (let item of items) {

@@ -102,7 +102,7 @@
         <div class="controlTree">
           <div style="width: 120px">
           </div>
-          <div><a><i class="el-icon-refresh"></i>刷新</a></div>
+          <div><a @click="getTree"><i class="el-icon-refresh"></i>刷新</a></div>
         </div>
         <el-tree :data="terminalTree" default-expand-all :expand-on-click-node="false"
                  @node-click="treeClick"></el-tree>
@@ -126,6 +126,7 @@
           <div class="control">
             <a @click="delTerminal"><i class="el-icon-delete"></i>删除</a>
             <a @click="synTerminal"><i class="el-icon-sort"></i>强制同步</a>
+            <a @click="queryTerminalList"><i class="el-icon-refresh"></i>刷新</a>
             <!--<el-dropdown>
           <span class="el-dropdown-link" style="cursor: pointer">
             <i class="el-icon-edit" style="margin-right: 5px"></i>批量操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
@@ -153,6 +154,12 @@
             <el-table-column prop="version" align="center" label="系统版本"></el-table-column>
             <el-table-column prop="mac" align="center" label="MAC地址"></el-table-column>
             <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
+            <el-table-column prop="status" align="center" label="在线状态">
+              <template slot-scope="scope">
+                <i v-if="scope.row.status=='1'" style="color: #00ce06;font-size: 16px" class="el-icon-success"></i>
+                <i v-if="scope.row.status=='0'" style="color: red;font-size: 16px" class="el-icon-error"></i>
+              </template>
+            </el-table-column>
             <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
           </el-table>
         </div>

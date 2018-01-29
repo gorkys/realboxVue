@@ -57,7 +57,7 @@
         </li>
         <li @click="generalSet">系统设置</li>
       </ul>-->
-      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect"
+      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal"
                background-color="#d33a31" text-color="#fff" active-text-color="#ffd04b" :router="true">
         <el-menu-item index="/index">首页</el-menu-item>
         <el-menu-item index="/resource">资源管理</el-menu-item>

@@ -358,7 +358,7 @@
                       if (_this.template.height == '720') _this.PP = 0.7;
                       if (_this.template.height == '1280') _this.PP = 0.6;
                       if (_this.template.height == '1920') _this.PP = 0.4;
-
+                      if (_this.template.height == '200') _this.PP = 0.5;
                       for (let i of _this.program.proItems) {
                         for (let y of _this.template.temItems) {
                           if (i.itemsId === y.id) {

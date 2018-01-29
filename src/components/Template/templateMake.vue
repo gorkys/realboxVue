@@ -395,7 +395,7 @@
       <div class="saveBox">
         <a class="save" @click="exportImage">保存</a>
         <a class="save" @click="exportImage('use')">保存并使用</a>
-        <a class="save" @click="exit">取消</a>
+        <router-link class="save" to="template">取消</router-link>
       </div>
       <div>
         <img id="exportedImage" style="width: 200px">
@@ -494,7 +494,8 @@
       if (this.temHeight == '1080') this.PP = 0.4;
       if (this.temHeight == '720') this.PP = 0.7;
       if (this.temHeight == '1280') this.PP = 0.6;
-      if (this.temHeight == '1920') this.PP = 0.4
+      if (this.temHeight == '1920') this.PP = 0.4;
+      if (this.temHeight == '200') this.PP = 0.5
     },
     data() {
       return {
@@ -605,9 +606,6 @@
         if (this.items[index].content == 'scroll') this.scroll = true;
         this.items.splice(index, 1);
       },                                     //模板删除
-      exit: function () {
-        this.$router.go(-1);
-      },                                //后退
       exportImage(value) {
         let vm = this;
         let table = $('#edit');

@@ -552,7 +552,7 @@
     components: {},
     methods: {
       exit() {
-        this.$router.go(-1);
+        this.$router.push('programList');
       },                               //返回
       terCheck(){
         let tree = this.$refs.terTree.getCheckedNodes();
