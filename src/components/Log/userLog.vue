@@ -82,12 +82,12 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">操作人</template>
             </el-input>
           </div>
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容">
               <template slot="prepend">操作时间</template>
             </el-input>
           </div>

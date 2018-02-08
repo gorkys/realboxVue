@@ -174,7 +174,7 @@
         if (this.$el.contains(target)) {
 
           if (!this.active) {
-            this.zIndex += 1
+            /*this.zIndex += 1*/
             this.active = true
 
             this.$emit('activated', this.left, this.top, this.width, this.height)

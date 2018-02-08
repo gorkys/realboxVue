@@ -1,5 +1,5 @@
 <style scoped>
-  #auditList {
+  #programList {
     width: 100%;
     height: 100%;
     background-color: #eeeeee;
@@ -62,7 +62,7 @@
     color: #d33a31;
   }
 
-  .auditList {
+  .programList {
     height: 620px;
   }
 
@@ -85,19 +85,25 @@
     width: 100%;
     height: 100%;
   }
+
 </style>
 
 <template>
-  <div id="auditList">
+  <div id="programList">
     <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
     <div class="content">
-      <div class="title">审核列表</div>
+      <div class="title">发布管理</div>
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
             <el-input placeholder="请输入内容" v-model="searchName">
               <template slot="prepend">节目名称</template>
+            </el-input>
+          </div>
+          <div style="width:200px;">
+            <el-input placeholder="请输入内容" v-model="searchStatus">
+              <template slot="prepend">发布状态</template>
             </el-input>
           </div>
           <div style="width:200px;">
@@ -107,10 +113,15 @@
           </div>
           <el-button @click="queryPublishList">搜索</el-button>
         </div>
+        <div class="control">
+          <a @click="New"><i class="el-icon-plus"></i>新建</a>
+          <a @click="delPro"><i class="el-icon-delete"></i>删除</a>
+        </div>
       </div>
-      <div class="auditList">
+      <div class="programList">
         <el-table
           :data="publish"
+          @selection-change="tableSelect"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
           <el-table-column prop="proType" align="center" label="节目类型"></el-table-column>
@@ -122,6 +133,7 @@
           <el-table-column prop="date" align="center" label="发布时间"></el-table-column>
           <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
           <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
+          <el-table-column prop="proStatus" align="center" label="节目状态"></el-table-column>
           <el-table-column prop="proPreview" align="center" label="节目预览">
             <template slot-scope="scope">
               <el-button
@@ -129,19 +141,6 @@
                 @click="proPreview(scope.$index, scope.row)">节目预览
               </el-button>
             </template>
-          </el-table-column>
-          <el-table-column prop="address" align="center" label="审核">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="auditPass('pass', scope.row)">通过
-              </el-button>
-              <el-button
-                size="mini"
-                @click="auditPass('refuse', scope.row)">拒绝
-              </el-button>
-            </template>
-          </el-table-column>
           </el-table-column>
         </el-table>
       </div>
@@ -215,10 +214,12 @@
       return {
         date: '',
         publish: [],       //发布列表数据
-        pageCount: 11,     //每页显示数目
+        pageCount: 8,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
+        row: '',              //行数据
         searchName: '',
+        searchStatus: '',
         searchProStatus: '',
         /*节目预览*/
         view: false,             //预览弹出框
@@ -236,12 +237,15 @@
       vueMarquee
     },
     methods: {
+      New: function () {
+        this.$router.push('/release')
+      },
       queryPublishList() {
         let _this = this;
         this.publish = [];
         this.$http({
           method: 'get',
-          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&status=未审核" + "&proName=" + this.searchName + "&proStatus=" + this.searchProStatus,
+          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&proName=' + this.searchName + '&status=' + this.searchStatus + '&proStatus=' + this.searchProStatus,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -249,8 +253,8 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let publish = response.data.cust.publish;
-            _this.total = response.data.cust.pages.count;
+            let publish = response.data.cust.publish
+            _this.total = response.data.cust.pages.count
             for (let item of publish) {
               _this.publish.push(item)
             }
@@ -268,20 +272,28 @@
         this.pageNo = val;
         this.queryPublishList()
       },                    //分页
-      auditPass(type, data) {
-        let message;
-        if(type==='pass'){
-          message='审核通过后节目将即刻发布, 是否继续?'
-        }else {
-          message='拒绝通过后节目将回到节目列表，是否继续？'
+      tableSelect(row) {
+        this.row = row
+      },                   //表格选择
+      delPro() {
+        let _this = this
+        let ids = _this.row.map(item => item.id).join(' ');      //列表模式的id
+        if (ids == '') {
+          _this.$message({
+            message: '未选择资源！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
         }
-        this.$confirm(message, '提示', {
+        _this.$confirm('此操作将删除该节目单, 是否继续?', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'get',
-            url: "publish/audit?id=" + data.id+"&type="+type,
+          _this.$http({
+            method: 'delete',
+            url: 'publish/delete?ids=' + ids,
             withCredentials: true,
             headers: {
               token: sessionStorage.getItem('token'),
@@ -289,24 +301,10 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              if(type==='pass'){
-                this.$message({
-                  message: '审核通过，节目已发布成功！',
-                  showClose: true,
-                  center: true,
-                  type: 'success'
-                });
-              }else {
-                this.$message({
-                  message: '拒绝通过，节目未发布！',
-                  showClose: true,
-                  center: true,
-                  type: 'success'
-                });
-              }
-              this.queryPublishList()
+              _this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
+              _this.queryPublishList()
             } else {
-              this.$message({
+              _this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
                 showClose: true,
                 center: true,
@@ -314,12 +312,8 @@
               });
             }
           })
-
-
         })
-
-
-      },                           //审核通过
+      },                      //删除节目
 
       viewClose(done) {
         let myVideo = document.getElementById('myVideo');
@@ -425,6 +419,7 @@
         this.openScroll = true;
         this.view = true;
       }            //节目预览
+
     }
   }
 </script>

@@ -189,8 +189,26 @@
     letter-spacing: 3px;
   }
 
-  .templateInfoList, .setBox, .areaBox {
+  .templateInfoList, .setBox, .areaBox, .infoList {
     padding: 10px;
+  }
+
+  .areaBox {
+    border-bottom: 1px solid #e4e4e4;
+  }
+
+  .areaControl {
+    display: flex;
+    justify-content: space-around;
+    font-size: 14px;
+    color: white;
+    padding-bottom: 5px;
+  }
+
+  .areaControl li {
+    cursor: pointer;
+    background-color: #d33a31;
+    padding: 2px 6px;
   }
 
   /*图片管理*/
@@ -299,7 +317,6 @@
         <li @click="add('scroll',false)"><i :style="{color:scroll?'#5ea2d3':'rgb(195, 195, 195)'}"
                                             class="iconfont icon-wenben"></i><b
           :style="{color:scroll?'#000':'rgb(195, 195, 195)'}">动态文本</b></li>
-        <!--<li @click="add('audio',false)"><i class="iconfont icon-yinle"></i><b>音乐</b></li>-->
       </ul>
     </div>
     <div id="editBox">
@@ -309,7 +326,7 @@
           <!--还原-->
           <vue-draggable-resizable v-if="revert" v-for="(item,index) in elements" :key="index"
                                    :w="item.width * PP" :h="item.height * PP" :x="item.x * PP" :y="item.y * PP"
-                                   :minw="50" :minh="50" @active="activated" @activated="onResize"
+                                   :minw="50" :minh="50" @active="activated" @activated="onResize" :zIndex="item.zIndex"
                                    @dragging="onDrag" @resizing="onResize" :parent="true" :name="item.name"
                                    :conflictCheck="item.conflictCheck" :id="item.id" :area-name="item.areaName">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
@@ -336,7 +353,7 @@
                                    :w="189" :h="142" :minw="50" :minh="50"
                                    @dragging="onDrag" @resizing="onResize" :parent="true"
                                    :conflictCheck="item.conflictCheck" :area-name="item.areaName" :name="item.name"
-                                   :id="item.id" @active="activated" @activated="onResize">
+                                   :id="item.id" @active="activated" @activated="onResize" :zIndex="item.zIndex">
             <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
               <div class="action" v-show="show">
                 <span @click="temDel(index)"><i class="el-icon-delete"></i></span>
@@ -372,6 +389,20 @@
         <div class="title" style="margin-bottom: 10px;">区域信息</div>
         <div class="areaBox">
           <span>区域名称：</span><input v-model="areaName" type="text">
+        </div>
+        <div class="infoList">
+          <ul class="areaControl">
+            <li @click="areaChange('up')">上移</li>
+            <li @click="areaChange('down')">下移</li>
+            <li @click="areaChange('top')">置顶</li>
+            <li @click="areaChange('bottom')">置底</li>
+          </ul>
+          <fieldset style="border: 1px solid #b5b8c8;padding: 10px;max-height: 200px;overflow: auto">
+            <legend>区域列表</legend>
+            <el-tree :data="areaList" node-key="key" show-checkbox @check-change="areaListCheckCheck"
+                     :expand-on-click-node="false" ref="areaList" :check-strictly="true" default-expand-all>
+            </el-tree>
+          </fieldset>
         </div>
       </div>
       <div class="parameterSet">
@@ -455,7 +486,7 @@
         <div v-else class="imgList">
           <ul class="resourceList">
             <li v-for="(resource,id) in resources" :key="id" :id="resource.id"
-                @click="selected($event)" :url="resource.url" @dblclick="preview($event)">
+                @click="selected($event,id)" :url="resource.url" @dblclick="preview($event)">
               <label class="el-upload-list__item-status-label">
                 <i class="el-icon-upload-success el-icon-check"></i>
               </label>
@@ -506,6 +537,14 @@
         items: [],
         show: false,
         id: 1,
+        zIndex: 10,
+        areaList: [
+          {
+            key: 0,
+            label: sessionStorage.getItem('temName'),
+            children: []
+          }],                                                   //区域列表数据
+        i: 0,
         //模板属性
         PP: 1,                                                         //百分比
         temName: sessionStorage.getItem('temName'),                     //模板名称
@@ -538,7 +577,7 @@
           }
         ],
         format: '',                                                      //资源格式
-        check: false,
+        check: '',
         //还原模板元素
         revert: false,                                                   //是否需要还原
         elements: [],
@@ -553,6 +592,58 @@
     },
     components: {},
     methods: {
+      areaChange(val, index) {
+        if(val!=''){
+          this.$message({
+            message: '移动功能正在开发中...',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false;
+        }
+        let area = this.$refs.areaList.getCheckedNodes();
+        let areas = this.areaList[0].children;
+        if (area.length === 0) return false;
+        /*let i=0;
+        for(let item of this.items) {
+          i++;
+          if(item.zIndex == key[0]){
+            i-=1;
+          }
+        }*/
+
+        if (val === 'up') {
+          let index = areas.indexOf(area[0]); //移动目标的坐标
+          let item = areas[index - 1];        //移动目标前面的数据
+          Vue.set(this.areaList[0].children, index, item);
+          Vue.set(this.areaList[0].children, index - 1, areas[index]);
+
+        }
+        if (val === 'down') {
+        }
+        if (val === 'top') {
+        }
+        if (val === 'bottom') {
+        }
+      },                                    //区域块的层级移动
+      areaListCheckCheck(data, node) {
+        if (data.id === 0 || data.id === 1) {
+          this.$refs.areaList.setCheckedNodes([]);
+          return false
+        }
+        this.i++;
+        if (this.i % 2 == 0) {
+          if (node) {
+            this.$refs.areaList.setCheckedNodes([]);
+            this.$refs.areaList.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.areaList.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
+      },                    //树单选
       onResize: function (left, top, width, height) {
         this.x = left;
         this.y = top;
@@ -592,20 +683,27 @@
         }
         if (content === 'video' && this.video) this.video = false;
         status ? id = 'check' : id = 'Uncheck';      //判断是否检查，用来给不检查的元素赋ID值
+        let zIndex = this.zIndex++;
         this.items.push({
+          zIndex: zIndex,
           key: this.id++,
           content: content,
           conflictCheck: status,
           id: id,
           name: new Date().getTime(),
           areaName: areaName
+        });
+        this.areaList[0].children.unshift({              //区域列表
+          key: zIndex,
+          label: areaName
         })
       },                  //添加区域块
       temDel(index) {
         if (this.items[index].content == 'video') this.video = true;
         if (this.items[index].content == 'scroll') this.scroll = true;
         this.items.splice(index, 1);
-      },                                     //模板删除
+        this.areaList[0].children.splice(index, 1);      //区域列表
+      },                                    //模板删除
       exportImage(value) {
         let vm = this;
         let table = $('#edit');
@@ -631,6 +729,7 @@
           let name = $(this).attr('area-name');
           let BGUrl = name === 'BG' ? $(this).children().find('img').attr('src') : '';
           let resId = $(this).children().last().attr('id');
+          let zIndex = $(this).css('z-index');
           Array.push({
             height: height,
             width: width,
@@ -640,7 +739,8 @@
             id: id,
             name: name,
             backGround: BGUrl,
-            bgId: resId
+            bgId: resId,
+            zIndex: zIndex
           });
         });
         let elements = Array;    //end
@@ -713,9 +813,13 @@
               data: data
             }).then(response => {
               if (response.data.code == '0000') {
-                vm.$message({message: '保存成功！', showClose: true, center: true, type: 'success'});
                 if (value == 'use') {
                   vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
+                } else {
+                  vm.$message({message: '保存成功,2秒后自动返回...', showClose: true, center: true, type: 'success'});
+                  setTimeout(() => {
+                    vm.$router.push({path: '/template'})
+                  }, 2000);
                 }
               } else {
                 vm.$message({
@@ -772,9 +876,9 @@
         this.row = row
       },                            //表格选择
       selected(e) {
-        this.check = !this.check;
         let dom = e.currentTarget.id;
         let target = e.currentTarget;
+        let p = target.parentNode.childNodes;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
           dom = e.target.offsetParent.id
           target = e.target.offsetParent
@@ -783,12 +887,20 @@
           target = e.target
         }*/     //currentTarget与target的区别
         let children = target.children[0];
-        if (this.check) {
+        if (children.style.display != 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 
           this.BGUrl = "http://" + document.getElementById(target.id).getAttribute("url");
-          this.BGId = dom
+          this.BGId = dom;
+          //去掉兄弟元素的选择项
+          if (p.length > 1) {
+            for (let i = 0; i <= p.length; i++) {
+              if (p[i].id !== dom) {
+                p[i].children[0].style.display = 'none';
+              }
+            }
+          }
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
@@ -833,6 +945,7 @@
               data['y'] = item.y;
               data['name'] = item.id;                     //元素的唯一标识
               data['areaName'] = item.name;
+              data['zIndex'] = item.zIndex;
               if (item.type === 'image') {
                 data['content'] = item.type;
                 data['conflictCheck'] = true;
@@ -868,12 +981,25 @@
         })
       },                                        //模板编辑
       activated() {
-        this.areaName = $('.active').attr('area-name')
+        this.areaName = $('.active').attr('area-name');
+        let index = $('.active').css('zIndex');
+        if (index != undefined) {
+          this.$refs.areaList.setCheckedKeys([index])
+        }
       },                                      //激活区域块
       openSetBG() {
         if (this.BG) this.setBg = true
       },                                      //打开背景选择对话框
       setBGImg() {
+        if(this.BGUrl=='') {
+          this.$message({
+            message: '未选择背景！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
         this.BGImg.push({
           key: this.id++,
           content: 'BG',

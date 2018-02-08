@@ -69,6 +69,30 @@ npm run mock
         └── login       登录
 ```
 ## 填坑之旅
+#### 16.vue在IE11中显示空白页
+解决办法：通过npm安装babel-polyfill。`npm install --save-dev babel-polyfill`</br>
+然后在main.js中引入。`import 'babel-polyfill'`
+#### 15.element-ui tree树形控件单选实现
+解决办法：通过tree的`check-change`事件曲线实现单选,注意：注意：</br>
+1、setCheckedNodes  
+2、勾选的节点，必须设置 node-key 属性
+```vue
+terCheck(data, node){
+          this.i++;
+          if(this.i%2==0){
+            if(node){
+              this.$refs.terTree.setCheckedNodes([]);
+              this.$refs.terTree.setCheckedNodes([data]);
+              //交叉点击节点
+            }else{
+              this.$refs.terTree.setCheckedNodes([]);
+              //点击已经选中的节点，置空
+            }
+          }
+        }
+```
+#### 14.[解决vue-cli element-ui打包报错](http://blog.csdn.net/qq_35624642/article/details/78828390)Unexpected token: punc (() [./~/element-ui/packages/row/src/row.js
+
 #### 13.如何在页面渲染完后去操作dom，而且只执行一次？
 解决办法：使用场景：节目编辑时还原节目素材;</br>
 最初使用`update`生命周期，后来发现会在数据每次更新后执行一次，更改后使用第一种方法。
@@ -155,7 +179,7 @@ add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Ag
 #### 8.MP4在网页上播放需要特定编码
 解决方法：由后台去转码
 #### 7.如何选择资源时切换选中状态
-解决方法：data中定义一个check变量，默认值为false,触发点击事件后`this.check=!this.check`,</br>
+解决方法：1、data中定义一个check变量，默认值为false,触发点击事件后`this.check=!this.check`,</br>
 然后
 ```
 if(this.check){
@@ -167,6 +191,19 @@ if(this.check){
  ```
 点击时传的`$event`参数中currentTarget与target区别为(代码见resource.vue的资源选中事件):</br>
 target指向被单击的对象而currentTarget指向当前事件活动的对象（一般为父级）
+2、1方法中会更适合单选，多选中会出现选择下一个目标时，第一次点击无效的bug。多选可根据其样式</br>
+是否增加去判断，代码已更改，详见资源选择模板选择内。
+3、单选需要干掉兄弟元素的样式。代码：
+
+```vue
+         if (p.length > 1) {
+            for (let i = 0; i <= p.length; i++) {
+              if (p[i].id !== id) {     //去除自身
+                p[i].children[0].style.display = 'none';
+              }
+            }
+          }
+```
 #### 7.如何动态添加对象属性
 解决方法：对象的访问方式有`data.name`与`data[name]`,动态添加需要使用`data[name]`,代码见roleSet.vue添加权限方法
 

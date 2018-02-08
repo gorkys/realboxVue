@@ -67,7 +67,6 @@
   }
 
   .roleTree {
-
     border: 1px solid #b5b8c8;
     padding: 10px;
   }

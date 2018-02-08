@@ -17,7 +17,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="play">
+          <router-link to="programList">
             <i class="iconfont icon-jiemu"></i>
             <b>节目列表</b>
           </router-link>
@@ -221,14 +221,25 @@
         })
       },                    //查询模板树
       selectedTem(e) {
-        this.check = !this.check
         let dom = e.currentTarget.children[2].innerHTML;
-        let target = e.currentTarget
+        let target = e.currentTarget;
         let children = target.children[0];
-        if (this.check) {
+        //单选判定所需
+        let p = target.parentNode.childNodes;
+        let id = e.currentTarget.id;
+
+        if (children.style.display != 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
-          this.temName = dom
+          this.temName = dom;
+          //去掉兄弟元素的选择项
+          if (p.length > 1) {
+            for (let i = 0; i <= p.length; i++) {
+              if (p[i].id !== id) {
+                p[i].children[0].style.display = 'none';
+              }
+            }
+          }
         } else {
           children.style.display = 'none';
           target.style.backgroundColor = "white";
@@ -236,7 +247,16 @@
         }
       },                  //单击选择文件
       selectTem() {
-        this.setTem = false
+        if (this.temName === '') {
+          this.$message({
+            message: '未选择模板！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false;
+        }
+        this.setTem = false;
         this.$router.push({path: '/programMack', query: {name: this.temName, groupId: this.tTreeId, type: 0}})
       },                     //新建模板
     }

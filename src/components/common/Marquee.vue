@@ -25,8 +25,10 @@
 <template>
   <div id="Marquee" ref="parent">
     <div class="BG" :style="{backgroundColor:BGColor,opacity:BGOpacity}"></div>
-    <p ref="target" v-if="direction==1" :style="{right: this.right + 'px',marginTop: -(this.height / 2) + 'px'}" class="box">{{content}}</p>
-    <p ref="target" v-if="direction==0" :style="{right: this.right + 'px',marginTop: -(this.height / 2) + 'px'}" class="box">{{content}}</p>
+    <p ref="target" v-if="direction==1" :style="{right: this.right + 'px',marginTop: -(this.height / 2) + 'px'}"
+       class="box">{{content}}</p>
+    <p ref="target" v-if="direction==0" :style="{left: this.left + 'px',marginTop: -(this.height / 2) + 'px'}"
+       class="box">{{content}}</p>
   </div>
 </template>
 
@@ -69,8 +71,8 @@
         type: String
       },
       BGOpacity: {
-        default: '1',
-        type: String
+        default: 1,
+        type: Number
       }
     },
     mounted: function () {
@@ -78,39 +80,40 @@
     },
     methods: {
       marquee() {
-        this.$nextTick(() => {
-            if (this.open) {
+        let _this = this;
+        _this.$nextTick(() => {
+            if (_this.open) {
               let speed;
-              if (this.speed == 0) speed = 80;
-              if (this.speed == 1) speed = 40;
-              if (this.speed == 2) speed = 5;
-              this.int = setInterval(() => {
-                let parentWidth = this.$refs.parent.clientWidth;           //父容器的宽度
-                let parentLeft = this.$refs.parent.offsetLeft;             //父容器的边界
+              if (_this.speed == 0) speed = 80;
+              if (_this.speed == 1) speed = 40;
+              if (_this.speed == 2) speed = 5;
+              _this.int = setInterval(() => {
+                let parentWidth = _this.$refs.parent.clientWidth;           //父容器的宽度
+                let parentLeft = _this.$refs.parent.offsetLeft;             //父容器的边界
                 let parent = parentWidth + parentLeft;
 
-                let targetLeft = this.$refs.target.offsetLeft;
-                let targetWidth = this.$refs.target.clientWidth;           //需要移动文字的宽度
-                this.height = this.$refs.target.clientHeight;
+                let targetLeft = _this.$refs.target.offsetLeft;
+                let targetWidth = _this.$refs.target.clientWidth;           //需要移动文字的宽度
+                _this.height = _this.$refs.target.clientHeight;
                 let target = targetWidth + targetLeft;
-                this.target = targetWidth;
-                if (this.direction == 1) {
+                _this.target = targetWidth;
+                if (_this.direction == 1) {
                   if (parentLeft <= target) {
-                    this.right++
+                    _this.right++
                   } else {
-                    this.right = -targetWidth
+                    _this.right = -targetWidth
                   }
                 } else {
                   if (target <= parent) {
-                    this.left++
+                    _this.left++
                   } else {
-                    this.left = -targetWidth
+                    _this.left = -targetWidth
                   }
                 }
               }, speed);
             } else {
-              clearInterval(this.int);
-              this.direction == 1 ? this.right = -this.target : this.left = -this.target
+              clearInterval(_this.int);
+              _this.direction == 1 ? _this.right = -_this.target : _this.left = -_this.target
             }
           }
         )

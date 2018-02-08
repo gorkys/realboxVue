@@ -5,13 +5,19 @@
         <div class="formBox">
           <div class="logo"></div>
           <div class="form">
-            <input type="text" v-model="name" name="name" placeholder="账号"/>
-            <input type="password" name="pass" v-model="pass" placeholder="密码"/>
+            <input type="text" v-model="name" name="name" :placeholder="$t('message.Username')"/>
+            <input type="password" name="pass" v-model="pass" :placeholder="$t('message.Password')"/>
             <div class="codeBox">
-              <input type="text" name="code" v-model="code" @keyup.enter='getLogin(name)' placeholder="验证码"/>
+              <input type="text" name="code" v-model="code" @keyup.enter='getLogin(name)'
+                     :placeholder="$t('message.Captcha')"/>
               <img id="code" :src="codeSrc" @click="getCode">
             </div>
-            <a class="entry" @click="getLogin(name)">登录</a>
+            <div class="lang">
+              <el-radio-group v-model="language" size="mini">
+                <el-radio v-for="item of lang" :label="item.value" border>{{item.label}}</el-radio>
+              </el-radio-group>
+            </div>
+            <a class="entry" @click="getLogin(name)">{{$t('message.login')}}</a>
           </div>
         </div>
       </div>
@@ -21,27 +27,40 @@
 </template>
 
 <script>
+  import Vue from 'vue'
+
   export default {
+    mounted() {
+      this.$i18n.locale === 'zh' ? this.language = 0 : this.language = 1
+    },
     data() {
       return {
         name: '',
         pass: "",
         code: '',
-        codeSrc: this.$http.defaults.baseURL+'/code'
+        language: 0,
+        lang: [{
+          label: this.$t('message.zh'),
+          value: 0
+        }, {
+          label: this.$t('message.en'),
+          value: 1
+        }],
+        codeSrc: this.$http.defaults.baseURL + '/code'
       }
     },
     methods: {
       getLogin() {
         if (this.name == '' || this.pass == '') {
-          this.$message({message: '账号与密码不能为空！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '账号与密码不能为空！', showClose: true, center: true, type: 'warning'});
         }
         if (this.code == '') {
-          this.$message({message: '验证码不能为空！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '验证码不能为空！', showClose: true, center: true, type: 'warning'});
         }
         this.$http({
           method: 'post',
           url: 'login',
-          withCredentials:true,
+          withCredentials: true,
           data: {
             name: this.name,
             password: this.pass,
@@ -51,8 +70,8 @@
           if (response.data.code == '0000') {
             sessionStorage.setItem("token", response.data.cust.token);
             sessionStorage.setItem("name", response.data.cust.name);
-            sessionStorage.setItem("privId",response.data.cust.privId);
-            sessionStorage.setItem("userId",response.data.cust.userId)
+            sessionStorage.setItem("privId", response.data.cust.privId);
+            sessionStorage.setItem("userId", response.data.cust.userId)
             this.$router.push('/index')
           } else {
             this.$message({
@@ -69,7 +88,14 @@
       getCode: function () {
         this.codeSrc += '?l=' + Math.random();
       }
-    }
+    },
+    watch: {
+      language: function (val) {
+        val === 0 ? this.$i18n.locale = 'zh' : this.$i18n.locale = 'en';
+        Vue.set(this.lang, 0, {label: this.$t('message.zh'), value: 0});
+        Vue.set(this.lang, 1, {label: this.$t('message.en'), value: 1})
+      }
+    },
   }
 </script>
 
@@ -113,7 +139,7 @@
   }
 
   .formBox {
-    padding: 25px 75px;
+    padding: 10px 75px;
   }
 
   .logo {
@@ -137,6 +163,10 @@
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
+  }
+
+  .lang {
+    margin-bottom: 20px;
   }
 
   input[name=code] {

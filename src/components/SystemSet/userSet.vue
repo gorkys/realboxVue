@@ -127,8 +127,8 @@
           <a @click="EditTree"><i class="el-icon-edit"></i>编辑</a>
           <a @click="delTree"><i class="el-icon-delete"></i>删除</a>
         </div>
-        <el-tree :data="userTree" node-key="id" default-expand-all show-checkbox
-                 ref="tree" :check-strictly="true" :highlight-current="true"></el-tree>
+        <el-tree :data="userTree" node-key="id" default-expand-all show-checkbox @node-click="handleNodeClick"
+                 ref="tree" :check-strictly="true" :highlight-current="true" @check-change="treeCheckCheck"></el-tree>
       </div>
       <div id="userList">
         <div class="title">用户列表</div>
@@ -258,7 +258,7 @@
       <el-dialog width="30%" title="选择分组上级" :visible.sync="openSuperG" append-to-body>
         <el-tree
           :data="groupSuper" show-checkbox default-expand-all :check-strictly="true"
-          node-key="id" ref="groupSuper" highlight-current>
+          node-key="id" ref="groupSuper" highlight-current @check-change="groupSuperCheckCheck">
         </el-tree>
         <div slot="footer" class="dialog-footer">
           <el-button @click="openSuperG = false">取 消</el-button>
@@ -308,7 +308,7 @@
           value: '2',
           label: '列表模式'
         }],
-        treeId: '',
+        treeId: 51,
         pageCount: 11,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
@@ -359,6 +359,9 @@
 
         searchName: '',
         searchType: '',
+
+        i: 0,
+        j: 0
       }
     },
     components: {
@@ -368,6 +371,36 @@
       Content
     },
     methods: {
+      groupSuperCheckCheck(data, node) {
+        this.j++;
+        if (this.j % 2 == 0) {
+          if (node) {
+            this.$refs.groupSuper.setCheckedNodes([]);
+            this.$refs.groupSuper.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.groupSuper.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
+      },
+      treeCheckCheck(data, node) {
+        this.i++;
+        if (this.i % 2 == 0) {
+          if (node) {
+            this.$refs.tree.setCheckedNodes([]);
+            this.$refs.tree.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.tree.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
+      },                 //树单选
+      handleNodeClick(val) {
+        val.id != 50 ? this.treeId = val.id : this.treeId = 51;
+        this.queryUserList()
+      },                   //用户分组树点击
       getTree() {
         let _this = this;
         this.$http({
@@ -395,7 +428,7 @@
         _this.users = [];
         this.$http({
           method: 'get',
-          url: 'user/query?treeId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&name=' + this.searchName + '&type=' + this.searchType,
+          url: 'user/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&name=' + this.searchName + '&type=' + this.searchType,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -602,7 +635,7 @@
       terGroupSelect() {
         let tree = this.$refs.terGroupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          this.$message({message: '不允许多项操作，只允许选择一个分组进行操作！', center: true, type: 'warning'});
           return false
         }
         this.terGroupId = tree[0].id;
@@ -612,7 +645,7 @@
       groupSelect() {
         let tree = this.$refs.groupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: '不允许多项操作，只允许选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.groupId = tree[0].id;
@@ -656,6 +689,13 @@
             if (response.data.code == '0000') {
               this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
               this.queryUserList()
+            } else if (response.data.code == 'USER006') {
+              this.$message({
+                message: response.data.infor,
+                showClose: true,
+                center: true,
+                type: 'warning'
+              });
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -688,7 +728,7 @@
         this.treeTitle = "编辑分组";
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.creator = tree[0].creator;
@@ -760,9 +800,16 @@
             if (response.data.code == '0000') {
               _this.getTree();
               _this.$message({message: '编辑分组成功！', showClose: true, center: true, type: 'success'});
-              this.openTreeDialog = false
+              this.openTreeDialog = false;
               _this.treeForm.superiorGroup = '';
               _this.treeForm.groupName = ''
+            } else if (response.data.code == 'TREE006') {
+              this.$message({
+                message: response.data.infor,
+                showClose: true,
+                center: true,
+                type: 'warning'
+              });
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -775,12 +822,12 @@
         }
       },                      //确认修改节目分组
       delTree() {
-        let tree = this.$refs.tree.getCheckedNodes()
+        let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '只能选择一个分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        let id = tree[0].id
+        let id = tree[0].id;
         this.$confirm('此操作将永久删除该分组, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -803,6 +850,13 @@
                 type: 'success'
               });
               this.getTree()
+            } else if (response.data.code == 'TREE006') {
+              this.$message({
+                message: response.data.infor,
+                showClose: true,
+                center: true,
+                type: 'warning'
+              });
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',

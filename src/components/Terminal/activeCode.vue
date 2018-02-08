@@ -119,7 +119,12 @@
           <el-table-column prop="code" align="center" label="激活码"></el-table-column>
           <el-table-column prop="name" align="center" label="所属终端"></el-table-column>
           <el-table-column prop="creator" align="center" label="创建者"></el-table-column>
-          <el-table-column prop="used" align="center" label="可用状态"></el-table-column>
+          <el-table-column prop="used" align="center" label="可用状态">
+            <template slot-scope="scope">
+              <i v-if="scope.row.used=='1'" style="color: #00ce06;font-size: 16px" class="el-icon-success"></i>
+              <i v-if="scope.row.used=='0'" style="color: red;font-size: 16px" class="el-icon-error"></i>
+            </template>
+          </el-table-column>
           <el-table-column prop="time" align="center" label="生成时间"></el-table-column>
         </el-table>
       </div>
@@ -351,9 +356,36 @@
         })
       },                                  //获取树资源
       exportCode(){
-        this.$confirm('功能正在开发中...', '提示', {
+        let ids = this.rowId.map(item => item.id).join(' ');
+        this.$confirm('确定将选定的激活码导出为压缩包？', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
+        }).then(()=>{
+          this.$http({
+            method: 'get',
+            url: 'activate/export?ids=' + ids,
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == '0000'){
+              this.$message({
+                message: '导出成功！',
+                showClose: true,
+                center: true,
+                type: 'success'
+              });
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
         })
       },                                //导出激活码
       unbundled(){
@@ -389,7 +421,7 @@
             }
           })
         })
-      }                                     //解绑激活码
+      }                                  //解绑激活码
     }
   }
 </script>

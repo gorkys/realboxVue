@@ -1,17 +1,24 @@
 <style scoped>
-  #programList {
+  #play {
     width: 100%;
     height: 100%;
     background-color: #eeeeee;
   }
 
-  .content {
-    height: 778px;
+  #playTree {
+    border: 1px solid #c1c1c1;
+    height: 98%;
+    width: 12%;
     border-radius: 10px;
-    margin: 20px 20px 0px;
-    background-color: white;
-    box-shadow: 0px 7px 4.8px 3.2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+  }
+
+  #playList {
+    border: 1px solid #c1c1c1;
+    height: 98%;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 87%;
   }
 
   .title {
@@ -22,48 +29,101 @@
     font-size: 1.4rem;
     color: white;
     letter-spacing: 3px;
-    width: 100%;
   }
 
   .controlBox {
-    height: 60px;
-    line-height: 60px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 4px solid #e0e0e0;
-  }
-
-  .search {
     height: 40px;
     line-height: 40px;
     text-align: right;
     padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
+  }
+
+  .control a {
+    margin-left: 10px;
+    font-size: 1.4rem;
+    border-right: 1px solid #cfcfcf;
+    padding-right: 10px;
+  }
+
+  .control > a > i {
+    margin-right: 5px;
+  }
+
+  .search {
+    display: flex;
   }
 
   .search > div {
     margin-right: 10px;
   }
 
-  .control {
-    font-size: 1.4rem;
+  .playBox, .tableList {
+    padding: 20px;
+    height: 580px;
   }
 
-  .control a {
-    padding: 10px;
+  .playList {
+    display: flex;
+    flex-wrap: wrap;
   }
 
-  .control a i {
-    margin-right: 5px;
+  .playList li {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 30px 40px;
+    cursor: pointer;
+    padding: 10px 5px;
+    border-radius: 5px;
+    position: relative;
   }
 
-  .control a:hover {
-    color: #d33a31;
+  .imgBox {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #e7e7e7;
   }
 
-  .programList {
-    height: 620px;
+  .playList li img {
+    max-width: 120px;
+    max-height: 120px;
+  }
+
+  .playList li:hover {
+    background-color: #ebebeb !important;
+  }
+
+  .playList p {
+    min-width: 20px;
+  }
+
+  .el-upload-list__item-status-label {
+    position: absolute;
+    right: -15px;
+    top: -7px;
+    width: 46px;
+    height: 26px;
+    background: #13ce66;
+    text-align: center;
+    transform: rotate(45deg);
+    box-shadow: 0 1px 1px #ccc;
+  }
+
+  .el-upload-list__item-status-label i {
+    font-size: 12px;
+    margin-top: 12px;
+    transform: rotate(-45deg);
+    color: white;
   }
 
   .page {
@@ -71,181 +131,430 @@
     padding-right: 20px;
   }
 
-  /*快速预览*/
-  #proPreview {
+  /*模板样式*/
+  .temDialog {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #templateTree {
+    border: 1px solid #c1c1c1;
+    overflow: hidden;
+    border-radius: 10px;
+    width: 12%;
+  }
+
+  #templateList {
+    border: 1px solid #c1c1c1;
+    height: 98%;
+    overflow: hidden;
+    border-radius: 10px;
+    width: 87%;
+  }
+
+  .controlBox {
+    height: 40px;
+    line-height: 40px;
+    text-align: right;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .control a {
+    margin-left: 10px;
+    font-size: 1.4rem;
+    border-right: 1px solid #cfcfcf;
+    padding-right: 10px;
+  }
+
+  .control > a > i {
+    margin-right: 5px;
+  }
+
+  .search {
+    display: flex;
+  }
+
+  .search > div {
+    margin-right: 10px;
+  }
+
+  .templateBox, .tableList {
+    padding: 20px;
+    height: 580px;
+  }
+
+  .templateList {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .templateList li {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 30px 40px;
+    cursor: pointer;
+    padding: 10px 5px;
+    border-radius: 5px;
     position: relative;
   }
 
-  #proPreview > div {
-    position: absolute;
-
+  .imgBox {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #e7e7e7;
   }
 
-  #proPreview > div > div {
-    width: 100%;
-    height: 100%;
+  .templateList li img {
+    max-width: 120px;
+    max-height: 120px;
   }
 
+  .templateList li:hover {
+    background-color: #ebebeb !important;
+  }
+
+  .templateList p {
+    min-width: 20px;
+  }
+
+  .controlTree {
+    height: 40px;
+    line-height: 40px;
+    text-align: right;
+    padding-right: 10px;
+    border-bottom: 1px solid #dedede;
+  }
+
+  .controlTree > a {
+    margin-left: 15px;
+  }
+
+  .controlTree > a > i {
+    margin-right: 3px;
+  }
+
+  .controlTree > a:hover {
+    color: #d33a31;
+  }
 </style>
 
 <template>
-  <div id="programList">
+  <div id="play">
     <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
-    <div class="content">
-      <div class="title">发布管理</div>
-      <div class="controlBox">
-        <div class="search">
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchName">
-              <template slot="prepend">节目名称</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchStatus">
-              <template slot="prepend">发布状态</template>
-            </el-input>
-          </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchProStatus">
-              <template slot="prepend">节目状态</template>
-            </el-input>
-          </div>
-          <el-button @click="queryPublishList">搜索</el-button>
+    <Content>
+      <div id="playTree">
+        <div class="title">节目分组</div>
+        <div class="controlTree">
+          <a @click="NewTree"><i class="el-icon-plus"></i>新建</a>
+          <a @click="EditTree"><i class="el-icon-edit"></i>编辑</a>
+          <a @click="delTree"><i class="el-icon-delete"></i>删除</a>
         </div>
-        <div class="control">
-          <a @click="New"><i class="el-icon-plus"></i>新建</a>
-          <a @click="delPro"><i class="el-icon-delete"></i>删除</a>
+        <el-tree :data="playTree" node-key="id" @node-click="handleNodeClick" show-checkbox :highlight-current="true"
+                 :check-strictly="true" default-expand-all ref="tree" :expand-on-click-node="false"
+                 @check-change="treeCheckCheck"></el-tree>
+      </div>
+      <div id="playList">
+        <div class="title">节目列表</div>
+        <div class="controlBox">
+          <div class="search">
+            <div style="width: 110px">
+              <el-select v-model="value" placeholder="图形模式">
+                <el-option v-for="item in select"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value"></el-option>
+              </el-select>
+            </div>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容" v-model="searchName">
+                <template slot="prepend">节目名称</template>
+              </el-input>
+            </div>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容" v-model="searchResolution">
+                <template slot="prepend">分辨率</template>
+              </el-input>
+            </div>
+            <el-button @click="queryPlayList">搜索</el-button>
+          </div>
+          <div class="control">
+            <a @click="newPlay"><i class="el-icon-plus"></i>新建</a>
+            <a @click="editPlay(playName)"><i class="el-icon-edit"></i>修改</a>
+            <a @click="delPlay"><i class="el-icon-delete"></i>删除</a>
+          </div>
+        </div>
+        <div v-if="value == '2'" class="tableList">
+          <el-table
+            :data="plays"
+            style="width: 100%">
+            <el-table-column type="selection" align="center" width="55"></el-table-column>
+            <el-table-column prop="name" align="center" label="节目名称"></el-table-column>
+            <el-table-column prop="preview" align="center" label="预览图">
+              <template scope="scope">
+                <img :src="scope.row.preview" width="100" height="70"/>
+              </template>
+            </el-table-column>
+            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+            <el-table-column prop="status" align="center" label="状态"></el-table-column>
+            <el-table-column prop="terminalType" align="center" label="终端类型"></el-table-column>
+            <el-table-column prop="address" align="center" label="素材大小"></el-table-column>
+            <el-table-column prop="address" align="center" label="播放时长"></el-table-column>
+            <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="address" align="center" label="操作"></el-table-column>
+          </el-table>
+        </div>
+        <div v-else class="playBox">
+          <ul class="playList">
+            <li v-for="(play,id) in plays" :key="id" :id="play.id"
+                @click="selected($event)" @dblclick="editTemplate(play.name)">
+              <label class="el-upload-list__item-status-label">
+                <i class="el-icon-upload-success el-icon-check"></i>
+              </label>
+              <div class="imgBox">
+                <img :src="play.preview">
+              </div>
+              <p>{{play.name}}</p>
+            </li>
+          </ul>
+        </div>
+        <div class="page">
+          <el-pagination
+            @current-change="handleCurrentChange"
+            :page-size="pageCount"
+            layout="total, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </div>
-      <div class="programList">
-        <el-table
-          :data="publish"
-          @selection-change="tableSelect"
-          style="width: 100%">
-          <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="proType" align="center" label="节目类型"></el-table-column>
-          <el-table-column prop="id" align="center" label="发布单号"></el-table-column>
-          <el-table-column prop="proName" align="center" label="节目名称"></el-table-column>
-          <el-table-column prop="disType" align="center" label="发布类型"></el-table-column>
-          <el-table-column prop="playMode" align="center" label="播放类型"></el-table-column>
-          <el-table-column prop="publisher" align="center" label="发布人"></el-table-column>
-          <el-table-column prop="date" align="center" label="发布时间"></el-table-column>
-          <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
-          <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
-          <el-table-column prop="proStatus" align="center" label="节目状态"></el-table-column>
-          <el-table-column prop="proPreview" align="center" label="节目预览">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="proPreview(scope.$index, scope.row)">节目预览
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="page">
-        <el-pagination
-          @current-change="pageChange"
-          :page-size="pageCount"
-          layout="total, prev, pager, next, jumper"
-          :total="total">
-        </el-pagination>
-      </div>
-    </div>
+    </Content>
     <footer-bar></footer-bar>
     <el-dialog
-      title="快速预览"
-      :visible.sync="view"
-      top="3vh"
-      :before-close="viewClose"
+      title="选择模板"
+      :visible.sync="setTem"
+      width="58%"
+      top="1vh"
     >
-      <div style="width: 100%;height: 100%;display: flex;justify-content: center;align-items: center;overflow: hidden">
-        <div id="proPreview" :style="{width : template.width * PP + 'px',height : template.height * PP + 'px'}">
-          <div v-for="item in items" style=""
-               :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px'}">
-            <!--背景-->
-            <div style="z-index: 1;position: absolute" v-if="item.type=='BG'" :name="item.type" :id="item.id">
-              <img  style="width: 100%;height: 100%" :src="item.url">
+      <div class="temDialog">
+        <div id="templateTree">
+          <div class="title">模板管理</div>
+          <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" :expand-on-click-node="false"
+                   default-expand-all></el-tree>
+        </div>
+        <div id="templateList">
+          <div class="controlBox">
+            <div class="search">
+              <div style="width: 110px">
+                <el-select v-model="tValue" placeholder="图形模式">
+                  <el-option v-for="item in tSelect"
+                             :key="item.value"
+                             :label="item.label"
+                             :value="item.value"></el-option>
+                </el-select>
+              </div>
+              <div style="width:200px;">
+                <el-input placeholder="请输入内容">
+                  <template slot="prepend">模板名称</template>
+                </el-input>
+              </div>
+              <el-button>搜索</el-button>
             </div>
-            <!--静态文本-->
-            <div v-if="item.type=='txt'" :name="item.type" :id="item.id" style="z-index: 10;position: absolute;width: 100%;height: 100px"
-                 :style="{textAlign:item.align}">
-              <p style="position: relative"
-                 :style="{fontSize:item.fontSize,fontFamily:item.font,color:item.fontColor,fontWeight: item.bold,fontStyle: item.italic,textDecoration: item.underline}">
-                {{item.url}}
-              </p>
-            </div>
-            <!--动态文本-->
-            <div style="z-index: 10;position: absolute;display: flex;justify-content: flex-start;align-items: center" v-if="item.type=='scroll'"
-                 :style="{color:item.scrollColor,fontSize:item.scrollFontSize + 'px',fontFamily:item.scrollFontFamily}">
-              <vue-marquee :BGOpacity="item.scrollBGTransparency" :open="openScroll" :BGColor="item.scrollBGColor"
-                           :fontOpacity="item.scrollTransparency" :speed="item.scrollSpeed"
-                           :direction="item.scrollDirection" :content="item.url"></vue-marquee>
-            </div>
-            <!--视频图片-->
-            <div style="z-index: 10;position: absolute" :name="item.type" :id="item.id">
-              <!--视频-->
-              <video preload="metadata" v-if="item.type ==='video'" id="myVideo" width="100%" height="100%" loop
-                     autoplay>
-                <source id="video" :src="item.url" type="video/mp4">
-              </video>
-              <!--图片-->
-              <img v-if="item.type=='image'" style="width: 100%;height: 100%;" :src="item.url">
-            </div>
-
+          </div>
+          <div v-if="tValue == '2'" class="tableList">
+            <el-table :data="templates" style="width: 100%">
+              <el-table-column prop="name" align="center" label="模板名称"></el-table-column>
+              <el-table-column prop="preview" align="center" label="预览图">
+                <template scope="scope">
+                  <img :src="scope.row.preview" width="30" height="50"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
+              <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+              <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
+              <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
+              <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+              <el-table-column prop="desc" align="center" label="描述"></el-table-column>
+            </el-table>
+          </div>
+          <div v-else class="templateBox">
+            <ul class="templateList">
+              <li v-for="(template,id) in templates" :key="id" :id="template.id"
+                  @click="selectedTem($event)" @dblclick="editPlay(template.name)">
+                <label class="el-upload-list__item-status-label">
+                  <i class="el-icon-upload-success el-icon-check"></i>
+                </label>
+                <div class="imgBox">
+                  <img :src="template.preview">
+                </div>
+                <p>{{template.name}}</p>
+              </li>
+            </ul>
+          </div>
+          <div class="page">
+            <el-pagination
+              @current-change="temChange"
+              :page-size="tPageCount"
+              layout="total, prev, pager, next, jumper"
+              :total="tTotal">
+            </el-pagination>
           </div>
         </div>
       </div>
-    </el-dialog><!--预览-->
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="selectTem">确 定</el-button>
+  </span>
+    </el-dialog><!--选择模板-->
+    <el-dialog :title="treeTitle" ref="TreeDialog" :visible.sync="openTreeDialog" width="27.5%">
+      <el-dialog width="30%" title="选择分组上级" :visible.sync="openSuperG" append-to-body>
+        <el-tree :data="groupSuper" node-key="id" :check-strictly="true" show-checkbox
+                 default-expand-all ref="groupSuper" @check-change="groupSuperCheckCheck"></el-tree>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="openSuperG = false">取 消</el-button>
+          <el-button type="primary" @click="selectSuperGroup">确 定</el-button>
+        </div>
+      </el-dialog>            <!--上级分组选择-->
+      <el-form :model="treeForm">
+        <el-form-item label="分组名称" :label-width="LabelWidth">
+          <el-input v-model="treeForm.groupName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="上级分组" :label-width="LabelWidth">
+          <input v-model="treeForm.superiorGroup" class="el-input__inner" auto-complete="off"
+                 style="cursor: pointer" @click="openSuperG = true" readonly="readonly"/>
+        </el-form-item>
+        <el-form-item label="分组描述" :label-width="LabelWidth">
+          <el-input type="textarea" v-model="treeForm.groupDesc" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="openTreeDialog = false">取 消</el-button>
+        <el-button type="primary" @click="groupSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
-  import vueMarquee from "@/components/common/Marquee.vue"
+  import Content from '@/components/common/content'
 
   export default {
-    mounted() {
-      this.queryPublishList()
+    mounted: function () {
+      this.getTree();
+      this.queryPlayList()
     },
     data() {
       return {
-        date: '',
-        publish: [],       //发布列表数据
-        pageCount: 8,     //每页显示数目
+        playTree: [],               //节目树
+        //节目列表
+        plays: [],
+        value: '',
+        select: [{
+          value: '1',
+          label: '图形模式'
+        }, {
+          value: '2',
+          label: '列表模式'
+        }],
+        pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
-        row: '',              //行数据
+        treeId: 31,
+        check: false,          //选中资源的变量
+        playName: '',           //节目名称
+        //模板选择
+        setTem: false,
+        tTreeId: 22,
+        templates: [],          //模板列表
+        templateTree: [],
+        tValue: '',
+        tSelect: [{
+          value: '1',
+          label: '图形模式'
+        }, {
+          value: '2',
+          label: '列表模式'
+        }],
+        tPageCount: 12,     //每页显示数目
+        tPageNo: 1,          //当前页
+        tTotal: 0,            //总数目
+        temName: '',          //模板名
+        //树操作
+        openTreeDialog: false,
+        openTreeG: false,
+        treeTitle: '',
+        groupSuper: [],         //分组上级选择
+        superId: '',             //分组上级ID
+        openSuperG: false,
+        creator: '',
+        currentGroupId: '',       //当前组ID
+        LabelWidth: '70px',
+        treeForm: {
+          groupName: '',
+          superiorGroup: '',
+          groupDesc: ''
+        },
+        ids: [],                //存储选中节目ID
         searchName: '',
-        searchStatus: '',
-        searchProStatus: '',
-        /*节目预览*/
-        view: false,             //预览弹出框
-        template: '',             //模板
-        program: '',               //节目
-        PP: '',                    //比例
-        items: [],                  //预览渲染参数
-        openScroll: false           //打开滚动
+        searchResolution: '',
+
+        i: 0,
+        j: 0
       }
     },
     components: {
       NavBar,
       FooterBar,
       Breadcrumb,
-      vueMarquee
+      Content
     },
     methods: {
-      New: function () {
-        this.$router.push('/release')
+      groupSuperCheckCheck(data, node) {
+        this.j++;
+        if (this.j % 2 == 0) {
+          if (node) {
+            this.$refs.groupSuper.setCheckedNodes([]);
+            this.$refs.groupSuper.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.groupSuper.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
       },
-      queryPublishList() {
-        let _this = this;
-        this.publish = [];
+      treeCheckCheck(data, node) {
+        this.i++;
+        if (this.i % 2 == 0) {
+          if (node) {
+            this.$refs.tree.setCheckedNodes([]);
+            this.$refs.tree.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.tree.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
+      },                 //树单选
+      getTree() {
+        let _this = this
         this.$http({
           method: 'get',
-          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&proName=' + this.searchName + '&status=' + this.searchStatus + '&proStatus=' + this.searchProStatus,
+          url: 'tree/query?id=30',
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -253,10 +562,34 @@
           }
         }).then(response => {
           if (response.data.code == '0000') {
-            let publish = response.data.cust.publish
-            _this.total = response.data.cust.pages.count
-            for (let item of publish) {
-              _this.publish.push(item)
+            _this.groupSuper = _this.playTree = response.data.cust.trees
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },
+      queryPlayList() {
+        let _this = this;
+        this.plays = [];
+        this.$http({
+          method: 'get',
+          url: 'program/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount + '&name=' + this.searchName + '&resolution=' + this.searchResolution,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let programs = response.data.cust.programs;
+            _this.total = response.data.cust.pages.count;
+            for (let play of programs) {
+              _this.plays.push(play);
             }
           } else {
             this.$message({
@@ -267,33 +600,64 @@
             });
           }
         })
-      },                //获取节目列表
-      pageChange(val) {
-        this.pageNo = val;
-        this.queryPublishList()
-      },                    //分页
-      tableSelect(row) {
-        this.row = row
-      },                   //表格选择
-      delPro() {
-        let _this = this
-        let ids = _this.row.map(item => item.id).join(' ');      //列表模式的id
+      },
+      handleCurrentChange(val) {
+        this.pageNo = val
+        this.getRoleList()
+      },        //翻页回调
+      handleNodeClick(val) {
+        val.id != 30 ? this.treeId = val.id : this.treeId = 31;
+        this.queryPlayList()
+      },            //点击树回调
+      selected(e) {
+        let id = e.currentTarget.id;
+        let playName = e.currentTarget.children[2].innerHTML;
+        let target = e.currentTarget;
+        /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
+          dom = e.target.offsetParent.id
+          target = e.target.offsetParent
+        } else {
+          dom = e.target
+          target = e.target
+        }*/     //currentTarget与target的区别
+        let children = target.children[0];
+        if (children.style.display != 'block') {
+          children.style.display = 'block';
+          target.style.backgroundColor = "#ebebeb";
+          this.playName = playName;
+          this.ids.push(id)
+        } else {
+          children.style.display = 'none';
+          target.style.backgroundColor = "white";
+          this.playName = '';
+          for (let i = 0; i < this.ids.length; i++) {
+            if (this.ids[i] == id) this.ids.splice(i, 1)
+          }       //取消则从ids删除该元素
+        }
+      },                     //单击选择文件
+      newPlay() {
+        this.setTem = true;
+        this.queryTemList();
+        this.getTemTree()
+      },
+      delPlay() {
+        let ids = this.ids.join(' ');
         if (ids == '') {
-          _this.$message({
-            message: '未选择资源！',
+          this.$message({
+            message: '未选择节目！',
             showClose: true,
             center: true,
             type: 'warning'
           });
           return false
         }
-        _this.$confirm('此操作将删除该节目单, 是否继续?', '提示', {
+        this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
         }).then(() => {
-          _this.$http({
+          this.$http({
             method: 'delete',
-            url: 'publish/delete?ids=' + ids,
+            url: 'program/delete?ids=' + ids,
             withCredentials: true,
             headers: {
               token: sessionStorage.getItem('token'),
@@ -301,10 +665,16 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              _this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
-              _this.queryPublishList()
+              this.queryPlayList();
+              this.$message({
+                message: '删除成功！',
+                showClose: true,
+                center: true,
+                type: 'success'
+              });
+              this.check = false
             } else {
-              _this.$message({
+              this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
                 showClose: true,
                 center: true,
@@ -313,115 +683,279 @@
             }
           })
         })
-      },                      //删除节目
-
-      viewClose(done) {
-        let myVideo = document.getElementById('myVideo');
-        if (myVideo != undefined) {
-          myVideo.currentTime = 0;                            //将视频当前时间初始化
-          myVideo.pause();
+      },
+      editPlay(name) {
+        if (name == '') {
+          this.$message({
+            message: '请选择一个节目进行修改！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
         }
-        this.openScroll = false;
-        done()
-      },                                //快速预览窗口关闭
-      proPreview(index, data) {
+        this.$router.push({path: '/programMack', query: {name: this.playName, groupId: this.treeId, type: 1}})
+      },
+      /*模板事件*/
+      queryTemList() {
         let _this = this;
-        _this.template = '';
-        _this.program = '';
-        _this.items = [];
+        this.templates = [];
         this.$http({
           method: 'get',
-          url: 'program/query?id=' + data.proId + '&pageNo=1&pageCount=1',
+          url: 'template/query?groupId=' + this.tTreeId + '&pageNo=' + this.tPageNo + '&pageCount=' + this.tPageCount,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
             name: sessionStorage.getItem('name')
           }
         }).then(response => {
-            if (response.data.code == '0000') {
-              _this.program = response.data.cust.programs[0];
-
-              _this.$nextTick(function () {
-                  _this.$http({
-                    method: 'get',
-                    url: 'template/query?id=' + _this.program.modelId + '&pageNo=1&pageCount=1',
-                    withCredentials: true,
-                    headers: {
-                      token: sessionStorage.getItem('token'),
-                      name: sessionStorage.getItem('name')
-                    }
-                  }).then(response => {
-                    if (response.data.code == '0000') {
-                      _this.template = response.data.cust.templates[0];
-                      /*根据模板高度设置缩放比例*/
-                      if (_this.template.height == '1080') _this.PP = 0.4;
-                      if (_this.template.height == '720') _this.PP = 0.7;
-                      if (_this.template.height == '1280') _this.PP = 0.6;
-                      if (_this.template.height == '1920') _this.PP = 0.4;
-                      if (_this.template.height == '200') _this.PP = 0.5;
-                      for (let i of _this.program.proItems) {
-                        for (let y of _this.template.temItems) {
-                          if (i.itemsId === y.id) {
-                            _this.items.push({
-                              id: y.id,
-                              type: y.type,
-                              height: y.height,
-                              width: y.width,
-                              x: y.x,
-                              y: y.y,
-                              url: i.url,
-                              scrollContent: i.scrollContent,
-                              scrollColor: i.scrollColor,
-                              scrollDirection: i.scrollDirection,
-                              scrollFontSize: i.scrollFontSize,
-                              scrollFontFamily: i.scrollFontFamily,
-                              scrollBGColor: i.scrollBGColor,
-                              scrollSpeed: i.scrollSpeed,
-                              scrollBGTransparency: i.scrollBGTransparency,
-                              scrollDuration: i.scrollDuration,
-                              justify: i.justify,
-                              txtContent: i.txtContent,
-                              font: i.font,
-                              fontSize: i.fontSize,
-                              fontColor: i.fontColor,
-                              align: i.align,
-                              bold: i.bold,
-                              italic: i.italic,
-                              underline: i.underline
-                            })
-                          }
-                        }
-                      }
-                      _this.items
-                      debugger
-                    } else {
-                      this.$message({
-                        message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
-                        showClose: true,
-                        center: true,
-                        type: 'error'
-                      });
-                    }
-                  })
-                }
-              )
+          if (response.data.code == '0000') {
+            let templates = response.data.cust.templates;
+            _this.tTotal = response.data.cust.pages.count;
+            for (let template of templates) {
+              _this.templates.push(template);
             }
-            else {
-              _this.$message({
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },                  //获取模板列表
+      temTreeClick(val) {
+        this.tTreeId = val.id;
+        this.queryTemList()
+      },               //点击模板树回调
+      temChange(val) {
+        this.tPageNo = val
+        this.queryTemList()
+      },                  //模板翻页回调
+      getTemTree() {
+        let _this = this
+        this.$http({
+          method: 'get',
+          url: 'tree/query?id=20',
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            _this.templateTree = response.data.cust.trees
+          } else {
+            this.$message({
+              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              showClose: true,
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      },                    //查询模板树
+      selectedTem(e) {
+        let dom = e.currentTarget.children[2].innerHTML;
+        let target = e.currentTarget;
+        let children = target.children[0];
+        //单选判定所需
+        let p = target.parentNode.childNodes;
+        let id = e.currentTarget.id;
+
+        if (children.style.display != 'block') {
+          children.style.display = 'block';
+          target.style.backgroundColor = "#ebebeb";
+          this.temName = dom;
+          //去掉兄弟元素的选择项
+          if (p.length > 1) {
+            for (let i = 0; i <= p.length; i++) {
+              if (p[i].id !== id) {
+                p[i].children[0].style.display = 'none';
+              }
+            }
+          }
+        } else {
+          children.style.display = 'none';
+          target.style.backgroundColor = "white";
+          this.temName = ''
+        }
+      },                  //单击选择文件
+      selectTem() {
+        if (this.temName === '') {
+          this.$message({
+            message: '未选择模板！',
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false;
+        }
+        this.setTem = false;
+        this.$router.push({path: '/programMack', query: {name: this.temName, groupId: this.tTreeId, type: 0}})
+      },                     //新建模板
+
+      NewTree() {
+        this.treeForm.groupName = '';
+        this.treeForm.superiorGroup = '';
+        this.treeTitle = "新建分组";
+        this.openTreeDialog = true
+      },                       //新建节目分组
+      EditTree() {
+        this.treeTitle = "编辑分组";
+        let tree = this.$refs.tree.getCheckedNodes();
+        if (tree.length > 1 || tree.length == 0) {
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        this.creator = tree[0].creator;
+        this.currentGroupId = tree[0].id;
+        this.treeForm.groupName = tree[0].label;
+        this.superId = tree[0].parentId;
+        this.treeForm.superiorGroup = tree[0].parentName;
+        this.openTreeDialog = true;
+      },                      //选择上级分组
+      delTree() {
+        let tree = this.$refs.tree.getCheckedNodes();
+        if (tree.length > 1 || tree.length == 0) {
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        let id = tree[0].id;
+        this.$confirm('此操作将永久删除该分组, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            method: 'delete',
+            url: 'tree/delete?id=' + id,
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == '0000') {
+              this.$message({
+                message: '删除成功！',
+                showClose: true,
+                center: true,
+                type: 'success'
+              });
+              this.getTree()
+            } else if (response.data.code == 'TREE006') {
+              this.$message({
+                message: response.data.infor,
+                showClose: true,
+                center: true,
+                type: 'warning'
+              });
+            } else {
+              this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
               });
             }
-          }
-        );
-        this.openScroll = true;
-        this.view = true;
-      }            //节目预览
-
+          })
+        })
+      },                       //编辑节目分组
+      selectSuperGroup() {
+        let tree = this.$refs.groupSuper.getCheckedNodes();
+        if (tree.length > 1 || tree.length == 0) {
+          this.$message({message: '请选择一个分组作为上级！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        this.superId = tree[0].id;
+        this.treeForm.superiorGroup = tree[0].label;
+        this.openSuperG = false
+      },              //确认修改节目分组
+      groupSubmit() {
+        if (this.treeForm.groupName == '') {
+          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        if (this.treeForm.superiorGroup == '') {
+          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        if (this.treeTitle == '新建分组') {
+          let _this = this;
+          let data = {
+            parentId: this.superId,
+            label: this.treeForm.groupName,
+            creator: sessionStorage.getItem('name')
+          };
+          this.$http({
+            method: 'post',
+            url: 'tree/create',
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            },
+            data: data
+          }).then(response => {
+            if (response.data.code == '0000') {
+              _this.getTree();
+              this.$message({message: '新建分组成功！', showClose: true, center: true, type: 'success'});
+              this.openTreeDialog = false
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        } else {
+          let _this = this;
+          let data = {
+            id: this.currentGroupId,          //当前ID
+            parentId: this.superId,
+            label: this.treeForm.groupName,
+            creator: this.creator,          //创建人
+            updaterCreator: sessionStorage.getItem('name'),
+            treeId: this.targetId        //目标树ID
+          };
+          this.$http({
+            method: 'put',
+            url: 'tree/update',
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            },
+            data: data
+          }).then(response => {
+            if (response.data.code === '0000') {
+              _this.getTree();
+              _this.$message({message: '编辑分组成功！', showClose: true, center: true, type: 'success'});
+              this.openTreeDialog = false;
+              _this.treeForm.superiorGroup = '';
+              _this.treeForm.groupName = ''
+            } else if (response.data.code === 'TREE006') {
+              this.$message({
+                message: response.data.infor,
+                showClose: true,
+                center: true,
+                type: 'warning'
+              });
+            } else {
+              this.$message({
+                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                showClose: true,
+                center: true,
+                type: 'error'
+              });
+            }
+          })
+        }
+      },                   //删除节目分组
     }
   }
 </script>
-
-

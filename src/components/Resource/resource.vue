@@ -315,7 +315,6 @@
         pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
-        check: false,          //选中资源的变量
         format: '',               //资源格式
         resName:''                //资源名称
       }
@@ -474,13 +473,18 @@
         })
       },                                   //删除资源
       preview(e) {
-        this.url = "http://" + document.getElementById(e.currentTarget.id).getAttribute("url")
+        this.url = "http://" + document.getElementById(e.currentTarget.id).getAttribute("url");
         this.title = this.treeName.slice(0, 2);
         if (this.url.indexOf('mp4') != '-1') {
           this.format = 'video';
         } else if (this.url.indexOf('png') != '-1' || this.url.indexOf('jpg') != '-1' || this.url.indexOf('jpeg') != '-1') {
           this.format = 'image'
         } else {
+          this.$message({
+            message: '该格式资源不支持预览！',
+            center: true,
+            type: 'warning'
+          });
           return false
         }
         this.view = true;
@@ -490,7 +494,6 @@
         }
       },                              //双击预览
       selected(e) {
-        this.check = !this.check;
         let dom = e.currentTarget.id;
         let target = e.currentTarget;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
@@ -501,7 +504,7 @@
           target = e.target
         }*/     //currentTarget与target的区别
         let children = target.children[0];
-        if (this.check) {
+        if (children.style.display != 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 

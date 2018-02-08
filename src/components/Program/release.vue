@@ -186,7 +186,7 @@
           </div>
         </div>
         <div class="terminalList">
-          <el-tree :data="terTree" show-checkbox :check-strictly="true" @check-change="terCheck"
+          <el-tree :data="terTree" node-key="id" :check-strictly="true" @node-click="terCheck"
                    default-expand-all :expand-on-click-node="false" ref="terTree"></el-tree>
         </div>
       </div>
@@ -451,7 +451,7 @@
           label: '列表模式'
         }],*/
         depfId: '',
-        groupId: '',
+        groupId: 41,
         /*播放列表*/
         proType: 1,
         proTypes: [{
@@ -539,13 +539,13 @@
         proPageCount: 10,
         proTotal: 0,
         proRow: [],
-        check: false,
         index: 10,                   //选定节目坐标
         /*终端列表*/
         pageCount: 7,            //每页显示数目
         pageNo: 1,                //当前页
         total: 0,                 //总数目
         terRow: [],                //终端选中行数据
+        i: 0
       }
 
     },
@@ -554,14 +554,32 @@
       exit() {
         this.$router.push('programList');
       },                               //返回
-      terCheck(){
-        let tree = this.$refs.terTree.getCheckedNodes();
+      terCheck(data) {
+        /*let tree = this.$refs.terTree.getCheckedNodes();
         if (tree.length > 1) {
-          this.$message({message: '请选择一个分组！', center: true, type: 'warning'});
+          this.$message({message: '不允许多项操作，只允许选择一个分组进行操作！', center: true, type: 'warning'});
           return false
         }
         this.groupId = tree[0].id;
+        this.getTerList()*/
+        this.groupId = data.id;
         this.getTerList()
+        /*this.i++;
+        if(this.i%2==0){
+          if(node){
+            this.$refs.terTree.setCheckedNodes([]);
+            this.$refs.terTree.setCheckedNodes([data]);
+            //交叉点击节点
+            this.groupId = data.id;
+            this.getTerList()
+
+          }else{
+            this.$refs.terTree.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+            this.terminals = [];
+          }
+        }*/
+
       },                            //选中终端分组树节点
       getTree() {
         let _this = this;
@@ -587,7 +605,8 @@
       },                            //获取树资源
       getTerList() {
         let _this = this;
-        this.terminals = [];
+        _this.terminals = [];
+        _this.groupId = _this.groupId == 40 ? 41 : _this.groupId;
         this.$http({
           method: 'get',
           url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.groupId,
@@ -667,10 +686,9 @@
         this.openProList = false
       },                          //选择节目
       selected(e) {
-        this.check = !this.check;
         let target = e.currentTarget;
         let children = target.children[0];
-        if (this.check) {
+        if (children.style.display != 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 
@@ -731,7 +749,7 @@
         }).then(response => {
           if (response.data.code == '0000') {
             _this.$message({message: '发布成功！', showClose: true, center: true, type: 'success'});
-            _this.$router.push('/programList')
+            _this.$router.push('/auditList')
           } else {
             _this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',

@@ -268,7 +268,6 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         treeId: 21,
-        check: false,          //选中资源的变量
 
         openDialog: false,       //新建对话框
         LabelWidth: '70px',
@@ -363,6 +362,7 @@
       },                      //获取模板列表
       editTemplate(name) {
         this.temName = '';
+        if(this.treeName==='系统模板') return false;
         if (name == '') {
           this.$message({
             message: '请选择模板进行修改！',
@@ -384,7 +384,6 @@
         this.queryList()
       },             //点击树回调
       selected(e) {
-        this.check = !this.check;
         let dom = e.currentTarget.id;
         let target = e.currentTarget;
         /*if (e.target.tagName == 'DIV' || e.target.tagName == 'IMG' || e.target.tagName == 'P') {          //如果点击的是LI下面的子元素，就将子元素的父元素提取出来（即LI）。
@@ -395,7 +394,7 @@
           target = e.target
         }*/     //currentTarget与target的区别
         let children = target.children[0];
-        if (this.check) {
+        if (children.style.display != 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
           this.ids.push(dom);

@@ -64,6 +64,7 @@
         show-checkbox
         default-expand-all
         node-key="id"
+        @check-change="depCheckChang"
         ref="tree" :check-strictly="true"
         highlight-current>
       </el-tree>
@@ -77,7 +78,7 @@
         append-to-body>
         <el-tree
           :data="departmentTree" show-checkbox default-expand-all :check-strictly="true"
-          node-key="id" ref="departmentTree" highlight-current>
+          node-key="id" ref="departmentTree" highlight-current @check-change="superiorDepCheckChang">
         </el-tree>
         <div slot="footer" class="dialog-footer">
           <el-button @click="innerVisible = false">取 消</el-button>
@@ -129,7 +130,9 @@
         treeId: 40,                         //终端树ID
         creator: '',                         //创建人
         departmentId: '',                    //分组ID  编辑用
-        targetId: ''                  //编辑时需要移动到的目标树ID
+        targetId: '',                       //编辑时需要移动到的目标树ID
+        i: 0,                                //记录点击次数
+        j: 0,
       }
     },
     components: {
@@ -138,6 +141,32 @@
       Breadcrumb
     },
     methods: {
+      depCheckChang(data, node) {
+        this.i++;
+        if (this.i % 2 == 0) {
+          if (node) {
+            this.$refs.tree.setCheckedNodes([]);
+            this.$refs.tree.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.tree.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
+      },        //树的单选实现
+      superiorDepCheckChang(data, node) {
+        this.j++;
+        if (this.j % 2 == 0) {
+          if (node) {
+            this.$refs.departmentTree.setCheckedNodes([]);
+            this.$refs.departmentTree.setCheckedNodes([data]);
+            //交叉点击节点
+          } else {
+            this.$refs.departmentTree.setCheckedNodes([]);
+            //点击已经选中的节点，置空
+          }
+        }
+      },            //上级树的单选实现
       getTree: function () {
         let _this = this
         this.$http({
@@ -225,7 +254,7 @@
       Edit() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.openDialog = true;
@@ -235,7 +264,6 @@
         this.creator = tree[0].creator;
         this.departmentId = tree[0].id;
         this.form.superiorDeartment = tree[0].parentName;
-        debugger
       },                       //编辑分组
       editDeartment() {
         if (this.form.deartmentName == '') {
@@ -253,7 +281,7 @@
           label: this.form.deartmentName,
           creator: this.creator,
           updaterCreator: sessionStorage.getItem('name'),
-          /*treeId:this.targetId*/
+          newId: this.targetId
         };
         this.$http({
           method: 'put',
@@ -268,6 +296,13 @@
           if (response.data.code == '0000') {
             _this.getTree();
             this.openDialog = false
+          } else if (response.data.code == 'TREE006') {
+            this.$message({
+              message: response.data.infor,
+              showClose: true,
+              center: true,
+              type: 'warning'
+            });
           } else {
             this.$message({
               message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -281,7 +316,7 @@
       delDeartment() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '只能选择一个分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id;
@@ -307,6 +342,13 @@
                 type: 'success'
               });
               this.getTree()
+            } else if (response.data.code == 'TREE006') {
+              this.$message({
+                message: response.data.infor,
+                showClose: true,
+                center: true,
+                type: 'warning'
+              });
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',

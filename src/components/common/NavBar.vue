@@ -59,34 +59,34 @@
       </ul>-->
       <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal"
                background-color="#d33a31" text-color="#fff" active-text-color="#ffd04b" :router="true">
-        <el-menu-item index="/index">首页</el-menu-item>
-        <el-menu-item index="/resource">资源管理</el-menu-item>
+        <el-menu-item index="/index">{{$t('nav.Home')}}</el-menu-item>
+        <el-menu-item index="/resource">{{$t('nav.Resource')}}</el-menu-item>
         <el-submenu index="3">
-          <template slot="title">终端管理</template>
-          <el-menu-item index="/terminal">终端管理</el-menu-item>
-          <el-menu-item index="">终端列表</el-menu-item>
-          <el-menu-item index="/activeCode">激活码管理</el-menu-item>
+          <template slot="title">{{$t('nav.Terminal')}}</template>
+          <el-menu-item index="/terminal">{{$t('nav.Terminal')}}</el-menu-item>
+          <!--<el-menu-item index="">终端列表</el-menu-item>-->
+          <el-menu-item index="/activeCode">{{$t('nav.ActiveCode')}}</el-menu-item>
         </el-submenu>
 
-        <el-menu-item index="/template">模板管理</el-menu-item>
+        <el-menu-item index="/template">{{$t('nav.Template')}}</el-menu-item>
         <el-submenu index="5">
-          <template slot="title">节目管理</template>
-          <el-menu-item index="/play">节目列表</el-menu-item>
-          <el-menu-item index="/programList">发布管理</el-menu-item>
-          <el-menu-item index="/auditList">审核列表</el-menu-item>
+          <template slot="title">{{$t('nav.Program')}}</template>
+          <el-menu-item index="/programList">{{$t('nav.ProgramList')}}</el-menu-item>
+          <el-menu-item index="/releaseMng">{{$t('nav.Release')}}</el-menu-item>
+          <el-menu-item index="/auditList">{{$t('nav.AuditList')}}</el-menu-item>
         </el-submenu>
         <el-submenu index="6">
-          <template slot="title">日志管理</template>
-          <el-menu-item index="/userLog">用户日志</el-menu-item>
-          <el-menu-item index="/operatingLog">系统日志</el-menu-item>
+          <template slot="title">{{$t('nav.Log')}}</template>
+          <el-menu-item index="/userLog">{{$t('nav.UserLog')}}</el-menu-item>
+          <el-menu-item index="/operatingLog">{{$t('nav.SystemLog')}}</el-menu-item>
         </el-submenu>
         <el-submenu index="7">
-          <template slot="title">用户管理</template>
-          <el-menu-item index="/terGroupSet">终端设置</el-menu-item>
-          <el-menu-item index="/userSet">用户设置</el-menu-item>
-          <el-menu-item index="/roleSet">角色管理</el-menu-item>
+          <template slot="title">{{$t('nav.User')}}</template>
+          <el-menu-item index="/terGroupSet">{{$t('nav.TerminalSet')}}</el-menu-item>
+          <el-menu-item index="/userSet">{{$t('nav.UserSet')}}</el-menu-item>
+          <el-menu-item index="/roleSet">{{$t('nav.RoleSet')}}</el-menu-item>
         </el-submenu>
-        <el-menu-item index="/generalSet">系统设置</el-menu-item>
+        <el-menu-item index="/generalSet">{{$t('nav.System')}}</el-menu-item>
       </el-menu>
     </div>
     <div class="user">
@@ -96,8 +96,17 @@
           <b class="name">{{name}}</b>
           <i class="iconfont icon-xiala"></i>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>修改密码</el-dropdown-item>
-            <el-dropdown-item @click.native="outLogin">退出登录</el-dropdown-item>
+            <el-dropdown-item>{{$t('nav.ModifyPass')}}</el-dropdown-item>
+            <el-dropdown-item @click.native="outLogin">{{$t('nav.SignOut')}}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
+      <div class="lang">
+        <el-dropdown trigger="click">
+          <b class="name">中文/EN</b>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item @click.native="changeLang('zh')">{{$t('message.zh')}}</el-dropdown-item>
+            <el-dropdown-item @click.native="changeLang('en')">{{$t('message.en')}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -110,16 +119,48 @@
     data() {
       return {
         name: sessionStorage.getItem('name'),
-        activeIndex: '1',
-        activeIndex2: '1'
+        int: ''
+      }
+    },
+    mounted() {
+      if (this.name != null) {
+        this.int = setInterval(() => {
+          this.$http({
+            method: 'get',
+            url: 'system/check',
+            withCredentials: true,
+            headers: {
+              token: sessionStorage.getItem('token'),
+              name: sessionStorage.getItem('name')
+            }
+          }).then(response => {
+            if (response.data.code == 'TOKEN000') {
+              clearInterval(this.int);
+              this.$alert('登录失效，请重新登录?', '提示', {
+                type: 'warning',
+                confirmButtonText: '确定',
+                callback: () => {
+                  this.$router.push('/');
+                  clearInterval(this.int)
+                }
+              });
+            }
+          })
+        }, 90000)
+      } else {
+        this.$router.push('/')
       }
     },
     methods: {
       //注销登录
       outLogin: function () {
         sessionStorage.removeItem("name");
-        this.$router.push('/')
+        this.$router.push('/');
+        clearInterval(this.int)
       },
+      changeLang(val) {
+        val === 'zh' ? this.$i18n.locale = 'zh' : this.$i18n.locale = 'en'
+      }
     }
   }
 </script>
@@ -176,28 +217,31 @@
 
   .user > i {
     color: #ffd224;
-    font-size: 2.8rem;
+    font-size: 2rem;
     margin-right: 10px;
   }
 
-  .userBox {
+  .userBox, .lang {
     display: inline-block;
     cursor: pointer;
   }
 
+  .lang {
+  margin-left: 20px;
+  }
+
   .userBox i {
     color: white;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     margin-left: 4px;
   }
 
   .name {
     color: white;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 
-  .el-dropdown-link {
-    color: white;
-    font-size: 1.6rem;
+  .el-menu--horizontal {
+    border: none !important;
   }
 </style>

@@ -314,7 +314,7 @@
         <div class="control">
           <a @click="quickPreview"><i class="el-icon-view"></i> 快速预览</a>
           <a @click="save"><i class="iconfont icon-iconset0237"></i> 保存</a>
-          <router-link to="play"><i class="iconfont icon-lingcunwei"></i> 返回</router-link>
+          <router-link to="programList"><i class="iconfont icon-lingcunwei"></i> 返回</router-link>
 
           <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
         </div>
@@ -414,12 +414,12 @@
         <div id="proPreview" :style="{width : proPreview.width * PP + 'px',height : proPreview.height * PP + 'px'}"
              style="background-color: black">
           <div v-for="item in proPreview.temItems" style=""
-               :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px'}">
+               :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px',zIndex:item.zIndex}">
             <!--静态文本-->
             <div v-if="item.type=='txt'" :name="item.type" :id="item.id" style="width: 100%;height: 100px"
                  :style="{textAlign:item.align}">
               <p style="position: relative"
-                 :style="{fontSize:item.fontSize,fontFamily:item.font,color:item.fontColor,fontWeight: item.bold,fontStyle: item.italic,textDecoration: item.underline}">
+                 :style="{fontSize:item.fontSize * PP + 'px',fontFamily:item.font,color:item.fontColor,fontWeight: item.bold,fontStyle: item.italic,textDecoration: item.underline}">
                 {{item.txtContent}}
               </p>
             </div>
@@ -687,7 +687,7 @@
           ],                                   //滚动速度列表
           scrollBGTransparency: 1,                      //背景透明度
           scrollBGTransparencys: [],                          //透明度列表
-          scrollDuration: '10',                            //持续时间
+          scrollDuration: '0',                            //持续时间
         },
         activeName: '',                                     //当前激活的区域块标签
 
@@ -737,7 +737,10 @@
         }
       },                              //window中移动事件
       handleUp() {
-        $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
+        setTimeout(()=>{
+          $('.move>img').attr({'src': '', 'id': '', 'name': '', 'type': ''});
+        },10);//移动到对应位置才能填充图片
+        $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'});
       },                                 //window中松开事件
 
       resourceQuery() {
@@ -1050,9 +1053,13 @@
               data: data
             }).then(response => {
               if (response.data.code == '0000') {
-                _this.$message({message: '保存成功！', showClose: true, center: true, type: 'success'});
                 if (type == 'release') {
                   _this.$router.push({path: '/release', query: {name: _this.proName}})
+                }else {
+                  _this.$message({message: '保存成功,2秒后自动返回...', showClose: true, center: true, type: 'success'});
+                  setTimeout(() => {
+                    _this.$router.push({path: '/programList'})
+                  }, 2000);
                 }
               } else {
                 _this.$message({
