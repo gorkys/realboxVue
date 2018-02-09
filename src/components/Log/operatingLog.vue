@@ -82,11 +82,11 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
+            <el-input placeholder="请输入内容" v-model="operator">
               <template slot="prepend">操作人</template>
             </el-input>
           </div>
-          <el-button @click="search">搜索</el-button>
+          <el-button @click="getUserLog">搜索</el-button>
         </div>
         <div class="control">
           <a><i class="el-icon-download"></i>导出为</a>
@@ -126,7 +126,7 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         logs: [],
-        operator:''         //操作人
+        operator: ''         //操作人
       }
     },
     components: {
@@ -141,7 +141,7 @@
       getUserLog() {
         this.$http({
           method: 'get',
-          url: "log/query/system?pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: "log/query/system?pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&operator=" + this.operator,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -165,9 +165,6 @@
         this.pageNo = val;
         this.getUserLog()
       },                    //分页
-      search(){
-
-      }
     }
   }
 </script>

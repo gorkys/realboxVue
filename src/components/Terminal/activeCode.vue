@@ -199,7 +199,7 @@
         value: 0,                     //生成与批量生成区分值
         terGroupTree: [],             //终端分组树
         isBatch: false,               //是否批量生成
-        creator:sessionStorage.getItem('name')
+        creator: sessionStorage.getItem('name')
       }
     },
     components: {
@@ -211,7 +211,7 @@
       generate() {
         this.$http({
           method: 'get',
-          url: 'activate/create?number=' + this.form.num + '&terId=' + this.terId +'&creator=' + this.creator,
+          url: 'activate/create?number=' + this.form.num + '&terId=' + this.terId + '&creator=' + this.creator,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -324,7 +324,7 @@
       selectDep() {
         let tree = this.$refs.terGroupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个终端分组！',showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个终端分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.terId = tree[0].id;
@@ -355,13 +355,13 @@
           }
         })
       },                                  //获取树资源
-      exportCode(){
+      exportCode() {
         let ids = this.rowId.map(item => item.id).join(' ');
         this.$confirm('确定将选定的激活码导出为压缩包？', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
-        }).then(()=> {
-          /* this.$http({
+        }).then(() => {
+          this.$http({
             method: 'get',
             url: 'activate/export?ids=' + ids,
             withCredentials: true,
@@ -370,13 +370,14 @@
               name: sessionStorage.getItem('name')
             }
           }).then(response => {
-            if (response.data.code == '0000'){
-              this.$message({
-                message: '导出成功！',
-                showClose: true,
-                center: true,
-                type: 'success'
-              });
+            if (response.data.code == '0000') {
+              let url =  response.data.cust.desc;
+              let a = document.createElement('a');
+              a.href = url;
+              a.download = '未命名';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
             } else {
               this.$message({
                 message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
@@ -385,11 +386,11 @@
                 type: 'error'
               });
             }
-          })*/
+          })
         })
 
       },                                //导出激活码
-      unbundled(){
+      unbundled() {
         let ids = this.rowId.map(item => item.id).join(' ');
         this.$confirm('激活码将与终端解除绑定，是否继续', '提示', {
           confirmButtonText: '确定',

@@ -63,9 +63,11 @@
   .control a:hover {
     color: #d33a31;
   }
-  .logList{
+
+  .logList {
     height: 620px;
   }
+
   .page {
     text-align: right;
     padding-right: 20px;
@@ -82,16 +84,11 @@
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容">
+            <el-input placeholder="请输入内容" v-model="operator">
               <template slot="prepend">操作人</template>
             </el-input>
           </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容">
-              <template slot="prepend">操作时间</template>
-            </el-input>
-          </div>
-          <el-button>搜索</el-button>
+          <el-button @click="getUserLog">搜索</el-button>
         </div>
         <div class="control">
           <a><i class="el-icon-download"></i>导出为</a>
@@ -130,7 +127,8 @@
         pageCount: 11,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
-        logs:[]
+        logs: [],
+        operator: ''         //操作人
       }
     },
     components: {
@@ -138,14 +136,14 @@
       FooterBar,
       Breadcrumb
     },
-    mounted(){
+    mounted() {
       this.getUserLog()
     },
     methods: {
-      getUserLog(){
+      getUserLog() {
         this.$http({
           method: 'get',
-          url: "log/query/user?pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
+          url: "log/query/user?pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&operator=" + this.operator,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),

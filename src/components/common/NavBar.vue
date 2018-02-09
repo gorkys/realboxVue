@@ -123,44 +123,46 @@
       }
     },
     mounted() {
-      if (this.name != null) {
-        debugger
-        this.int = setInterval(() => {
-          this.$http({
-            method: 'get',
-            url: 'system/check',
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == 'TOKEN000') {
-              clearInterval(this.int);
-              this.$alert('登录失效，请重新登录?', '提示', {
-                type: 'warning',
-                confirmButtonText: '确定',
-                callback: () => {
-                  this.$router.push('/');
-                  clearInterval(this.int)
-                }
-              });
-            }
-          })
-        }, 90000)
-      } else {
-        this.$router.push('/')
-      }
+      this.check();
     },
     methods: {
       //注销登录
       outLogin: function () {
         sessionStorage.removeItem("name");
+        clearInterval(this.int);
         this.$router.push('/');
-        clearInterval(this.int)
       },
       changeLang(val) {
         val === 'zh' ? this.$i18n.locale = 'zh' : this.$i18n.locale = 'en'
+      },
+      check() {
+        let _this = this;
+        if (_this.name != null) {
+          _this.int = setInterval(() => {
+            _this.$http({
+              method: 'get',
+              url: 'system/check',
+              withCredentials: true,
+              headers: {
+                token: sessionStorage.getItem('token'),
+                name: sessionStorage.getItem('name')
+              }
+            }).then(response => {
+              if (response.data.code == 'TOKEN000') {
+                clearInterval(_this.int);
+                _this.$alert('登录失效，请重新登录?', '提示', {
+                  type: 'warning',
+                  confirmButtonText: '确定',
+                  callback: () => {
+                    _this.$router.push('/');
+                  }
+                });
+              }
+            })
+          }, 9000)
+        } else {
+          this.$router.push('/')
+        }
       }
     }
   }
@@ -228,7 +230,7 @@
   }
 
   .lang {
-  margin-left: 20px;
+    margin-left: 20px;
   }
 
   .userBox i {

@@ -457,9 +457,6 @@
         proTypes: [{
           value: 1,
           label: '播放列表'
-        }, {
-          value: 2,
-          label: '滚动字幕'
         }],
         playImgs: [],                 //播放列表显示
         /*发布属性*/
