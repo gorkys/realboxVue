@@ -73,6 +73,10 @@
       BGOpacity: {
         default: 1,
         type: Number
+      },
+      Duration: {
+        default: 1,
+        type: Number
       }
     },
     mounted: function () {
@@ -84,10 +88,17 @@
         _this.$nextTick(() => {
             if (_this.open) {
               let speed;
-              if (_this.speed == 0) speed = 80;
-              if (_this.speed == 1) speed = 40;
-              if (_this.speed == 2) speed = 5;
+              if (_this.speed === 0) speed = 80;
+              if (_this.speed === 1) speed = 40;
+              if (_this.speed === 2) speed = 5;
+              let duration = _this.Duration * 1000 / speed;               //由时间计算出需要滚动的次数
+              let i=0;
               _this.int = setInterval(() => {
+                i++;                                                      //记录滚动次数
+                if(duration===i) {                                        //当滚动次数与所需滚动次数相等时停止滚动
+                  clearInterval(_this.int);
+                  return false
+                }
                 let parentWidth = _this.$refs.parent.clientWidth;           //父容器的宽度
                 let parentLeft = _this.$refs.parent.offsetLeft;             //父容器的边界
                 let parent = parentWidth + parentLeft;
@@ -97,14 +108,14 @@
                 _this.height = _this.$refs.target.clientHeight;
                 let target = targetWidth + targetLeft;
                 _this.target = targetWidth;
-                if (_this.direction == 1) {
+                if (_this.direction === 1) {
                   if (parentLeft <= target) {
                     _this.right++
                   } else {
                     _this.right = -targetWidth
                   }
                 } else {
-                  if (target <= parent) {
+                  if (targetLeft <= parent) {
                     _this.left++
                   } else {
                     _this.left = -targetWidth
@@ -113,7 +124,7 @@
               }, speed);
             } else {
               clearInterval(_this.int);
-              _this.direction == 1 ? _this.right = -_this.target : _this.left = -_this.target
+              _this.direction === 1 ? _this.right = -_this.target : _this.left = -_this.target
             }
           }
         )

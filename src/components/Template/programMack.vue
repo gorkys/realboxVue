@@ -383,10 +383,10 @@
               </el-col>
               <el-col :span="6">
                 <el-form-item label="持续时间" size="mini">
-                  <el-time-picker
-                    v-model="form.scrollDuration"
-                    placeholder="任意时间点">
-                  </el-time-picker>
+                  <el-tooltip placement="top">
+                    <div slot="content">单位为秒(s)，0秒为持续滚动。<br/>建议设定为0秒。</div>
+                    <el-input-number size="mini" v-model="form.scrollDuration"></el-input-number>
+                  </el-tooltip>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -428,6 +428,7 @@
                  :style="{color:form.scrollColor,fontSize:form.scrollFontSize + 'px',fontFamily:form.scrollFontFamily}">
               <vue-marquee :BGOpacity="form.scrollBGTransparency" :open="openScroll" :BGColor="form.scrollBGColor"
                            :fontOpacity="form.scrollTransparency" :speed="form.scrollSpeed"
+                           :Duration="form.scrollDuration"
                            :direction="form.scrollDirection" :content="form.scrollContent"></vue-marquee>
             </div>
             <div :name="item.type" :id="item.id">
@@ -687,7 +688,7 @@
           ],                                   //滚动速度列表
           scrollBGTransparency: 1,                      //背景透明度
           scrollBGTransparencys: [],                          //透明度列表
-          scrollDuration: '0',                            //持续时间
+          scrollDuration: '',                            //持续时间
         },
         activeName: '',                                     //当前激活的区域块标签
 
@@ -737,9 +738,9 @@
         }
       },                              //window中移动事件
       handleUp() {
-        setTimeout(()=>{
+        setTimeout(() => {
           $('.move>img').attr({'src': '', 'id': '', 'name': '', 'type': ''});
-        },10);//移动到对应位置才能填充图片
+        }, 10);//移动到对应位置才能填充图片
         $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'});
       },                                 //window中松开事件
 
@@ -836,6 +837,28 @@
               _this.proId = program.id;
               _this.groupId = program.groupId;
               program.proItems.forEach(item => {
+                if (item.scrollColor != null && item.scrollColor != '' && item.scrollColor != undefined) {
+                  _this.form.scrollBGTransparency = item.scrollBGTransparency;
+                  _this.form.scrollColor = item.scrollColor;
+                  _this.form.scrollDirection = item.scrollDirection;
+                  _this.form.scrollDuration = item.scrollDuration;
+                  _this.form.scrollFontFamily = item.scrollFontFamily;
+                  _this.form.scrollFontSize = item.scrollFontSize;
+                  _this.form.scrollFontTransparency = item.scrollFontTransparency;
+                  _this.form.scrollSpeed = item.scrollSpeed;
+                  _this.form.scrollBGColor = item.scrollBGColor;
+                  _this.form.scrollContent = item.url;
+                }  //滚动文字还原
+                if (item.font != null && item.font != '' && item.font != undefined) {
+                  _this.txtContent = item.url;
+                  _this.font = item.font;
+                  _this.fontSize = item.fontSize;
+                  _this.fontColor = item.fontColor;
+                  _this.align = item.align;
+                  _this.bold = item.bold;
+                  _this.italic = item.italic;
+                  _this.underline = item.underline;
+                }         //静态文本还原
                 _this.res.push({name: item.resId, itemsId: item.itemsId, url: item.url, thumbnail: item.thumbnail})
               });
               _this.getTemplate()
@@ -865,20 +888,6 @@
                 this.isDown = false;
                 $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
               });
-              //还原节目资源
-              if (this.$route.query.type == 1) {
-                if (document.getElementById('edit') != null && document.getElementById('edit').children != null) {
-                  let edit = document.getElementById('edit').children;
-                  for (let item of this.res) {
-                    for (let i = 0; i < edit.length; i++) {
-                      if (item.itemsId == edit[i].getAttribute('name')) {
-                        if (item.thumbnail == null) return false;
-                        edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
-                      }
-                    }
-                  }
-                }
-              }
               //为文本与动态文本绑定编辑事件
               $('.txt').on('click', function () {
 
@@ -911,7 +920,23 @@
               });
               $('.vdr').on('click', function () {
                 _this.activeName = $(this).attr('area-name')
-              })
+              });
+              //还原节目资源
+              if (this.$route.query.type == 1) {
+                if (document.getElementById('edit') != null && document.getElementById('edit').children != null) {
+                  let edit = document.getElementById('edit').children;
+                  for (let item of this.res) {
+                    for (let i = 0; i < edit.length; i++) {
+                      if (item.itemsId == edit[i].getAttribute('name')) {
+                        if (item.thumbnail != null) {             //缩略图为空的情况只有文字
+                          edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
             })
           } else {
             _this.$message({
@@ -1055,7 +1080,7 @@
               if (response.data.code == '0000') {
                 if (type == 'release') {
                   _this.$router.push({path: '/release', query: {name: _this.proName}})
-                }else {
+                } else {
                   _this.$message({message: '保存成功,2秒后自动返回...', showClose: true, center: true, type: 'success'});
                   setTimeout(() => {
                     _this.$router.push({path: '/programList'})
@@ -1123,7 +1148,7 @@
             if (_this.proPreview.height == '720') _this.PP = 0.7;
             if (_this.proPreview.height == '1280') _this.PP = 0.6;
             if (_this.proPreview.height == '1920') _this.PP = 0.4;
-            if (_this.proPreview.height== '200') this.PP = 0.5;
+            if (_this.proPreview.height == '200') this.PP = 0.5;
             /*取节目资源地址*/
 
             for (let item of items) {

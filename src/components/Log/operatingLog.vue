@@ -86,12 +86,7 @@
               <template slot="prepend">操作人</template>
             </el-input>
           </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="input3">
-              <template slot="prepend">操作时间</template>
-            </el-input>
-          </div>
-          <el-button>搜索</el-button>
+          <el-button @click="search">搜索</el-button>
         </div>
         <div class="control">
           <a><i class="el-icon-download"></i>导出为</a>
@@ -130,7 +125,8 @@
         pageCount: 11,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
-        logs: []
+        logs: [],
+        operator:''         //操作人
       }
     },
     components: {
@@ -169,6 +165,9 @@
         this.pageNo = val;
         this.getUserLog()
       },                    //分页
+      search(){
+
+      }
     }
   }
 </script>

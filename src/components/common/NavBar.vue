@@ -124,6 +124,7 @@
     },
     mounted() {
       if (this.name != null) {
+        debugger
         this.int = setInterval(() => {
           this.$http({
             method: 'get',

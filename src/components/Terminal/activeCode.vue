@@ -360,8 +360,8 @@
         this.$confirm('确定将选定的激活码导出为压缩包？', '提示', {
           confirmButtonText: '确定',
           type: 'warning'
-        }).then(()=>{
-          this.$http({
+        }).then(()=> {
+          /* this.$http({
             method: 'get',
             url: 'activate/export?ids=' + ids,
             withCredentials: true,
@@ -385,8 +385,9 @@
                 type: 'error'
               });
             }
-          })
+          })*/
         })
+
       },                                //导出激活码
       unbundled(){
         let ids = this.rowId.map(item => item.id).join(' ');

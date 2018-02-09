@@ -28,7 +28,6 @@ const i18n = new VueI18n({
     en: require('@/components/common/lang/en'),
   }
 });
-debugger
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

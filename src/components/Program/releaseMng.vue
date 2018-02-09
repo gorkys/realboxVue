@@ -180,7 +180,7 @@
             <div style="z-index: 10;position: absolute;display: flex;justify-content: flex-start;align-items: center" v-if="item.type=='scroll'"
                  :style="{color:item.scrollColor,fontSize:item.scrollFontSize + 'px',fontFamily:item.scrollFontFamily}">
               <vue-marquee :BGOpacity="item.scrollBGTransparency" :open="openScroll" :BGColor="item.scrollBGColor"
-                           :fontOpacity="item.scrollTransparency" :speed="item.scrollSpeed"
+                           :fontOpacity="item.scrollTransparency" :speed="item.scrollSpeed" :Duration="item.scrollDuration"
                            :direction="item.scrollDirection" :content="item.url"></vue-marquee>
             </div>
             <!--视频图片-->
@@ -392,8 +392,6 @@
                           }
                         }
                       }
-                      _this.items
-                      debugger
                     } else {
                       this.$message({
                         message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',

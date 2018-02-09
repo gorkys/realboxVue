@@ -236,6 +236,7 @@
           <el-upload
             class="upload-demo"
             drag
+            ref="upload"
             :data="data"
             :action=" baseURL + 'resource/upload'"
             :accept="accept"
@@ -248,7 +249,7 @@
             <div class="el-upload__tip" slot="tip">上传说明：{{directions}}</div>
           </el-upload>
           <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialog = false">确 定</el-button>
+        <el-button type="primary" @click="uploadCon">确 定</el-button>
       </span>
         </el-dialog>  <!--上传-->
         <el-dialog
@@ -390,7 +391,11 @@
       upload() {
         this.title = this.treeName.slice(0, 2);
         this.dialog = true
-      },
+      },                                //打开上传对话框
+      uploadCon(){
+        this.$refs.upload.clearFiles();             //清除上传List
+        this.dialog = false
+      },                                  //上传确认
       beforeUp: function (file) {
         if (this.accept.indexOf(file.type.slice(0, 4)) == -1) {
           this.$message({
