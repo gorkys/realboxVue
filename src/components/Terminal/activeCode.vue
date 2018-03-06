@@ -77,7 +77,7 @@
     <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
     <div class="content">
-      <div class="title">激活码管理</div>
+      <div class="title">{{$t('Content.ID_ACTIVATION_CODE_MSG')}}</div>
       <div class="controlBox">
         <div class="search">
           <!--<div style="width:200px;">
@@ -103,11 +103,11 @@
           <el-button>搜索</el-button>-->
         </div>
         <div class="control">
-          <a @click="gert"><i class="el-icon-plus"></i> 生成</a>
-          <a @click="batch"><i class="el-icon-edit"></i> 批量生成</a>
-          <a @click="exportCode"><i class="iconfont icon-lingcunwei"></i> 导出</a>
-          <a @click="unbundled"><i class="el-icon-sort"></i> 解绑</a>
-          <a @click="delCode"><i class="el-icon-delete"></i> 删除</a>
+          <a @click="gert"><i class="el-icon-plus"></i> {{$t('Content.ID_GENERATE')}}</a>
+          <a @click="batch"><i class="el-icon-edit"></i> {{$t('Content.ID_BATCH_GENERATE')}}</a>
+          <a @click="exportCode"><i class="iconfont icon-lingcunwei"></i> {{$t('Content.ID_EXPORT')}}</a>
+          <a @click="unbundled"><i class="el-icon-sort"></i> {{$t('Content.ID_UNBIND')}}</a>
+          <a @click="delCode"><i class="el-icon-delete"></i> {{$t('Content.ID_DELETE')}}</a>
         </div>
       </div>
       <div class="playList">
@@ -116,16 +116,16 @@
           :data="activates"
           @selection-change="selectChange">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="code" align="center" label="激活码"></el-table-column>
-          <el-table-column prop="name" align="center" label="所属终端"></el-table-column>
-          <el-table-column prop="creator" align="center" label="创建者"></el-table-column>
-          <el-table-column prop="used" align="center" label="可用状态">
+          <el-table-column prop="code" align="center" :label="$t('Content.ID_ACTIVATION_CODE')"></el-table-column>
+          <el-table-column prop="name" align="center" :label="$t('Content.ID_TERMINAL_CODE')"></el-table-column>
+          <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+          <el-table-column prop="used" align="center" :label="$t('Content.ID_AVAILABLE_STATUS')">
             <template slot-scope="scope">
               <i v-if="scope.row.used=='1'" style="color: #00ce06;font-size: 16px" class="el-icon-success"></i>
               <i v-if="scope.row.used=='0'" style="color: red;font-size: 16px" class="el-icon-error"></i>
             </template>
           </el-table-column>
-          <el-table-column prop="time" align="center" label="生成时间"></el-table-column>
+          <el-table-column prop="time" align="center" :label="$t('Content.ID_GENERATE_TIME')"></el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -141,28 +141,28 @@
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="20%">
       <el-dialog
         width="20%"
-        title="选择终端分组"
+        :title="$t('Msg.ID_MSG_28')"
         :visible.sync="openEntDep"
         append-to-body>
         <el-tree :data="terGroupTree" node-key="id" ref="terGroupTree"
                  show-checkbox :check-strictly="true" default-expand-all highlight-current></el-tree>       <!--部门树-->
         <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="selectDep">确 定</el-button>
+          <el-button type="primary" @click="selectDep">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--选择终端分组-->
 
       <el-form :model="form">
-        <el-form-item label="终端分组" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP')" :label-width="LabelWidth">
           <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="clickEntDep" readonly="readonly"/>
         </el-form-item>
-        <el-form-item v-if="isBatch" label="生成数量" :label-width="LabelWidth">
+        <el-form-item v-if="isBatch" :label="$t('Content.ID_GENERATE_NUMBER')" :label-width="LabelWidth">
           <el-input-number v-model="form.num" :min="1" :max="999"></el-input-number>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openDialog = false">取 消</el-button>
-        <el-button type="primary" @click="generate">确 定</el-button>
+        <el-button @click="openDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="generate">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -220,7 +220,7 @@
         }).then(response => {
           if (response.data.code == '0000') {
             this.$message({
-              message: '生成成功！',
+              message: this.$t('Content.ID_GENERATE_SUCCESS'),
               showClose: true,
               center: true,
               type: 'success'
@@ -228,7 +228,7 @@
             this.activeQuery()
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -257,7 +257,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -266,10 +266,19 @@
         })
       },                              //查询激活码
       delCode() {
+        if (this.rowId == '') {
+          this.$message({
+            message: this.$t('Msg.ID_MSG_29'),
+            showClose: true,
+            center: true,
+            type: 'warning'
+          });
+          return false
+        }
         let ids = this.rowId.map(item => item.id).join(' ');
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('Msg.ID_MSG_15'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -283,7 +292,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               this.$message({
-                message: '删除成功！',
+                message: this.$t('Content.ID_DELETE_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
@@ -291,7 +300,7 @@
               this.activeQuery()
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -309,12 +318,12 @@
       },                   //当前页翻页
       gert() {
         this.openDialog = true;
-        this.title = '生成激活码';
+        this.title = this.$t('Content.ID_GENERATE_ACTIVATION_CODE');
         this.isBatch = false
       },                                      //生成
       batch() {
         this.openDialog = true;
-        this.title = '批量生成激活码';
+        this.title = this.$t('Content.ID_BATCH_ACTIVATION_CODE');
         this.isBatch = true
       },                                     //批量生成
       clickEntDep() {
@@ -324,7 +333,7 @@
       selectDep() {
         let tree = this.$refs.terGroupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个终端分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_28'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.terId = tree[0].id;
@@ -347,7 +356,7 @@
             _this.terGroupTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -357,8 +366,9 @@
       },                                  //获取树资源
       exportCode() {
         let ids = this.rowId.map(item => item.id).join(' ');
-        this.$confirm('确定将选定的激活码导出为压缩包？', '提示', {
-          confirmButtonText: '确定',
+        this.$confirm(this.$t('Msg.ID_MSG_13'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -371,16 +381,16 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              let url =  response.data.cust.desc;
+              let url = response.data.cust.desc;
               let a = document.createElement('a');
               a.href = url;
-              a.download = '未命名';
+              a.download = '';
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -392,8 +402,9 @@
       },                                //导出激活码
       unbundled() {
         let ids = this.rowId.map(item => item.id).join(' ');
-        this.$confirm('激活码将与终端解除绑定，是否继续', '提示', {
-          confirmButtonText: '确定',
+        this.$confirm(this.$t('Msg.ID_MSG_14'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -407,7 +418,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               this.$message({
-                message: '解绑成功！',
+                message: this.$t('Content.ID_UNBIND_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
@@ -415,7 +426,7 @@
               this.activeQuery()
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'

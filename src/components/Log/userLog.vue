@@ -80,18 +80,18 @@
     <nav-bar></nav-bar>
     <Breadcrumb></Breadcrumb>
     <div class="content">
-      <div class="title">日志列表</div>
+      <div class="title">{{$t('Content.ID_LOG_LIST')}}</div>
       <div class="controlBox">
         <div class="search">
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="operator">
-              <template slot="prepend">操作人</template>
+          <div >
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="operator">
+              <template slot="prepend">{{$t('Content.ID_OPERATOR')}}</template>
             </el-input>
           </div>
-          <el-button @click="getUserLog">搜索</el-button>
+          <el-button @click="getUserLog">{{$t('Content.ID_RESEARCH')}}</el-button>
         </div>
         <div class="control">
-          <a><i class="el-icon-download"></i>导出为</a>
+          <a @click="download"><i class="el-icon-download"></i>{{$t('Content.ID_EXPORT')}}</a>
         </div>
       </div>
       <div class="logList">
@@ -99,9 +99,9 @@
           :data="logs"
           style="width: 100%">
           <el-table-column prop="id" align="center" label="ID"></el-table-column>
-          <el-table-column prop="operator" align="center" label="操作人"></el-table-column>
-          <el-table-column prop="desc" align="center" label="操作内容"></el-table-column>
-          <el-table-column prop="time" align="center" label="操作时间"></el-table-column>
+          <el-table-column prop="operator" align="center" :label="$t('Content.ID_OPERATOR')"></el-table-column>
+          <el-table-column prop="desc" align="center" :label="$t('Content.ID_CONTENT')"></el-table-column>
+          <el-table-column prop="time" align="center" :label="$t('Content.ID_TIME')"></el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -155,7 +155,7 @@
             this.total = response.data.cust.pages.count;
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -167,6 +167,33 @@
         this.pageNo = val;
         this.getUserLog()
       },                    //分页
+      download(){
+        this.$http({
+          method: 'get',
+          url: "log/export/user",
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code == '0000') {
+            let a = document.createElement('a');
+            a.href = response.data.cust.desc;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            this.$message({
+              message: response.data.infor + '。',
+              showClose: true,
+              center: true,
+              type: 'error'
+            });
+          }
+        })
+      }
     }
   }
 </script>

@@ -129,7 +129,7 @@
       //注销登录
       outLogin: function () {
         sessionStorage.removeItem("name");
-        clearInterval(this.int);
+        clearTimeout(this.int);
         this.$router.push('/');
       },
       changeLang(val) {
@@ -138,7 +138,7 @@
       check() {
         let _this = this;
         if (_this.name != null) {
-          _this.int = setInterval(() => {
+          _this.int = setTimeout(() => {
             _this.$http({
               method: 'get',
               url: 'system/check',
@@ -149,7 +149,7 @@
               }
             }).then(response => {
               if (response.data.code == 'TOKEN000') {
-                clearInterval(_this.int);
+                clearTimeout(_this.int);
                 _this.$alert('登录失效，请重新登录?', '提示', {
                   type: 'warning',
                   confirmButtonText: '确定',
@@ -157,6 +157,8 @@
                     _this.$router.push('/');
                   }
                 });
+              }else {
+                this.check();
               }
             })
           }, 9000)

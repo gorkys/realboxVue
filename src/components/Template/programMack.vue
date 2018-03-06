@@ -278,7 +278,7 @@
 <template>
   <div id="programMack">
     <div id="material">
-      <div class="title">素材</div>
+      <div class="title">{{$t('Content.ID_SELECT_RESOURCE')}}</div>
       <el-tabs type="border-card" @tab-click="handleClick">
         <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id">
           <span slot="label">{{resourceTitle.label}}</span>
@@ -304,19 +304,19 @@
       </el-tabs>
     </div>
     <div id="templateBox">
-      <div class="title">模板信息</div>
+      <div class="title">{{$t('Content.ID_TEMPLATE_INFORMATION')}}</div>
       <div class="controlBox">
         <div class="name">
           <div style="width:350px;">
-            <label>节目名称</label><input v-model="proName" style="width: 50%;margin-left: 10px;" type="text">
+            <label>{{$t('Content.ID_PROGRAM_NAME')}}</label><input v-model="proName" style="width: 50%;margin-left: 10px;" type="text">
           </div>
         </div>
         <div class="control">
-          <a @click="quickPreview"><i class="el-icon-view"></i> 快速预览</a>
-          <a @click="save"><i class="iconfont icon-iconset0237"></i> 保存</a>
-          <router-link to="programList"><i class="iconfont icon-lingcunwei"></i> 返回</router-link>
+          <a @click="quickPreview"><i class="el-icon-view"></i> {{$t('Content.ID_PREVIEW')}}</a>
+          <a @click="save"><i class="iconfont icon-iconset0237"></i> {{$t('Content.ID_SAVE')}}</a>
+          <router-link to="programList"><i class="iconfont icon-lingcunwei"></i> {{$t('Content.ID_RETURN')}}</router-link>
 
-          <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> 发布</a>
+          <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> {{$t('Content.ID_PUBLISH')}}</a>
         </div>
       </div>
       <div v-html="template.body" class="template"></div>
@@ -326,35 +326,35 @@
         <el-tab-pane v-for="item in temItems" v-if="item.type.indexOf('txt') == -1" :label="item.name"
                      :name="item.name">
           <el-form v-if="item.type=='scroll'" v-model="form" label-width="100px">
-            <el-form-item label="字幕内容" style="margin-bottom: 5px">
-              <el-input v-model="form.scrollContent" type="textarea" placeholder="请输入文本内容..."
+            <el-form-item :label="$t('Content.ID_SUBTITLE_CONTENT')" style="margin-bottom: 5px">
+              <el-input v-model="form.scrollContent" type="textarea" :placeholder="$t('Msg.ID_MSG_60')"
                         :autosize="{ minRows: 1, maxRows: 1}" style="width: 98%" resize="none">
               </el-input>
             </el-form-item>
             <el-row>
               <el-col :span="6">
-                <el-form-item label="字体颜色" size="mini" style="margin-bottom: 5px;">
+                <el-form-item :label="$t('Content.ID_FONT_COLOR')" size="mini" style="margin-bottom: 5px;">
                   <el-color-picker v-model="form.scrollColor" size="mini"></el-color-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="字幕滚动" size="mini" style="margin-bottom: 5px;">
-                  <el-select v-model="form.scrollDirection" placeholder="请选择滚动方向" style="width: 150px">
+                <el-form-item :label="$t('Content.ID_SUBTITLE_SCROLL')" size="mini" style="margin-bottom: 5px;">
+                  <el-select v-model="form.scrollDirection" :placeholder="$t('Msg.ID_MSG_61')" style="width: 150px">
                     <el-option v-for="item in form.scrollDirections" :label="item.direction"
                                :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="字体大小" size="mini" style="margin-bottom: 5px;">
-                  <el-select v-model="form.scrollFontSize" placeholder="请选择字体大小" style="width: 150px">
+                <el-form-item :label="$t('Content.ID_FONT_SIZE')" size="mini" style="margin-bottom: 5px;">
+                  <el-select v-model="form.scrollFontSize" :placeholder="$t('Msg.ID_MSG_62')" style="width: 150px">
                     <el-option v-for="item in form.scrollFontSizes" :label="item.size" :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="字体类型" size="mini" style="margin-bottom: 5px;">
-                  <el-select v-model="form.scrollFontFamily" placeholder="请选择字体类型" style="width: 150px">
+                <el-form-item :label="$t('Content.ID_FONT_TYPE')" size="mini" style="margin-bottom: 5px;">
+                  <el-select v-model="form.scrollFontFamily" :placeholder="$t('Msg.ID_MSG_63')" style="width: 150px">
                     <el-option v-for="item in form.scrollFontFamilys" :label="item.font" :value="item.font"></el-option>
                   </el-select>
                 </el-form-item>
@@ -362,29 +362,29 @@
             </el-row>
             <el-row>
               <el-col :span="6">
-                <el-form-item label="背景颜色" size="mini">
+                <el-form-item :label="$t('Content.ID_BG_COLOR')" size="mini">
                   <el-color-picker v-model="form.scrollBGColor" size="mini"></el-color-picker>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="滚动速度" size="mini">
-                  <el-select v-model="form.scrollSpeed" placeholder="请选择滚动速度" style="width: 150px">
+                <el-form-item :label="$t('Content.ID_SCROLL_SPEED')" size="mini">
+                  <el-select v-model="form.scrollSpeed" :placeholder="$t('Msg.ID_MSG_64')" style="width: 150px">
                     <el-option v-for="item in form.scrollSpeeds" :label="item.speed" :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="背景透明度" size="mini">
-                  <el-select v-model="form.scrollBGTransparency" placeholder="请选择透明度" style="width: 150px">
+                <el-form-item :label="$t('Content.ID_BG_OPACITY')" size="mini">
+                  <el-select v-model="form.scrollBGTransparency" :placeholder="$t('Msg.ID_MSG_65')" style="width: 150px">
                     <el-option v-for="item in form.scrollBGTransparencys" :label="item.transparency"
                                :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="持续时间" size="mini">
+                <el-form-item :label="$t('Content.ID_DURATION')" size="mini">
                   <el-tooltip placement="top">
-                    <div slot="content">单位为秒(s)，0秒为持续滚动。<br/>建议设定为0秒。</div>
+                    <div slot="content">{{$t('Msg.ID_MSG_66')}}<br/>{{$t('Msg.ID_MSG_67')}}</div>
                     <el-input-number size="mini" v-model="form.scrollDuration"></el-input-number>
                   </el-tooltip>
                 </el-form-item>
@@ -405,7 +405,7 @@
       <p></p>
     </div>
     <el-dialog
-      title="快速预览"
+      :title="$t('Content.ID_PREVIEW')"
       :visible.sync="view"
       top="3vh"
       :before-close="viewClose"
@@ -446,7 +446,7 @@
       </div>
     </el-dialog><!--预览-->
     <el-dialog
-      title="文本编辑"
+      :title="$t('Content.ID_TEXT_EDITOR')"
       :visible.sync="editTxt"
       :fullscreen="true"
     >
@@ -474,29 +474,29 @@
           </div>
 
           <el-form style="margin-top: 20px">
-            <el-form-item label="字号" size="mini">
-              <el-select v-model="fontSize" placeholder="请选择字体大小" style="width: 150px">
+            <el-form-item :label="$t('Content.ID_FONT_SIZE')" size="mini">
+              <el-select v-model="fontSize" :placeholder="$t('Msg.ID_MSG_62')" style="width: 150px">
                 <el-option v-for="item in fontSizes" :label="item.size" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="字体" size="mini">
-              <el-select v-model="font" placeholder="请选择字体大小" style="width: 150px">
+            <el-form-item :label="$t('Content.ID_FONT_TYPE')" size="mini">
+              <el-select v-model="font" :placeholder="$t('Msg.ID_MSG_63')" style="width: 150px">
                 <el-option v-for="item in fonts" :label="item.font" :value="item.font"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="颜色">
+            <el-form-item :label="$t('Content.ID_FONT_COLOR')">
               <el-color-picker v-model="fontColor"></el-color-picker>
             </el-form-item>
           </el-form>
-          <el-button size="mini" @click="editTxt=false">取 消</el-button>
-          <el-button size="mini" type="primary" @click="saveTxt">保 存</el-button>
+          <el-button size="mini" @click="editTxt=false">{{$t('Content.ID_CANCEL')}}</el-button>
+          <el-button size="mini" type="primary" @click="saveTxt">{{$t('Content.ID_OK')}}</el-button>
         </div>
         <div id="editTxt" :style="{width : txtSize.width + 'px',height : txtSize.height + 'px'}"
              style="background-color: black">
           <div v-for="item in txtSize.temItems"
                :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px'}">
             <div :name="item.type" :id="item.id" style="overflow: hidden;opacity: 0.7;">
-              <textarea v-if="item.type == 'txt'" v-model="txtContent" placeholder="请输入文本内容..."
+              <textarea v-if="item.type == 'txt'" v-model="txtContent" placeholder="$t('Msg.ID_MSG_60')"
                         :style="{fontSize:fontSize+'px',fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
               </textarea>
               <img v-if="item.type=='BG'" style="width: 100%;height: 100%;" :src="item.backGround">
@@ -635,11 +635,11 @@
           scrollDirection: 1,                           //滚动方向
           scrollDirections: [
             {
-              direction: '从右到左',
+              direction: this.$t('Content.ID_RIGHT_LEFT'),
               value: 1
             },
             {
-              direction: '从左到右',
+              direction: this.$t('Content.ID_LEFT_RIGHT'),
               value: 0
             }
           ],                               //滚动方向列表
@@ -676,13 +676,13 @@
           scrollSpeed: 1,                               //滚动速度
           scrollSpeeds: [
             {
-              speed: '慢',
+              speed: this.$t('Content.ID_SLOW'),
               value: 0
             }, {
-              speed: '普通',
+              speed: this.$t('Content.ID_ORDINARY'),
               value: 1
             }, {
-              speed: '快',
+              speed: this.$t('Content.ID_FAST'),
               value: 2
             }
           ],                                   //滚动速度列表
@@ -764,7 +764,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -797,7 +797,7 @@
             })
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -909,7 +909,7 @@
                     _this.editTxt = true
                   } else {
                     this.$message({
-                      message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                      message: response.data.infor + '。',
                       showClose: true,
                       center: true,
                       type: 'error'
@@ -940,7 +940,7 @@
             })
           } else {
             _this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -1081,14 +1081,14 @@
                 if (type == 'release') {
                   _this.$router.push({path: '/release', query: {name: _this.proName}})
                 } else {
-                  _this.$message({message: '保存成功,2秒后自动返回...', showClose: true, center: true, type: 'success'});
+                  _this.$message({message: this.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
                   setTimeout(() => {
                     _this.$router.push({path: '/programList'})
                   }, 2000);
                 }
               } else {
                 _this.$message({
-                  message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                  message: response.data.infor + '。',
                   showClose: true,
                   center: true,
                   type: 'error'
@@ -1192,7 +1192,7 @@
             }
           } else {
             _this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'

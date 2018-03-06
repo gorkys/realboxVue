@@ -98,35 +98,35 @@
     <breadcrumb></breadcrumb>
     <Content>
       <div id="terminalTree">
-        <div class="title">{{treeTitle}}</div>
+        <div class="title">{{$t('Content.ID_GROUP')}}</div>
         <div class="controlTree">
           <div style="width: 120px">
           </div>
-          <div><a @click="getTree"><i class="el-icon-refresh"></i>刷新</a></div>
+          <div><a @click="getTree"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a></div>
         </div>
         <el-tree :data="terminalTree" default-expand-all :expand-on-click-node="false"
                  @node-click="treeClick"></el-tree>
       </div>
       <div id="terminalList">
-        <div class="title">终端列表</div>
+        <div class="title">{{$t('Content.ID_TERMINAL_LIST')}}</div>
         <div class="controlBox">
           <div class="search">
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="terName">
-                <template slot="prepend">终端名称</template>
+            <div>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="terName">
+                <template slot="prepend">{{$t('Content.ID_TERMINAL_NAME')}}</template>
               </el-input>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="terCode">
-                <template slot="prepend">终端编号</template>
+            <div>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="terCode">
+                <template slot="prepend">{{$t('Content.ID_TERMINAL_CODE')}}</template>
               </el-input>
             </div>
-            <el-button @click="queryTerminalList">搜索</el-button>
+            <el-button @click="queryTerminalList">{{$t('Content.ID_RESEARCH')}}</el-button>
           </div>
           <div class="control">
-            <a @click="delTerminal"><i class="el-icon-delete"></i>删除</a>
-            <a @click="synTerminal"><i class="el-icon-sort"></i>强制同步</a>
-            <a @click="queryTerminalList"><i class="el-icon-refresh"></i>刷新</a>
+            <a @click="delTerminal"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
+            <a @click="synTerminal"><i class="el-icon-sort"></i>{{$t('Content.ID_SYNCHRONIZATION')}}</a>
+            <a @click="queryTerminalList"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a>
             <!--<el-dropdown>
           <span class="el-dropdown-link" style="cursor: pointer">
             <i class="el-icon-edit" style="margin-right: 5px"></i>批量操作<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
@@ -146,21 +146,21 @@
             @selection-change="tableSelect"
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
-            <el-table-column prop="name" align="center" label="终端名称"></el-table-column>
-            <el-table-column prop="name" align="center" label="硬件编号"></el-table-column>
-            <el-table-column prop="type" align="center" label="终端类型"></el-table-column>
-            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
-            <el-table-column prop="sversion" align="center" label="软件版本"></el-table-column>
-            <el-table-column prop="version" align="center" label="系统版本"></el-table-column>
-            <el-table-column prop="mac" align="center" label="MAC地址"></el-table-column>
-            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-            <el-table-column prop="status" align="center" label="在线状态">
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_TERMINAL_NAME')"></el-table-column>
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_TERMINAL_CODE')"></el-table-column>
+            <el-table-column prop="type" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
+            <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
+            <el-table-column prop="sversion" align="center" :label="$t('Content.ID_SOFTWARE_VERSION')"></el-table-column>
+            <el-table-column prop="version" align="center" :label="$t('Content.ID_SYSTEM_VERSION')"></el-table-column>
+            <el-table-column prop="mac" align="center" :label="$t('Content.ID_MAC_ADDRESS')"></el-table-column>
+            <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+            <el-table-column prop="status" align="center" :label="$t('Content.ID_ONLINE_STATUS')">
               <template slot-scope="scope">
                 <i v-if="scope.row.status=='1'" style="color: #00ce06;font-size: 16px" class="el-icon-success"></i>
                 <i v-if="scope.row.status=='0'" style="color: red;font-size: 16px" class="el-icon-error"></i>
               </template>
             </el-table-column>
-            <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
           </el-table>
         </div>
         <div class="page">
@@ -197,7 +197,6 @@
         row: '',              //行数据
 
         terId: '41',                //终端分组ID
-        treeTitle: '终端分组',        //树标题
         terName: '',               //终端名称
         terCode: '',               //终端编号
       }
@@ -224,7 +223,7 @@
             _this.terminalTree = response.data.cust.trees;
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -253,7 +252,7 @@
             _this.terId = '';
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -269,18 +268,19 @@
         this.row = row
       },                   //表格选择
       delTerminal() {
-        let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
-        if (ids == '') {
+        if (this.row == '') {
           this.$message({
-            message: '未选择资源！',
+            message: this.$t('Msg.ID_MSG_27'),
             showClose: true,
             center: true,
             type: 'warning'
           });
           return false
         }
-        this.$confirm('此操作将删除该终端, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
+        this.$confirm(this.$t('Msg.ID_MSG_10'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -293,11 +293,11 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
+              this.$message({message: this.$t('Content.ID_DELETE_SUCCESS'), showClose: true, center: true, type: 'success'});
               this.queryTerminalList()
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -307,18 +307,19 @@
         })
       },                      //删除终端
       synTerminal(){
-        let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
-        if (ids == '') {
+        if (this.row == '') {
           this.$message({
-            message: '未选择资源！',
+            message: this.$t('Msg.ID_MSG_27'),
             showClose: true,
             center: true,
             type: 'warning'
           });
           return false
         }
-        this.$confirm('此操作将服务器强制终端同步, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        let ids = this.row.map(item => item.id).join(' ');      //列表模式的id
+        this.$confirm(this.$t('Msg.ID_MSG_11'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -331,11 +332,11 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '强制同步成功！', showClose: true, center: true, type: 'success'});
+              this.$message({message: this.$t('Msg.ID_MSG_12'), showClose: true, center: true, type: 'success'});
               this.queryTerminalList()
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'

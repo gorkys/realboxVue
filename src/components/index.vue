@@ -7,52 +7,52 @@
         <li>
           <a @click="newPlay">
             <i class="iconfont icon-server-kuaisufabu"></i>
-            <b>快速发布</b>
+            <b>{{$t('Content.ID_QUICK_PUBLISH')}}</b>
           </a>
         </li>
         <li>
           <router-link to="auditList">
             <i class="iconfont icon-shenhe"></i>
-            <b>审核列表</b>
+            <b>{{$t('Content.ID_AUDIT_LIST')}}</b>
           </router-link>
         </li>
         <li>
           <router-link to="programList">
             <i class="iconfont icon-jiemu"></i>
-            <b>节目列表</b>
+            <b>{{$t('Content.ID_PROGRAM')}}</b>
           </router-link>
         </li>
         <li>
           <router-link to="terminal">
             <i class="iconfont icon-zhongduan"></i>
-            <b>终端管理</b>
+            <b>{{$t('Content.ID_TERMINAL')}}</b>
           </router-link>
         </li>
         <li>
           <router-link to="resource">
             <i class="iconfont icon-ziyuanguanli"></i>
-            <b>资源管理</b>
+            <b>{{$t('Content.ID_RESOURCE')}}</b>
           </router-link>
         </li>
       </ul>
-      <div style="font-size: 2rem;padding-left: 100px;margin-bottom: 20px;">发布步骤：</div>
+      <div style="font-size: 2rem;padding-left: 100px;margin-bottom: 20px;">{{$t('Content.ID_RELEASE_STEPS')}}：</div>
       <el-steps :active="4" align-center>
-        <el-step title="选择模板" description="选择一个的模板"></el-step>
-        <el-step title="选择素材" description="为模板填充素材"></el-step>
-        <el-step title="设置属性" description="设置播放的属性值"></el-step>
-        <el-step title="发布节目" description="发布节目成功"></el-step>
+        <el-step :title="$t('Content.ID_SELECT_TEMPLATE')" :description="$t('Msg.ID_MSG_1')"></el-step>
+        <el-step :title="$t('Content.ID_SELECT_RESOURCE')" :description="$t('Msg.ID_MSG_2')"></el-step>
+        <el-step :title="$t('Content.ID_SETTING_PROPERTY')" :description="$t('Msg.ID_MSG_3')"></el-step>
+        <el-step :title="$t('Content.ID_PUBLISH_PROGRAM')" :description="$t('Msg.ID_MSG_4')"></el-step>
       </el-steps>
     </div>
     <footer-bar></footer-bar>
     <el-dialog
-      title="选择模板"
+      :title="$t('Content.ID_SELECT_TEMPLATE')"
       :visible.sync="setTem"
       width="58%"
       top="1vh"
     >
       <div class="temDialog">
         <div id="templateTree">
-          <div class="title">模板管理</div>
+          <div class="title">{{$t('Content.ID_TEMPLATE')}}</div>
           <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" :expand-on-click-node="false"
                    default-expand-all></el-tree>
         </div>
@@ -60,7 +60,7 @@
           <div class="controlBox">
             <div class="search">
               <div style="width: 110px">
-                <el-select v-model="tValue" placeholder="图形模式">
+                <el-select v-model="tValue" :placeholder="$t('Content.ID_IMAGE_MODE')">
                   <el-option v-for="item in tSelect"
                              :key="item.value"
                              :label="item.label"
@@ -68,27 +68,26 @@
                 </el-select>
               </div>
               <div style="width:200px;">
-                <el-input placeholder="请输入内容">
-                  <template slot="prepend">模板名称</template>
+                <el-input :placeholder="$t('Msg.ID_MSG_5')">
+                  <template slot="prepend">{{$t('Content.ID_TEMPLATE_NAME')}}</template>
                 </el-input>
               </div>
-              <el-button>搜索</el-button>
+              <el-button>{{$t('Content.ID_RESEARCH')}}</el-button>
             </div>
           </div>
           <div v-if="tValue == '2'" class="tableList">
             <el-table :data="templates" style="width: 100%">
-              <el-table-column prop="name" align="center" label="模板名称"></el-table-column>
-              <el-table-column prop="preview" align="center" label="预览图">
+              <el-table-column prop="name" align="center" :label="$t('Content.ID_TEMPLATE_NAME')"></el-table-column>
+              <el-table-column prop="preview" align="center" :label="$t('Content.ID_THUMBNAIL')">
                 <template scope="scope">
                   <img :src="scope.row.preview" width="30" height="50"/>
                 </template>
               </el-table-column>
-              <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
-              <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
-              <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
-              <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-              <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
-              <el-table-column prop="desc" align="center" label="描述"></el-table-column>
+              <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
+              <el-table-column prop="address" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
+              <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+              <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
+              <el-table-column prop="desc" align="center" :label="$t('Content.ID_DESCRIPTION')"></el-table-column>
             </el-table>
           </div>
           <div v-else class="templateBox">
@@ -116,7 +115,7 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="selectTem">确 定</el-button>
+        <el-button type="primary" @click="selectTem">{{$t('Content.ID_OK')}}</el-button>
   </span>
     </el-dialog><!--选择模板-->
   </div>
@@ -138,10 +137,10 @@
         tValue: '',
         tSelect: [{
           value: '1',
-          label: '图形模式'
+          label: this.$t('Content.ID_IMAGE_MODE')
         }, {
           value: '2',
-          label: '列表模式'
+          label: this.$t('Content.ID_LIST_MODE')
         }],
         tPageCount: 12,     //每页显示数目
         tPageNo: 1,          //当前页
@@ -181,7 +180,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message:response.data.infor,
               showClose: true,
               center: true,
               type: 'error'
@@ -212,7 +211,7 @@
             _this.templateTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor,
               showClose: true,
               center: true,
               type: 'error'

@@ -304,23 +304,23 @@
 <template>
   <div id="resizableBox">
     <div class="area">
-      <div class="title">区域</div>
+      <div class="title">{{$t('Content.ID_AREA')}}</div>
       <ul class="areaList">
         <li @click="openSetBG"><i :style="{color:BG?'#5ea2d3':'rgb(195, 195, 195)'}"
                                   class="iconfont icon-beijing"></i><b
-          :style="{color:BG?'#000':'rgb(195, 195, 195)'}">背景</b></li>
-        <li @click="add('image',true)"><i class="iconfont icon-tupian"></i><b>图片</b></li>
+          :style="{color:BG?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_BACKGROUND')}}</b></li>
+        <li @click="add('image',true)"><i class="iconfont icon-tupian"></i><b>{{$t('Content.ID_IMAGE')}}</b></li>
         <li @click="add('video',true)"><i :style="{color:video?'#5ea2d3':'rgb(195, 195, 195)'}"
                                           class="iconfont icon-shipin"></i><b
-          :style="{color:video?'#000':'rgb(195, 195, 195)'}">视频</b></li>
-        <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>文本</b></li>
+          :style="{color:video?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_VIDEO')}}</b></li>
+        <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>{{$t('Content.ID_TEXT')}}</b></li>
         <li @click="add('scroll',false)"><i :style="{color:scroll?'#5ea2d3':'rgb(195, 195, 195)'}"
                                             class="iconfont icon-wenben"></i><b
-          :style="{color:scroll?'#000':'rgb(195, 195, 195)'}">动态文本</b></li>
+          :style="{color:scroll?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_SCROLL_TEXT')}}</b></li>
       </ul>
     </div>
     <div id="editBox">
-      <div class="title">编辑区</div>
+      <div class="title">{{$t('Content.ID_EDIT_AREA')}}</div>
       <div class="editBox">
         <div id="edit" :style="{width : temWidth * PP + 'px',height : temHeight * PP + 'px'}">
           <!--还原-->
@@ -377,28 +377,28 @@
     </div>
     <div class="info">
       <div class="templateInfo">
-        <div class="title" style="margin-bottom: 10px;">模板信息</div>
+        <div class="title" style="margin-bottom: 10px;">{{$t('Content.ID_TEMPLATE_INFORMATION')}}</div>
         <ul class="templateInfoList">
-          <li><span>模板名称：</span><input v-model="temName" type="text"></li>
-          <li><span>模板类型：</span><b>{{temType}}</b></li>
-          <li><span>终端类型：</span><b>{{terminalType}}</b><i class="iconfont"></i></li>
-          <li><span>分辨率：&nbsp;&nbsp;&nbsp;</span><input type="text" v-model="resolution" readonly="readonly"></li>
+          <li><span>{{$t('Content.ID_TEMPLATE_NAME')}}：</span><input v-model="temName" type="text"></li>
+          <li><span>{{$t('Content.ID_TEMPLATE_TYPE')}}：</span><b>{{temType}}</b></li>
+          <li><span>{{$t('Content.ID_TERMINAL_TYPE')}}：</span><b>{{terminalType}}</b><i class="iconfont"></i></li>
+          <li><span>{{$t('Content.ID_RESOLUTION')}}：&nbsp;&nbsp;&nbsp;</span><input type="text" v-model="resolution" readonly="readonly"></li>
         </ul>
       </div>
       <div class="areaInfo">
-        <div class="title" style="margin-bottom: 10px;">区域信息</div>
+        <div class="title" style="margin-bottom: 10px;">{{$t('Content.ID_AREA_INFORMATION')}}</div>
         <div class="areaBox">
-          <span>区域名称：</span><input v-model="areaName" type="text">
+          <span>{{$t('Content.ID_AREA_NAME')}}：</span><input v-model="areaName" type="text">
         </div>
         <div class="infoList">
           <ul class="areaControl">
-            <li @click="areaChange('up')">上移</li>
-            <li @click="areaChange('down')">下移</li>
-            <li @click="areaChange('top')">置顶</li>
-            <li @click="areaChange('bottom')">置底</li>
+            <li @click="areaChange('up')">{{$t('Content.ID_UP')}}</li>
+            <li @click="areaChange('down')">{{$t('Content.ID_DOWN')}}</li>
+            <li @click="areaChange('top')">{{$t('Content.ID_TOP')}}</li>
+            <li @click="areaChange('bottom')">{{$t('Content.ID_BOTTOM')}}</li>
           </ul>
           <fieldset style="border: 1px solid #b5b8c8;padding: 10px;max-height: 200px;overflow: auto">
-            <legend>区域列表</legend>
+            <legend>{{$t('Content.ID_AREA_LIST')}}</legend>
             <el-tree :data="areaList" node-key="key" show-checkbox @check-change="areaListCheckCheck"
                      :expand-on-click-node="false" ref="areaList" :check-strictly="true" default-expand-all>
             </el-tree>
@@ -406,7 +406,7 @@
         </div>
       </div>
       <div class="parameterSet">
-        <div class="title" style="margin-bottom: 10px;">参数设置</div>
+        <div class="title" style="margin-bottom: 10px;">{{$t('Content.ID_PARAMTERS_SETTING')}}</div>
         <div class="setBox">
           <div class="pixel">
             <b>X:</b><input type="number" :value="parseInt(x/PP)"> px</br></br>
@@ -424,16 +424,16 @@
 
       </div>
       <div class="saveBox">
-        <a class="save" @click="exportImage">保存</a>
-        <a class="save" @click="exportImage('use')">保存并使用</a>
-        <router-link class="save" to="template">取消</router-link>
+        <a class="save" @click="exportImage">{{$t('Content.ID_SAVE')}}</a>
+        <a class="save" @click="exportImage('use')">{{$t('Content.ID_SAVE_AND_USED')}}</a>
+        <router-link class="save" to="template">{{$t('Content.ID_CANCEL')}}</router-link>
       </div>
       <div>
         <img id="exportedImage" style="width: 200px">
       </div>
     </div>
     <el-dialog
-      title="选择背景"
+      :title="$t('Content.ID_CHOOSE_BG')"
       :visible.sync="setBg"
       width="51%"
       top="1vh"
@@ -442,7 +442,7 @@
         <div class="controlBox">
           <div class="search">
             <div style="width: 110px">
-              <el-select v-model="value" placeholder="图形模式" @change="selectChange">
+              <el-select v-model="value" :placeholder="$t('Content.ID_IMAGE_MODE')" @change="selectChange">
                 <el-option v-for="item in select"
                            :key="item.value"
                            :label="item.label"
@@ -450,37 +450,37 @@
               </el-select>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">名称</template>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')">
+                <template slot="prepend">{{$t('Content.ID_NAME')}}</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">终端分组</template>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')">
+                <template slot="prepend">{{$t('Content.ID_GROUP')}}</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容">
-                <template slot="prepend">上传者</template>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')">
+                <template slot="prepend">{{$t('Content.ID_OPERATOR')}}</template>
               </el-input>
             </div>
-            <el-button>搜索</el-button>
+            <el-button>{{$t('Content.ID_RESEARCH')}}</el-button>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
           <el-table :data="resources" @selection-change="tableSelect">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
-            <el-table-column prop="name" align="center" label="名称"></el-table-column>
-            <el-table-column prop="screenshot" align="center" label="预览图">
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_NAME')"></el-table-column>
+            <el-table-column prop="screenshot" align="center" :label="$t('Content.ID_THUMBNAIL')">
               <template scope="scope">
                 <img :src="'http://'+ scope.row.thumbnail" width="100" height="70"/>
               </template>
             </el-table-column>
-            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
-            <el-table-column prop="size" align="center" label="大小(kb)"></el-table-column>
-            <el-table-column prop="orgId" align="center" label="终端分组"></el-table-column>
-            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-            <el-table-column prop="uploadtime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
+            <el-table-column prop="size" align="center" :label="$t('Content.ID_SIZE')+'(kb)'"></el-table-column>
+            <el-table-column prop="orgId" align="center" :label="$t('Content.ID_GROUP')"></el-table-column>
+            <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+            <el-table-column prop="uploadtime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
           </el-table>
         </div>
         <div v-else class="imgList">
@@ -507,7 +507,7 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="setBGImg">确 定</el-button>
+        <el-button type="primary" @click="setBGImg">{{$t('Content.ID_OK')}}</el-button>
        </span>
     </el-dialog><!--选择背景-->
   </div>
@@ -548,7 +548,7 @@
         //模板属性
         PP: 1,                                                         //百分比
         temName: sessionStorage.getItem('temName'),                     //模板名称
-        terminalType: '安卓',                                           //终端类型
+        terminalType: this.$t('Content.ID_ANDROID'),                    //终端类型
         temType: sessionStorage.getItem('temType'),                     //模板类型
         desc: sessionStorage.getItem('desc'),                           //备注
         resolution: sessionStorage.getItem('resolution'),               //分辨率
@@ -569,11 +569,11 @@
         select: [
           {
             value: 1,
-            label: '图形模式'
+            label: this.$t('Content.ID_IMAGE_MODE')
           },
           {
             value: 2,
-            label: '列表模式'
+            label: this.$t('Content.ID_LIST_MODE')
           }
         ],
         format: '',                                                      //资源格式
@@ -595,7 +595,7 @@
       areaChange(val, index) {
         if(val!=''){
           this.$message({
-            message: '移动功能正在开发中...',
+            message: this.$t('Msg.ID_MSG_69'),
             showClose: true,
             center: true,
             type: 'warning'
@@ -666,14 +666,14 @@
           areaName = content + this.image
         } else if (content == 'txt') {
           if (this.BG) {
-            this.$message({message: '使用文本请先加入背景！', showClose: true, center: true, type: 'warning'});
+            this.$message({message: this.$t('Msg.ID_MSG_70'), showClose: true, center: true, type: 'warning'});
             return false
           }
           this.txt++;
           areaName = content + this.txt
         } else if (content === 'scroll') {
           if (this.BG) {
-            this.$message({message: '使用文本请先加入背景！', showClose: true, center: true, type: 'warning'});
+            this.$message({message: this.$t('Msg.ID_MSG_70'), showClose: true, center: true, type: 'warning'});
             return false
           }
           this.scroll = false;
@@ -708,7 +708,7 @@
         let vm = this;
         let table = $('#edit');
         let treeId = 0;                                      //树ID
-        this.temType == '用户模板' ? treeId = 22 : treeId = 21;
+        this.temType == this.$t('Content.ID_USER_TEMPLATE') ? treeId = 22 : treeId = 21;
         let html = $('.editBox').html();                      //模板代码
         let creator = sessionStorage.getItem('name');         //创建人
 
@@ -764,7 +764,7 @@
             vm.preview = url;
 
             if (table.html() == "") {
-              vm.$message({message: '请加入区域块！', showClose: true, center: true, type: 'warning'});
+              vm.$message({message: this.$t('Msg.ID_MSG_71'), showClose: true, center: true, type: 'warning'});
             } else {
               //区分新建与编辑
               if (query.name == undefined && query.groupId == undefined) {
@@ -816,14 +816,14 @@
                 if (value == 'use') {
                   vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
                 } else {
-                  vm.$message({message: '保存成功,2秒后自动返回...', showClose: true, center: true, type: 'success'});
+                  vm.$message({message: this.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
                   setTimeout(() => {
                     vm.$router.push({path: '/template'})
                   }, 2000);
                 }
               } else {
                 vm.$message({
-                  message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                  message: response.data.infor + '。',
                   showClose: true,
                   center: true,
                   type: 'error'
@@ -856,7 +856,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -993,7 +993,7 @@
       setBGImg() {
         if(this.BGUrl=='') {
           this.$message({
-            message: '未选择背景！',
+            message: this.$t('Msg.ID_MSG_72'),
             showClose: true,
             center: true,
             type: 'warning'

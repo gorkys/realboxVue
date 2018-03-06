@@ -158,10 +158,10 @@
     <breadcrumb></breadcrumb>
     <Content>
       <div id="resourceTree">
-        <div class="title">资源管理</div>
+        <div class="title">{{$t('Content.ID_RESOURCE')}}</div>
         <div class="controlTree">
           <!--<a><i class="el-icon-plus"></i>新建</a>-->
-          <a @click="getTree"><i class="el-icon-refresh"></i>刷新</a>
+          <a @click="getTree"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a>
         </div>
         <el-tree :data="resourceTree" default-expand-all :expand-on-click-node="false" :highlight-current="true"
                  @node-click="handleNodeClick"></el-tree>
@@ -170,41 +170,41 @@
         <div class="title">{{treeName}}</div>
         <div class="controlBox">
           <div class="search">
-            <div style="width: 110px">
-              <el-select v-model="value" placeholder="图形模式" @change="selectChange">
+            <div>
+              <el-select v-model="value" :placeholder="$t('Content.ID_IMAGE_MODE')" @change="selectChange">
                 <el-option v-for="item in select"
                            :key="item.value"
                            :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="resName">
-                <template slot="prepend">资源名称</template>
+            <div>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="resName">
+                <template slot="prepend">{{$t('Content.ID_RESOURCE_NAME')}}</template>
               </el-input>
             </div>
-            <el-button @click="resourceQuery">搜索</el-button>
+            <el-button @click="resourceQuery">{{$t('Content.ID_RESEARCH')}}</el-button>
           </div>
           <div class="control">
-            <a @click="upload"><i class="el-icon-upload"></i>上传</a>
-            <a @click="download"><i class="el-icon-download"></i>下载</a>
-            <a @click="del"><i class="el-icon-delete"></i>删除</a>
+            <a @click="upload"><i class="el-icon-upload"></i>{{$t('Content.ID_UPLOAD')}}</a>
+            <a @click="download"><i class="el-icon-download"></i>{{$t('Content.ID_DOWNLOAD')}}</a>
+            <a @click="del"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
           <el-table :data="resources" @selection-change="tableSelect">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
-            <el-table-column prop="name" align="center" label="名称"></el-table-column>
-            <el-table-column prop="screenshot" align="center" label="预览图">
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_NAME')"></el-table-column>
+            <el-table-column prop="screenshot" align="center" :label="$t('Content.ID_THUMBNAIL')">
               <template scope="scope">
                 <img :src="'http://'+ scope.row.thumbnail" width="100" height="70"/>
               </template>
             </el-table-column>
-            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
-            <el-table-column prop="size" align="center" label="大小(kb)"></el-table-column>
-            <el-table-column prop="orgId" align="center" label="终端分组"></el-table-column>
-            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-            <el-table-column prop="uploadtime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
+            <el-table-column prop="size" align="center" :label="$t('Content.ID_SIZE')+'(kb)'"></el-table-column>
+            <el-table-column prop="orgId" align="center" :label="$t('Content.ID_GROUP')"></el-table-column>
+            <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+            <el-table-column prop="uploadtime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
           </el-table>
         </div>
         <div v-else class="imgList">
@@ -230,7 +230,7 @@
           </el-pagination>
         </div>
         <el-dialog
-          :title="title + '上传'"
+          :title="title + $t('Content.ID_UPLOAD')"
           :visible.sync="dialog"
           width="400px">
           <el-upload
@@ -245,15 +245,15 @@
             :on-success="onSuccess"
             multiple>
             <i class="el-icon-upload"></i>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            <div class="el-upload__tip" slot="tip">上传说明：{{directions}}</div>
+            <div class="el-upload__text">{{$t('Msg.ID_MSG_6')}}<em>&nbsp;{{$t('Msg.ID_MSG_23')}}</em></div>
+            <div class="el-upload__tip" slot="tip">{{$t('Content.ID_UPLOAD_DESCRIPTION')}}：{{directions}}</div>
           </el-upload>
           <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="uploadCon">确 定</el-button>
+        <el-button type="primary" @click="uploadCon">{{$t('Content.ID_OK')}}</el-button>
       </span>
         </el-dialog>  <!--上传-->
         <el-dialog
-          :title="title + '预览'"
+          :title="title + $t('Content.ID_PREVIEW')"
           :visible.sync="view"
           width="30%"
           top="3vh"
@@ -290,12 +290,12 @@
 
         type: 'image',           //资源类型
         accept: 'image/png,image/jpg,image/jpeg',         //允许上传的资源类型
-        directions: '仅允许上传png、jpg、jpeg文件。',                      //上传时的说明文字
+        directions: this.$t('Msg.ID_MSG_7'),                      //上传时的说明文字
         dialog: false,
         title: '',
         value: '',
         treeId: 1,
-        treeName: '图片',
+        treeName: this.$t('Content.ID_IMAGE'),
         resources: [],
         row: [],
         url: '',                   //资源地址
@@ -306,11 +306,11 @@
         select: [
           {
             value: 1,
-            label: '图形模式'
+            label: this.$t('Content.ID_IMAGE_MODE')
           },
           {
             value: 2,
-            label: '列表模式'
+            label: this.$t('Content.ID_LIST_MODE')
           }
         ],
         pageCount: 21,     //每页显示数目
@@ -357,7 +357,7 @@
             _this.resourceTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -373,15 +373,15 @@
         let audio = 'audio/*';
         if (image.indexOf(val.treeType) != -1) {
           this.accept = image;
-          this.directions = '仅允许上传png、jpg、jpeg文件。'
+          this.directions = this.$t('Msg.ID_MSG_7')
         } else if (video.indexOf(val.treeType) != -1) {
           this.accept = video;
-          this.directions = '仅允许上传视频文件。'
+          this.directions = this.$t('Msg.ID_MSG_8')
         } else if (audio.indexOf(val.treeType) != -1) {
           this.accept = audio;
           this.directions = '仅允许上传音频文件。'
         } else {
-          this.accept = '*'
+          this.accept = '*';
           this.directions = '不允许上传任何文件。'
         }
         this.resourceQuery()
@@ -399,7 +399,7 @@
       beforeUp: function (file) {
         if (this.accept.indexOf(file.type.slice(0, 4)) == -1) {
           this.$message({
-            message: '上传资源格式不支持！',
+            message: this.$t('Msg.ID_MSG_25'),
             center: true,
             type: 'warning'
           });
@@ -409,14 +409,14 @@
       onSuccess: function (response) {
         if (response.code == '0000') {
           this.$message({
-            message: '上传成功！',
+            message: this.$t('Content.ID_UPLOAD_SUCCESS'),
             center: true,
             type: 'success'
           });
           this.resourceQuery()
         } else {
           this.$message({
-            message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+            message:response.data.infor + '。',
             center: true,
             type: 'error'
           });
@@ -428,7 +428,7 @@
           ids = this.row.map(item => item.id).join(' ');      //列表模式的id
           if (ids == '') {
             this.$message({
-              message: '未选择资源！',
+              message: this.$t('Msg.ID_MSG_24'),
               center: true,
               type: 'warning'
             });
@@ -438,15 +438,16 @@
           ids = this.ids.join(' ');
           if (ids == '') {
             this.$message({
-              message: '未选择资源！',
+              message: this.$t('Msg.ID_MSG_24'),
               center: true,
               type: 'warning'
             });
             return false
           }
         }
-        this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        this.$confirm(this.$t('Msg.ID_MSG_9'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -459,16 +460,16 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.resourceQuery()
+              this.resourceQuery();
               this.$message({
-                message: '删除成功！',
+                message: this.$t('Content.ID_DELETE_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
               })
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -486,7 +487,7 @@
           this.format = 'image'
         } else {
           this.$message({
-            message: '该格式资源不支持预览！',
+            message: this.$t('Msg.ID_MSG_26'),
             center: true,
             type: 'warning'
           });
@@ -546,7 +547,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message:response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -564,15 +565,10 @@
           this.downloadName = 'http://' + this.row.map(item => item.name).join('')
         }
         if (this.downloadUrl != '' || this.downloadName != '') {
-          let a = document.createElement('a');
-          a.href = this.downloadUrl;
-          a.download = this.downloadName ? this.downloadName : '未命名';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+
         } else {
           this.$message({
-            message: '未选择资源！',
+            message: this.$t('Msg.ID_MSG_24'),
             showClose: true,
             center: true,
             type: 'warning'

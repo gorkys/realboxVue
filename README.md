@@ -33,16 +33,20 @@ npm run mock
 [JSON-server （mock数据）](https://github.com/typicode/json-server)<br>
 [vue-draggable-resizable（移动插件）](https://github.com/mauricius/vue-draggable-resizable)<br>
 [html2canvas(网页截图)](https://github.com/niklasvh/html2canvas)</br>
-[jQuery]()
+[jQuery]()</br>
+[vue-i18n(国际化)]()
 
 ## 功能
 
 - 登录/登出
+- 国际化
 - 模板管理
-    - 保存模板
+    - 模板制作
     - 保存并使用
 - 用户管理
-- 发布节目
+- 节目管理
+    - 节目预览
+    - 发布节目
 
 ## 文件结构
 ```shell
@@ -59,6 +63,7 @@ npm run mock
     ├── router    路由配置
     └── components    视图组件
         ├── common      公共组件（导航页尾）
+                   └── lang    国际化语言包
         ├── Log         系统日志
         ├── Program     节目管理
         ├── Resource    资源管理

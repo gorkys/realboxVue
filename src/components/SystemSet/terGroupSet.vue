@@ -52,12 +52,12 @@
     <nav-bar></nav-bar>
     <Breadcrumb></Breadcrumb>
     <div class="content">
-      <div class="title">终端设置</div>
+      <div class="title">{{$t('Content.ID_TERMINAL_SETTINGS')}}</div>
       <div class="controlBox">
-        <a @click="New"><i class="el-icon-plus"></i>新建</a>
-        <a @click="Edit"><i class="el-icon-edit"></i>编辑</a>
-        <a @click="delDeartment"><i class="el-icon-delete"></i>删除</a>
-        <a @click="getTree"><i class="el-icon-refresh"></i>刷新</a>
+        <a @click="New"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
+        <a @click="Edit"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
+        <a @click="delDeartment"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
+        <a @click="getTree"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a>
       </div>
       <el-tree
         :data="departmentTree"
@@ -73,7 +73,7 @@
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="27.5%">
       <el-dialog
         width="30%"
-        title="选择上级分组"
+        :title="$t('Content.ID_PARENT_GROUP')"
         :visible.sync="innerVisible"
         append-to-body>
         <el-tree
@@ -81,25 +81,25 @@
           node-key="id" ref="departmentTree" highlight-current @check-change="superiorDepCheckChang">
         </el-tree>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="innerVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitSD">确 定</el-button>
+          <el-button @click="innerVisible = false">{{$t('Content.ID_CANCEL')}}</el-button>
+          <el-button type="primary" @click="submitSD">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--上级分组选择-->
       <el-form :model="form">
-        <el-form-item label="分组名称" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP_NAME')" :label-width="LabelWidth">
           <el-input v-model="form.deartmentName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="上级分组" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_PARENT_GROUP')" :label-width="LabelWidth">
           <input v-model="form.superiorDeartment" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="innerVisible = true" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="分组描述" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP_DESCRIPTION')" :label-width="LabelWidth">
           <el-input type="textarea" v-model="form.deartmentDescribe" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openDialog = false">取 消</el-button>
-        <el-button type="primary" @click="submit">确 定</el-button>
+        <el-button @click="openDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="submit">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -182,7 +182,7 @@
             _this.departmentTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -192,11 +192,11 @@
       },         //获取树资源
       addDeartment() {
         if (this.form.deartmentName == '') {
-          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_41'), showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.form.superiorDeartment == '') {
-          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_42'), showClose: true, center: true, type: 'warning'});
           return false
         }
         let _this = this;
@@ -220,7 +220,7 @@
             this.openDialog = false
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -231,7 +231,7 @@
       submitSD() {
         let superior = this.$refs.departmentTree.getCheckedNodes();
         if (superior.length > 1) {
-          this.$message({message: '只能选择一个上级！', showClose: true, center: true, type: 'warning'});
+          this.$message({message:this.$t('Msg.ID_MSG_47'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.form.superiorDeartment = superior[0].label;
@@ -239,14 +239,14 @@
         this.innerVisible = false
       },                   //选择上级分组
       submit() {
-        if (this.title == '新建分组') {
+        if (this.title == this.$t('Content.ID_NEW_GROUP')) {
           this.addDeartment()
         } else {
           this.editDeartment()
         }
       },                     //判断是新建还是编辑
       New() {
-        this.title = '新建分组';
+        this.title = this.$t('Content.ID_NEW_GROUP');
         this.form.deartmentName = '';
         this.form.superiorDeartment = '';
         this.openDialog = true;
@@ -254,11 +254,11 @@
       Edit() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.openDialog = true;
-        this.title = '编辑分组';
+        this.title = this.$t('Content.ID_EDIT_GROUP');
         this.form.deartmentName = tree[0].label;
         this.superiorId = tree[0].parentId;
         this.creator = tree[0].creator;
@@ -267,11 +267,11 @@
       },                       //编辑分组
       editDeartment() {
         if (this.form.deartmentName == '') {
-          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_41'), showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.form.superiorDeartment == '') {
-          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_42'), showClose: true, center: true, type: 'warning'});
           return false
         }
         let _this = this;
@@ -305,7 +305,7 @@
             });
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -316,13 +316,13 @@
       delDeartment() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id;
-        this.$confirm('此操作将永久删除该分组及下属的资源等, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('Msg.ID_MSG_39'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -336,7 +336,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               this.$message({
-                message: '删除成功！',
+                message: this.$t('Content.ID_DELETE_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
@@ -351,7 +351,7 @@
               });
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'

@@ -13,7 +13,7 @@ export default new Router({
     },
     {
       path: '/index',
-      name: '首页',
+      name: 'nav.Home',
       component: (resolve) => require(['@/components/index'], resolve)
     },
     {
@@ -28,33 +28,33 @@ export default new Router({
     },
     {
       path: '/resource',
-      name: '资源管理',
+      name: 'nav.Resource',
       component: (resolve) => require(['@/components/Resource/resource'], resolve)
     },
     {
       path: '/template',
-      name: '模板管理',
+      name: 'nav.Template',
       component: (resolve) => require(['@/components/Template/template'], resolve)
     },
     {
       path: '/generalSet',
-      name: '系统设置',
+      name: 'nav.System',
       component: (resolve) => require(['@/components/SystemSet/generalSet'], resolve)
     },
     //日志管理
     {
       path: '',
-      name: '日志管理',
+      name: 'nav.Log',
       component: App,
       children: [
         {
           path: '/userLog',
-          name: '用户日志',
+          name: 'nav.UserLog',
           component: (resolve) => require(['@/components/Log/userLog'], resolve),
         },
         {
           path: '/operatingLog',
-          name: '系统日志',
+          name: 'nav.SystemLog',
           component: (resolve) => require(['@/components/Log/operatingLog'], resolve),
         },
       ]
@@ -62,22 +62,22 @@ export default new Router({
     //用户设置
     {
       path: '',
-      name: '用户设置',
+      name: 'nav.User',
       component: App,
       children: [
         {
           path: '/terGroupSet',
-          name: '终端设置',
+          name: 'nav.TerminalSet',
           component: (resolve) => require(['@/components/SystemSet/terGroupSet'], resolve)
         },
         {
           path: '/userSet',
-          name: '用户设置',
+          name: 'nav.UserSet',
           component: (resolve) => require(['@/components/SystemSet/userSet'], resolve)
         },
         {
           path: '/roleSet',
-          name: '角色设置',
+          name: 'nav.RoleSet',
           component: (resolve) => require(['@/components/SystemSet/roleSet'], resolve)
         }
       ]
@@ -85,17 +85,17 @@ export default new Router({
     //终端管理
     {
       path: '',
-      name: '终端管理',
+      name: 'nav.Terminal',
       component: App,
       children: [
         {
           path: '/terminal',
-          name: '终端管理',
+          name: 'nav.Terminal',
           component: (resolve) =>require(['@/components/Terminal/terminal'], resolve)
         },
         {
           path: '/activeCode',
-          name: '激活码管理',
+          name: 'nav.ActiveCode',
           component: (resolve) =>require(['@/components/Terminal/activeCode'], resolve)
         },
       ]
@@ -103,22 +103,22 @@ export default new Router({
     //节目管理
     {
       path: '',
-      name: '节目管理',
+      name: 'nav.Program',
       component: App,
       children: [
         {
           path: '/programList',
-          name: '节目列表',
+          name: 'nav.ProgramList',
           component: (resolve) =>require(['@/components/Program/programList'], resolve)
         },
         {
           path: '/releaseMng',
-          name: '发布管理',
+          name: 'nav.Release',
           component: (resolve) =>require(['@/components/Program/releaseMng'], resolve)
         },
         {
           path: '/auditList',
-          name: '审核列表',
+          name: 'nav.AuditList',
           component: (resolve) =>require(['@/components/Program/auditList'], resolve)
         },
         {

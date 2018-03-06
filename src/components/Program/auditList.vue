@@ -92,20 +92,20 @@
     <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
     <div class="content">
-      <div class="title">审核列表</div>
+      <div class="title">{{$t('Content.ID_AUDIT_LIST')}}</div>
       <div class="controlBox">
         <div class="search">
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchName">
-              <template slot="prepend">节目名称</template>
+          <div>
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchName">
+              <template slot="prepend">{{$t('Content.ID_PROGRAM_NAME')}}</template>
             </el-input>
           </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchProStatus">
-              <template slot="prepend">节目状态</template>
+          <div>
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchProStatus">
+              <template slot="prepend">{{$t('Content.ID_PROGRAM_STATUS')}}</template>
             </el-input>
           </div>
-          <el-button @click="queryPublishList">搜索</el-button>
+          <el-button @click="queryPublishList">{{$t('Content.ID_RESEARCH')}}</el-button>
         </div>
       </div>
       <div class="auditList">
@@ -113,32 +113,32 @@
           :data="publish"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="proType" align="center" label="节目类型"></el-table-column>
-          <el-table-column prop="id" align="center" label="发布单号"></el-table-column>
-          <el-table-column prop="proName" align="center" label="节目名称"></el-table-column>
-          <el-table-column prop="disType" align="center" label="发布类型"></el-table-column>
-          <el-table-column prop="playMode" align="center" label="播放类型"></el-table-column>
-          <el-table-column prop="publisher" align="center" label="发布人"></el-table-column>
-          <el-table-column prop="date" align="center" label="发布时间"></el-table-column>
-          <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
-          <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
-          <el-table-column prop="proPreview" align="center" label="节目预览">
+          <el-table-column prop="proType" align="center" :label="$t('Content.ID_PROGRAM_TYPE')"></el-table-column>
+          <el-table-column prop="id" align="center" :label="$t('Content.ID_PUBLISH_CODE')"></el-table-column>
+          <el-table-column prop="proName" align="center" :label="$t('Content.ID_PROGRAM_NAME')"></el-table-column>
+          <el-table-column prop="disType" align="center" :label="$t('Content.ID_PUBLISH_TYPE')"></el-table-column>
+          <el-table-column prop="playMode" align="center" :label="$t('Content.ID_PLAY_TYPE')"></el-table-column>
+          <el-table-column prop="publisher" align="center" :label="$t('Content.ID_PUBLISHER')"></el-table-column>
+          <el-table-column prop="date" align="center" :label="$t('Content.ID_PUBLISH_TIME')"></el-table-column>
+          <el-table-column prop="invalidTime" align="center" :label="$t('Content.ID_USELESS_TIME')"></el-table-column>
+          <el-table-column prop="status" align="center" :label="$t('Content.ID_PUBLISH_STATUS')"></el-table-column>
+          <el-table-column prop="proPreview" align="center" :label="$t('Content.ID_PROGRAM_PREVIEW')">
             <template slot-scope="scope">
               <el-button
                 size="mini"
-                @click="proPreview(scope.$index, scope.row)">节目预览
+                @click="proPreview(scope.$index, scope.row)">{{$t('Content.ID_PROGRAM_PREVIEW')}}
               </el-button>
             </template>
           </el-table-column>
-          <el-table-column prop="address" align="center" label="审核">
+          <el-table-column prop="address" align="center" :label="$t('Content.ID_AUDIT')">
             <template slot-scope="scope">
               <el-button
                 size="mini"
-                @click="auditPass('pass', scope.row)">通过
+                @click="auditPass('pass', scope.row)">{{$t('Content.ID_PASS')}}
               </el-button>
               <el-button
                 size="mini"
-                @click="auditPass('refuse', scope.row)">拒绝
+                @click="auditPass('refuse', scope.row)">{{$t('Content.ID_FAIL')}}
               </el-button>
             </template>
           </el-table-column>
@@ -156,7 +156,7 @@
     </div>
     <footer-bar></footer-bar>
     <el-dialog
-      title="快速预览"
+      :title="$t('Content.ID_PREVIEW')"
       :visible.sync="view"
       top="3vh"
       :before-close="viewClose"
@@ -256,7 +256,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -271,12 +271,13 @@
       auditPass(type, data) {
         let message;
         if(type==='pass'){
-          message='审核通过后节目将即刻发布, 是否继续?'
+          message=this.$t('Msg.ID_MSG_30')
         }else {
-          message='拒绝通过后节目将回到节目列表，是否继续？'
+          message=this.$t('Msg.ID_MSG_31')
         }
-        this.$confirm(message, '提示', {
-          confirmButtonText: '确定',
+        this.$confirm(message, this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -291,14 +292,14 @@
             if (response.data.code == '0000') {
               if(type==='pass'){
                 this.$message({
-                  message: '审核通过，节目已发布成功！',
+                  message: this.$t('Msg.ID_MSG_32'),
                   showClose: true,
                   center: true,
                   type: 'success'
                 });
               }else {
                 this.$message({
-                  message: '拒绝通过，节目未发布！',
+                  message: this.$t('Msg.ID_MSG_33'),
                   showClose: true,
                   center: true,
                   type: 'success'
@@ -307,7 +308,7 @@
               this.queryPublishList()
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -400,7 +401,7 @@
                       }
                     } else {
                       this.$message({
-                        message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                        message: response.data.infor + '。',
                         showClose: true,
                         center: true,
                         type: 'error'
@@ -412,7 +413,7 @@
             }
             else {
               _this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'

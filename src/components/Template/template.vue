@@ -138,54 +138,55 @@
     <breadcrumb></breadcrumb>
     <Content>
       <div id="templateTree">
-        <div class="title">模板管理</div>
-        <el-tree :data="templateTree" node-key="id" :highlight-current="true" @node-click="handleNodeClick" :expand-on-click-node="false"
+        <div class="title">{{$t('Content.ID_TEMPLATE')}}</div>
+        <el-tree :data="templateTree" node-key="id" :highlight-current="true" @node-click="handleNodeClick"
+                 :expand-on-click-node="false"
                  default-expand-all></el-tree>
       </div>
       <div id="templateList">
         <div class="title">{{treeName}}</div>
         <div class="controlBox">
           <div class="search">
-            <div style="width: 110px">
-              <el-select v-model="value" placeholder="图形模式">
+            <div>
+              <el-select v-model="value" :placeholder="$t('Content.ID_IMAGE_MODE')">
                 <el-option v-for="item in select"
                            :key="item.value"
                            :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="searchName">
-                <template slot="prepend">模板名称</template>
+            <div>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchName">
+                <template slot="prepend">{{$t('Content.ID_TEMPLATE_NAME')}}</template>
               </el-input>
             </div>
-            <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="searchResolution">
-                <template slot="prepend">分辨率</template>
+            <div>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchResolution">
+                <template slot="prepend">{{$t('Content.ID_RESOLUTION')}}</template>
               </el-input>
             </div>
-            <el-button @click="queryList">搜索</el-button>
+            <el-button @click="queryList">{{$t('Content.ID_RESEARCH')}}</el-button>
           </div>
           <div class="control">
-            <a v-if="treeName=='用户模板'" @click="openDialog=true"><i class="el-icon-plus"></i>新建</a>
-            <a v-if="treeName=='用户模板'" @click="editTemplate(temName)"><i class="el-icon-edit"></i>修改</a>
-            <a v-if="treeName=='用户模板'" @click="delTemplate"><i class="el-icon-delete"></i>删除</a>
+            <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="openDialog=true"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
+            <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="editTemplate(temName)"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
+            <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="delTemplate"><i
+              class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
           <el-table :data="templates" style="width: 100%">
-            <el-table-column prop="name" align="center" label="模板名称"></el-table-column>
-            <el-table-column prop="preview" align="center" label="预览图">
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_TEMPLATE_NAME')"></el-table-column>
+            <el-table-column prop="preview" align="center" :label="$t('Content.ID_THUMBNAIL')">
               <template scope="scope">
                 <img :src="scope.row.preview" width="30" height="50"/>
               </template>
             </el-table-column>
-            <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
-            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
-            <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
-            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-            <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
-            <el-table-column prop="desc" align="center" label="描述"></el-table-column>
+            <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
+            <el-table-column prop="address" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
+            <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+            <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
+            <el-table-column prop="desc" align="center" :label="$t('Content.ID_DESCRIPTION')"></el-table-column>
           </el-table>
         </div>
         <div v-else class="templateBox">
@@ -213,12 +214,12 @@
       </div>
     </Content>
     <footer-bar></footer-bar>
-    <el-dialog title="新建模板" ref="dialog" :visible.sync="openDialog" width="18%">
+    <el-dialog :title="$t('Content.ID_NEW_TEMPLATE')" ref="dialog" :visible.sync="openDialog" width="18%">
       <el-form :model="form">
-        <el-form-item label="模板名称" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_TEMPLATE_NAME')" :label-width="LabelWidth">
           <el-input v-model="form.temName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="分辨率" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_RESOLUTION')" :label-width="LabelWidth">
           <el-select v-model="rltValue" style="width: 100%" @change="rltChange">
             <el-option v-for="item in resolution"
                        :key="item.value"
@@ -227,16 +228,16 @@
                        auto-complete="off"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="模板类型" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_TEMPLATE_TYPE')" :label-width="LabelWidth">
           <el-input v-model="form.temType" auto-complete="off" readonly="readonly"></el-input>
         </el-form-item>
-        <el-form-item label="备注" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_REMARK')" :label-width="LabelWidth">
           <el-input type="textarea" v-model="form.desc" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openDialog = false">取 消</el-button>
-        <el-button type="primary" @click="NewTemplateMake">确 定</el-button>
+        <el-button @click="openDialog = false">{{$t('Content.ID_ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="NewTemplateMake">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -259,10 +260,10 @@
         value: '',
         select: [{
           value: '1',
-          label: '图形模式'
+          label: this.$t('Content.ID_IMAGE_MODE')
         }, {
           value: '2',
-          label: '列表模式'
+          label: this.$t('Content.ID_LIST_MODE')
         }],
         pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
@@ -274,7 +275,7 @@
         form: {
           temName: '',
           resolution: '1280×720',
-          temType: '用户模板',
+          temType: this.$t('Content.ID_USER_TEMPLATE'),
           desc: '',              //备注
         },
         rltValue: '1280×720',
@@ -290,15 +291,15 @@
         }, {
           value: '4',
           label: '720×1280'
-        },{
+        }, {
           value: '5',
           label: '1920×200'
         }],                     //分辨率
         temName: '',            //模板名
-        treeName:'系统模板',
-        ids:[],                  //存储选中节目ID
-        searchName:'',              //搜索名称
-        searchResolution:'',              //搜索分辨率
+        treeName: this.$t('Content.ID_SYSTEM_TEMPLATE'),
+        ids: [],                  //存储选中节目ID
+        searchName: '',              //搜索名称
+        searchResolution: '',              //搜索分辨率
       }
     },
     components: {
@@ -323,7 +324,7 @@
             _this.templateTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -336,7 +337,7 @@
         this.templates = [];
         this.$http({
           method: 'get',
-          url: 'template/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount + '&name='+this.searchName + '&resolution=' +this.searchResolution,
+          url: 'template/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount + '&name=' + this.searchName + '&resolution=' + this.searchResolution,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -352,7 +353,7 @@
 
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -362,10 +363,10 @@
       },                      //获取模板列表
       editTemplate(name) {
         this.temName = '';
-        if(this.treeName==='系统模板') return false;
+        if (this.treeName === this.$t('Content.ID_SYSTEM_TEMPLATE')) return false;
         if (name == '') {
           this.$message({
-            message: '请选择模板进行修改！',
+            message: this.$t('Msg.ID_MSG_36'),
             showClose: true,
             center: true,
             type: 'warning'
@@ -412,15 +413,16 @@
         let ids = this.ids.join(' ');
         if (ids == '') {
           this.$message({
-            message: '未选择模板！',
+            message: this.$t('Msg.ID_MSG_36'),
             showClose: true,
             center: true,
             type: 'warning'
           });
           return false
         }
-        this.$confirm('此操作将删除该模板, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        this.$confirm(this.$t('Msg.ID_MSG_16'),this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -435,14 +437,14 @@
             if (response.data.code == '0000') {
               this.queryList();
               this.$message({
-                message: '删除成功！',
+                message: this.$t('Content.ID_DELETE_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
               })
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -454,7 +456,7 @@
       NewTemplateMake() {
         if (this.form.temName == '') {
           this.$message({
-            message: '请输入模板名称！',
+            message: this.$t('Msg.ID_MSG_59'),
             showClose: true,
             center: true,
             type: 'warning'

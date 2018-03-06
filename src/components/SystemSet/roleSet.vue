@@ -91,20 +91,20 @@
     <NavBar></NavBar>
     <Breadcrumb></Breadcrumb>
     <div class="content">
-      <div class="title">角色管理</div>
+      <div class="title">{{$t('Content.ID_ROLE')}}</div>
       <div class="controlBox">
         <div class="search">
           <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchName">
-              <template slot="prepend">角色名称</template>
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchName">
+              <template slot="prepend">{{$t('Content.ID_ROLE_NAME')}}</template>
             </el-input>
           </div>
-          <el-button @click="getRoleList">搜索</el-button>
+          <el-button @click="getRoleList">{{$t('Content.ID_RESEARCH')}}</el-button>
         </div>
         <div class="control">
-          <a @click="newRole"><i class="el-icon-plus"></i>新建</a>
-          <a @click="editRole"><i class="el-icon-edit"></i>编辑</a>
-          <a @click="delRole"><i class="el-icon-delete"></i>删除</a>
+          <a @click="newRole"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
+          <a @click="editRole"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
+          <a @click="delRole"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
         </div>
       </div>
       <div class="roleList">
@@ -113,10 +113,10 @@
           @selection-change="selectChange"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="name" align="center" label="角色名称"></el-table-column>
-          <el-table-column prop="desc" align="center" label="角色描述"></el-table-column>
-          <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-          <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+          <el-table-column prop="name" align="center" :label="$t('Content.ID_ROLE_NAME')"></el-table-column>
+          <el-table-column prop="desc" align="center" :label="$t('Content.ID_ROLE_DESCRIPTION')"></el-table-column>
+          <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+          <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -131,24 +131,24 @@
     <FooterBar></FooterBar>
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="27.5%">
       <el-form :model="form">
-        <el-form-item label="角色名称" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_ROLE_NAME')" :label-width="LabelWidth">
           <el-input v-model="form.roleName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="角色描述" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_ROLE_DESCRIPTION')" :label-width="LabelWidth">
           <el-input v-model="form.roleDescribe" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <fieldset class="roleTree">
-        <legend>权限树</legend>
-        <p>分配权限</p>
+        <legend>{{$t('Content.ID_PRIVILEGE_TREE')}}</legend>
+        <p>{{$t('Content.ID_SET_PRIVILEGE')}}</p>
         <el-tree :data="powerTree" show-checkbox node-key="id"
                  ref="tree" style="height: 300px;overflow: auto"
                  :check-strictly="true">
         </el-tree>
       </fieldset>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openDialog = false">取 消</el-button>
-        <el-button type="primary" @click="submit()">确 定</el-button>
+        <el-button @click="openDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="submit()">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -193,7 +193,7 @@
     methods: {
       newRole: function () {
         this.openDialog = true;
-        this.title = '新建角色';
+        this.title = this.$t('Content.ID_NEW_ROLE');
         this.creator = sessionStorage.getItem('name');
         this.userPrivId = sessionStorage.getItem('privId');
         this.getTree()
@@ -225,7 +225,7 @@
             _this.rolePrivId = _this.userPrivId = ''
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -249,7 +249,7 @@
             _this.total = response.data.cust.pages.count
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -258,7 +258,7 @@
         })
       },    //获取角色列表
       submit() {
-        if (this.title == '新建角色') {
+        if (this.title == this.$t('Content.ID_NEW_ROLE')) {
           this.powerAdd()
         } else {
           this.updatePower()
@@ -287,7 +287,7 @@
             _this.roleAdd()
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -298,7 +298,7 @@
       roleAdd: function () {
         if (this.roleName == '') {
           this.$message({
-            message: '请填写角色名称！',
+            message: this.$t('Msg.ID_MSG_43'),
             showClose: true,
             center: true,
             type: 'warning'
@@ -324,7 +324,7 @@
         }).then(response => {
           if (response.data.code == '0000') {
             this.$message({
-              message: '新建角色成功！',
+              message: this.$t('Msg.ID_MSG_44'),
               showClose: true,
               center: true,
               type: 'success'
@@ -333,7 +333,7 @@
             _this.openDialog = false
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -342,13 +342,13 @@
         })
       },        //新建角色方法
       updatePower() {
-        let power = this.$refs.tree.getCheckedNodes()
-        let data = {id: this.row[0].privId}
+        let power = this.$refs.tree.getCheckedNodes();
+        let data = {id: this.row[0].privId};
         power.map(function (item) {                 //遍历选中权限
-          let name = item.property                  //取出权限名称
+          let name = item.property;                  //取出权限名称
           data[name] = 1                            //添加到对象并赋值为1（1为有权限0为无），对象的访问方式有data.name与data[name],动态添加需要使用data[name]
-        })
-        let _this = this
+        });
+        let _this = this;
         this.$http({
           method: 'put',
           url: 'privilege/update',
@@ -363,7 +363,7 @@
             _this.updateRole()
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -374,7 +374,7 @@
       updateRole() {
         if (this.roleName == '') {
           this.$message({
-            message: '请填写角色名称！',
+            message: this.$t('Msg.ID_MSG_43'),
             showClose: true,
             center: true,
             type: 'warning'
@@ -387,8 +387,8 @@
           name: this.form.roleName,
           desc: this.form.roleDescribe,
           privId: this.row[0].privId
-        }
-        let _this = this
+        };
+        let _this = this;
         this.$http({
           method: 'put',
           url: 'role/update',
@@ -401,16 +401,16 @@
         }).then(response => {
           if (response.data.code == '0000') {
             this.$message({
-              message: '更新角色成功！',
+              message: this.$t('Msg.ID_MSG_45'),
               showClose: true,
               center: true,
               type: 'success'
             });
-            this.getRoleList()
+            this.getRoleList();
             _this.openDialog = false
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -420,9 +420,9 @@
       },                //编辑角色
       delRole() {
         var ids = this.row.map(item => item.id).join(' ')
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm( this.$t('Msg.ID_MSG_46'),this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -436,15 +436,15 @@
           }).then(response => {
             if (response.data.code == '0000') {
               this.$message({
-                message: '删除成功！',
+                message: this.$t('Content.ID_DELETE_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
-              })
+              });
               this.getRoleList()
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -459,14 +459,14 @@
       editRole() {
         if (this.row.length > 1 || this.row.length == 0) {
           this.$message({
-            message: '只允许对一个角色进行编辑！',
+            message: this.$t('Msg.ID_MSG_20'),
             showClose: true,
             center: true,
             type: 'warning'
           });
         } else {
           this.openDialog = true;
-          this.title = '编辑角色';
+          this.title = this.$t('Content.ID_EDIT_ROLE');
           this.creator = this.row[0].creator;
           this.userPrivId = sessionStorage.getItem('privId');
           this.rolePrivId = this.row[0].privId;

@@ -93,29 +93,29 @@
     <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
     <div class="content">
-      <div class="title">发布管理</div>
+      <div class="title">{{$t('nav.Release')}}</div>
       <div class="controlBox">
         <div class="search">
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchName">
-              <template slot="prepend">节目名称</template>
+          <div>
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchName">
+              <template slot="prepend">{{$t('Content.ID_PROGRAM_NAME')}}</template>
             </el-input>
           </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchStatus">
-              <template slot="prepend">发布状态</template>
+          <div>
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchStatus">
+              <template slot="prepend">{{$t('Content.ID_PUBLISH_STATUS')}}</template>
             </el-input>
           </div>
-          <div style="width:200px;">
-            <el-input placeholder="请输入内容" v-model="searchProStatus">
-              <template slot="prepend">节目状态</template>
+          <div>
+            <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchProStatus">
+              <template slot="prepend">{{$t('Content.ID_PROGRAM_STATUS')}}</template>
             </el-input>
           </div>
-          <el-button @click="queryPublishList">搜索</el-button>
+          <el-button @click="queryPublishList">{{$t('Content.ID_RESEARCH')}}</el-button>
         </div>
         <div class="control">
-          <a @click="New"><i class="el-icon-plus"></i>新建</a>
-          <a @click="delPro"><i class="el-icon-delete"></i>删除</a>
+          <a @click="New"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
+          <a @click="delPro"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
         </div>
       </div>
       <div class="programList">
@@ -124,21 +124,21 @@
           @selection-change="tableSelect"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="proType" align="center" label="节目类型"></el-table-column>
-          <el-table-column prop="id" align="center" label="发布单号"></el-table-column>
-          <el-table-column prop="proName" align="center" label="节目名称"></el-table-column>
-          <el-table-column prop="disType" align="center" label="发布类型"></el-table-column>
-          <el-table-column prop="playMode" align="center" label="播放类型"></el-table-column>
-          <el-table-column prop="publisher" align="center" label="发布人"></el-table-column>
-          <el-table-column prop="date" align="center" label="发布时间"></el-table-column>
-          <el-table-column prop="invalidTime" align="center" label="失效日期"></el-table-column>
-          <el-table-column prop="status" align="center" label="发布状态"></el-table-column>
-          <el-table-column prop="proStatus" align="center" label="节目状态"></el-table-column>
-          <el-table-column prop="proPreview" align="center" label="节目预览">
+          <el-table-column prop="proType" align="center" :label="$t('Content.ID_PROGRAM_TYPE')"></el-table-column>
+          <el-table-column prop="id" align="center" :label="$t('Content.ID_PUBLISH_CODE')"></el-table-column>
+          <el-table-column prop="proName" align="center" :label="$t('Content.ID_PROGRAM_NAME')"></el-table-column>
+          <el-table-column prop="disType" align="center" :label="$t('Content.ID_PUBLISH_TYPE')"></el-table-column>
+          <el-table-column prop="playMode" align="center" :label="$t('Content.ID_PLAY_TYPE')"></el-table-column>
+          <el-table-column prop="publisher" align="center" :label="$t('Content.ID_PUBLISHER')"></el-table-column>
+          <el-table-column prop="date" align="center" :label="$t('Content.ID_PUBLISH_TIME')"></el-table-column>
+          <el-table-column prop="invalidTime" align="center" :label="$t('Content.ID_USELESS_TIME')"></el-table-column>
+          <el-table-column prop="status" align="center" :label="$t('Content.ID_PUBLISH_STATUS')"></el-table-column>
+          <el-table-column prop="proStatus" align="center" :label="$t('Content.ID_PROGRAM_STATUS')"></el-table-column>
+          <el-table-column prop="proPreview" align="center" :label="$t('Content.ID_PROGRAM_PREVIEW')">
             <template slot-scope="scope">
               <el-button
                 size="mini"
-                @click="proPreview(scope.$index, scope.row)">节目预览
+                @click="proPreview(scope.$index, scope.row)">{{$t('Content.ID_PROGRAM_PREVIEW')}}
               </el-button>
             </template>
           </el-table-column>
@@ -155,7 +155,7 @@
     </div>
     <footer-bar></footer-bar>
     <el-dialog
-      title="快速预览"
+      :title="$t('Content.ID_PREVIEW')"
       :visible.sync="view"
       top="3vh"
       :before-close="viewClose"
@@ -166,10 +166,11 @@
                :style="{width:item.width * PP+'px',height : item.height * PP + 'px',top : item.y * PP + 'px',left : item.x * PP + 'px',zIndex : item.zIndex}">
             <!--背景-->
             <div style="z-index: 1;position: absolute" v-if="item.type=='BG'" :name="item.type" :id="item.id">
-              <img  style="width: 100%;height: 100%" :src="item.url">
+              <img style="width: 100%;height: 100%" :src="item.url">
             </div>
             <!--静态文本-->
-            <div v-if="item.type=='txt'" :name="item.type" :id="item.id" style="z-index: 10;position: absolute;width: 100%;height: 100px"
+            <div v-if="item.type=='txt'" :name="item.type" :id="item.id"
+                 style="z-index: 10;position: absolute;width: 100%;height: 100px"
                  :style="{textAlign:item.align}">
               <p style="position: relative"
                  :style="{fontSize:item.fontSize,fontFamily:item.font,color:item.fontColor,fontWeight: item.bold,fontStyle: item.italic,textDecoration: item.underline}">
@@ -177,10 +178,12 @@
               </p>
             </div>
             <!--动态文本-->
-            <div style="z-index: 10;position: absolute;display: flex;justify-content: flex-start;align-items: center" v-if="item.type=='scroll'"
+            <div style="z-index: 10;position: absolute;display: flex;justify-content: flex-start;align-items: center"
+                 v-if="item.type=='scroll'"
                  :style="{color:item.scrollColor,fontSize:item.scrollFontSize + 'px',fontFamily:item.scrollFontFamily}">
               <vue-marquee :BGOpacity="item.scrollBGTransparency" :open="openScroll" :BGColor="item.scrollBGColor"
-                           :fontOpacity="item.scrollTransparency" :speed="item.scrollSpeed" :Duration="item.scrollDuration"
+                           :fontOpacity="item.scrollTransparency" :speed="item.scrollSpeed"
+                           :Duration="item.scrollDuration"
                            :direction="item.scrollDirection" :content="item.url"></vue-marquee>
             </div>
             <!--视频图片-->
@@ -260,7 +263,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -276,19 +279,20 @@
         this.row = row
       },                   //表格选择
       delPro() {
-        let _this = this
-        let ids = _this.row.map(item => item.id).join(' ');      //列表模式的id
-        if (ids == '') {
+        let _this = this;
+        if (_this.row == '') {
           _this.$message({
-            message: '未选择资源！',
+            message: _this.$t('Msg.ID_MSG_34'),
             showClose: true,
             center: true,
             type: 'warning'
           });
           return false
         }
-        _this.$confirm('此操作将删除该节目单, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        let ids = _this.row.map(item => item.id).join(' ');      //列表模式的id
+        _this.$confirm(_this.$t('Msg.ID_MSG_35'), _this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: _this.$t('Content.ID_OK'),
+          cancelButtonText: _this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           _this.$http({
@@ -301,11 +305,11 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              _this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
+              _this.$message({message: _this.$t('Content.ID_DELETE_SUCCESS'), showClose: true, center: true, type: 'success'});
               _this.queryPublishList()
             } else {
               _this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -394,7 +398,7 @@
                       }
                     } else {
                       this.$message({
-                        message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                        message: response.data.infor + '。',
                         showClose: true,
                         center: true,
                         type: 'error'
@@ -406,7 +410,7 @@
             }
             else {
               _this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'

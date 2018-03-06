@@ -174,10 +174,10 @@
   <div id="release">
     <div class="left">
       <div class="terminalBox">
-        <div class="title">终端分组</div>
+        <div class="title">{{$t('Content.ID_GROUP')}}</div>
         <div class="controlBox">
           <div style="width: 120px">
-            <el-select v-model="terSelect" size="mini" placeholder="终端分组" @change="getTree">
+            <el-select v-model="terSelect" size="mini" :placeholder="$t('Content.ID_GROUP')" @change="getTree">
               <el-option v-for="item in terSelects"
                          :key="item.value"
                          :label="item.label"
@@ -193,13 +193,13 @@
     </div>
     <div class="right">
       <div class="releaseAttr">
-        <div class="title">发布属性</div>
+        <div class="title">{{$t('Content.ID_PUBLISH_PROPERTY')}}</div>
         <div class="controlBox" style="height: 62px;line-height: normal;flex-wrap: wrap">
           <div class="box" style="margin-bottom: 2px">
             <div>
-              <label>播放模式</label>
+              <label>{{$t('Content.ID_PLAY_MODE')}}</label>
               <div style="width:120px;">
-                <el-select v-model="playMode" size="mini" placeholder="循环播放">
+                <el-select v-model="playMode" size="mini" :placeholder="$t('Content.ID_LOOP_PLAY')">
                   <el-option v-for="item in playModes"
                              :key="item.value"
                              :label="item.label"
@@ -209,7 +209,7 @@
             </div>                <!--//播放模式-->
             <div v-if="playMode == '2'|| playMode == '3'">
               <div style="width:120px;">
-                <el-select v-model="timingMode" size="mini" placeholder="按日期">
+                <el-select v-model="timingMode" size="mini" :placeholder="$t('Content.ID_BY_DATE')">
                   <el-option v-for="item in timingModes"
                              :key="item.value"
                              :label="item.label"
@@ -218,7 +218,7 @@
               </div>
             </div>
             <div>
-              <label>失效时间</label>
+              <label>{{$t('Content.ID_USELESS_TIME')}}</label>
               <el-date-picker
                 v-model="failTime"
                 style="width:125px;"
@@ -226,13 +226,13 @@
                 size="mini"
                 :editable="false"
                 value-format="yyyy-MM-dd"
-                placeholder="失效时间">
+                :placeholder="$t('Content.ID_USELESS_TIME')">
               </el-date-picker>
             </div>                <!--//失效时间-->
             <div>
-              <label>发布策略</label>
+              <label>{{$t('Content.ID_PLAY_STRATEGY')}}</label>
               <div style="width:120px;">
-                <el-select v-model="releasePloy" size="mini" placeholder="追加日程">
+                <el-select v-model="releasePloy" size="mini" :placeholder="$t('Content.ID_APPEND')">
                   <el-option v-for="item in releasePloys"
                              :key="item.value"
                              :label="item.label"
@@ -241,9 +241,9 @@
               </div>
             </div>                <!--//发布策略-->
             <div>
-              <label>发布类型</label>
+              <label>{{$t('Content.ID_PUBLISH_TYPE')}}</label>
               <div style="width:120px;">
-                <el-select v-model="releaseType" size="mini" placeholder="立即发布">
+                <el-select v-model="releaseType" size="mini" :placeholder="$t('Content.ID_NOW')">
                   <el-option v-for="item in releaseTypes"
                              :key="item.value"
                              :label="item.label"
@@ -259,41 +259,41 @@
                 size="mini"
                 :editable="false"
                 value-format="yyyy-MM-dd HH:mm:ss"
-                placeholder="预约时间">
+                :placeholder="$t('Content.ID_ORDER_TIME')">
               </el-date-picker>
             </div>
           </div>
           <div v-if="playMode == '2'|| playMode == '3'" class="box">
             <div v-if="timingMode == '1'">
-              <label>播放日期</label>
+              <label>{{$t('Content.ID_PLAY_DATE')}}</label>
               <el-date-picker
                 v-model="playDate"
                 style="width:350px;"
                 size="mini"
                 type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
+                :range-separator="$t('Content.ID_TO')"
+                :start-placeholder="$t('Content.ID_START_TIME')"
+                :end-placeholder="$t('Content.ID_END_TIME')"
                 value-format="yyyy-MM-dd"
               >
               </el-date-picker>
             </div>
             <div v-else="">
-              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选
+              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">{{$t('Content.ID_SELECT_ALL')}}
               </el-checkbox>
               <el-checkbox-group v-model="checkedWeeks" @change="CheckedWeeksChange">
                 <el-checkbox v-for="week in weeks" :label="week.value" :key="week.value">{{week.label}}</el-checkbox>
               </el-checkbox-group>
             </div>
             <div>
-              <label>播放时间</label>
+              <label>{{$t('Content.ID_PLAY_TIME')}}</label>
               <el-time-picker
                 is-range
                 v-model="playTime"
                 size="mini"
-                range-separator="至"
-                start-placeholder="开始时间"
-                end-placeholder="结束时间"
+                :range-separator="$t('Content.ID_TO')"
+                :start-placeholder="$t('Content.ID_START_TIME')"
+                :end-placeholder="$t('Content.ID_END_TIME')"
                 value-format="HH:mm:ss">
               </el-time-picker>
             </div>
@@ -301,7 +301,7 @@
         </div>
       </div>
       <div class="playListBox">
-        <div class="title">播放列表</div>
+        <div class="title">{{$t('Content.ID_PLAY_LIST')}}</div>
         <div class="controlBox playListControl">
           <div class="control">
             <!--<div style="width: 120px">
@@ -312,9 +312,9 @@
                            :value="item.value"></el-option>
               </el-select>
             </div>-->
-            <label>节目类型</label>
+            <label>{{$t('Content.ID_PROGRAM_TYPE')}}</label>
             <div style="width:120px;">
-              <el-select v-model="proType" size="mini" placeholder="播放列表">
+              <el-select v-model="proType" size="mini" :placeholder="$t('Content.ID_PLAY_LIST')">
                 <el-option v-for="item in proTypes"
                            :key="item.value"
                            :label="item.label"
@@ -323,8 +323,8 @@
             </div>
           </div>
           <div class="action">
-            <el-button @click="openPro" size="mini" class="el-icon-plus"> 添加</el-button>
-            <el-button @click="delPro" size="mini" class="el-icon-delete"> 删除</el-button>
+            <el-button @click="openPro" size="mini" class="el-icon-plus"> {{$t('Content.ID_ADD')}}</el-button>
+            <el-button @click="delPro" size="mini" class="el-icon-delete"> {{$t('Content.ID_DELETE')}}</el-button>
           </div>
         </div>
         <div class="playList">
@@ -343,9 +343,9 @@
         </div>
       </div>
       <div class="checked">
-        <div class="title">选中终端</div>
+        <div class="title">{{$t('Content.ID_SELECT_TERMINAL')}}</div>
         <div class="controlBox">
-          <a><i class="el-icon-delete"></i>删除</a>
+          <a><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
         </div>
         <div class="checkedList">
           <el-table
@@ -353,10 +353,10 @@
             @selection-change="terminalSelect"
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
-            <el-table-column prop="date" align="center" label="类型"></el-table-column>
-            <el-table-column prop="name" align="center" label="终端"></el-table-column>
-            <el-table-column prop="type" align="center" label="终端类型"></el-table-column>
-            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+            <el-table-column prop="date" align="center" :label="$t('Content.ID_TYPE')"></el-table-column>
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_TER')"></el-table-column>
+            <el-table-column prop="type" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
+            <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
           </el-table>
         </div>
         <div class="page">
@@ -369,8 +369,8 @@
         </div>
       </div>
       <div class="confirm">
-        <el-button @click="release" size="mini">发布</el-button>
-        <el-button @click.native="exit" size="mini">取消</el-button>
+        <el-button @click="release" size="mini">{{$t('Content.ID_PUBLISH')}}</el-button>
+        <el-button @click.native="exit" size="mini">{{$t('Content.ID_CANCEL')}}</el-button>
       </div>
     </div>
     <el-dialog
@@ -385,12 +385,12 @@
           @selection-change="ProSelect"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="name" align="center" label="节目名称"></el-table-column>
-          <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
-          <el-table-column prop="terminalType" align="center" label="终端类型"></el-table-column>
-          <el-table-column prop="address" align="center" label="素材大小"></el-table-column>
-          <el-table-column prop="address" align="center" label="播放时长"></el-table-column>
-          <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+          <el-table-column prop="name" align="center" :label="$t('Content.ID_PROGRAM_NAME')"></el-table-column>
+          <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
+          <el-table-column prop="terminalType" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
+          <el-table-column prop="address" align="center" :label="$t('Content.ID_RESOURCE_SIZE')"></el-table-column>
+          <el-table-column prop="address" align="center" :label="$t('Content.ID_PLAYTIME')"></el-table-column>
+          <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
         </el-table>
       </div>
       <div class="page">
@@ -402,7 +402,7 @@
         </el-pagination>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="selectPro">确 定</el-button>
+        <el-button type="primary" @click="selectPro">{{$t('Content.ID_OK')}}</el-button>
   </span>
     </el-dialog><!--选择节目-->
   </div>
@@ -437,7 +437,7 @@
         terSelect: 1,
         terSelects: [{
           value: 1,
-          label: '终端分组'
+          label:this.$t('Content.ID_GROUP')
         }/*, {
           value: 2,
           label: '终端分组'
@@ -456,17 +456,17 @@
         proType: 1,
         proTypes: [{
           value: 1,
-          label: '播放列表'
+          label:this.$t('Content.ID_PLAY_LIST')
         }],
         playImgs: [],                 //播放列表显示
         /*发布属性*/
         playMode: 1,
         playModes: [{
           value: 1,
-          label: '循环播放'
+          label: this.$t('Content.ID_LOOP_PLAY')
         }, {
           value: 2,
-          label: '定时播放'
+          label: this.$t('Content.ID_TIMER_PLAY')
         }/*, {
           value: '3',
           label: '插播节目'
@@ -475,19 +475,19 @@
         releaseType: 1,
         releaseTypes: [{
           value: 1,
-          label: '立即发布'
+          label: this.$t('Content.ID_NOW')
         }, {
           value: 2,
-          label: '预约发布'
+          label: this.$t('Content.ID_ORDER')
         }],
         releasePloy: 1,
         releasePloys: [
           {
             value: 1,
-            label: '追加日程'
+            label: this.$t('Content.ID_APPEND')
           }, {
             value: 2,
-            label: '覆盖日程'
+            label: this.$t('Content.ID_OVERWRITE')
           }
         ],
         playDate: '',            //播放日期
@@ -496,34 +496,34 @@
         timingMode: 1,           //按日期
         timingModes: [{
           value: 1,
-          label: '按日期'
+          label: this.$t('Content.ID_BY_DATE')
         }, {
           value: 2,
-          label: '按星期'
+          label: this.$t('Content.ID_BY_WEEK')
         }],
         week: [1, 2, 3, 4, 5, 6, 0],      //全选星期
         weeks: [
           {
             value: 0,
-            label: '周天'
+            label: this.$t('Content.ID_SUNDAY')
           }, {
             value: 1,
-            label: '周一'
+            label: this.$t('Content.ID_MONDAY')
           }, {
             value: 2,
-            label: '周二'
+            label: this.$t('Content.ID_TUESDAY')
           }, {
             value: 3,
-            label: '周三'
+            label: this.$t('Content.ID_WEDNESDAY')
           }, {
             value: 4,
-            label: '周四'
+            label: this.$t('Content.ID_THURSDAY')
           }, {
             value: 5,
-            label: '周五'
+            label: this.$t('Content.ID_FRIDAY')
           }, {
             value: 6,
-            label: '周六'
+            label: this.$t('Content.ID_SATURDAY')
           }
         ],
         isIndeterminate: false,                                                //全选状态
@@ -593,7 +593,7 @@
             _this.terTree = response.data.cust.trees;
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -621,7 +621,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -649,7 +649,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -673,7 +673,7 @@
         let ids = this.proRow.map(item => item.id).join(' ');      //列表模式的id
         if (ids == '') {
           this.$message({
-            message: '未选择资源！',
+            message: this.$t('Content.ID_MSG_24'),
             showClose: true,
             center: true,
             type: 'warning'
@@ -745,11 +745,11 @@
           data: data
         }).then(response => {
           if (response.data.code == '0000') {
-            _this.$message({message: '发布成功！', showClose: true, center: true, type: 'success'});
+            _this.$message({message: this.$t('Content.ID_PUBLISH_SUCCESS'), showClose: true, center: true, type: 'success'});
             _this.$router.push('/auditList')
           } else {
             _this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'

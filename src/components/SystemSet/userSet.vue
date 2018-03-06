@@ -121,36 +121,36 @@
     <breadcrumb></breadcrumb>
     <Content>
       <div id="userTree">
-        <div class="title">用户分组</div>
+        <div class="title">{{$t('Content.ID_USER_GROUP')}}</div>
         <div class="controlTree">
-          <a @click="NewTree"><i class="el-icon-plus"></i>新建</a>
-          <a @click="EditTree"><i class="el-icon-edit"></i>编辑</a>
-          <a @click="delTree"><i class="el-icon-delete"></i>删除</a>
+          <a @click="NewTree"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
+          <a @click="EditTree"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
+          <a @click="delTree"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
         </div>
         <el-tree :data="userTree" node-key="id" default-expand-all show-checkbox @node-click="handleNodeClick"
                  ref="tree" :check-strictly="true" :highlight-current="true" @check-change="treeCheckCheck"></el-tree>
       </div>
       <div id="userList">
-        <div class="title">用户列表</div>
+        <div class="title">{{$t('Content.ID_USER_LIST')}}</div>
         <div class="controlBox">
           <div class="search">
             <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="searchName">
-                <template slot="prepend">用户名</template>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchName">
+                <template slot="prepend">{{$t('Content.ID_USERNAME')}}</template>
               </el-input>
             </div>
             <div style="width:200px;">
-              <el-input placeholder="请输入内容" v-model="searchType">
-                <template slot="prepend">用户类型</template>
+              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchType">
+                <template slot="prepend">{{$t('Content.ID_USER_TYPE')}}</template>
               </el-input>
             </div>
-            <el-button @click="queryUserList">搜索</el-button>
+            <el-button @click="queryUserList">{{$t('Content.ID_RESEARCH')}}</el-button>
           </div>
           <div class="control">
-            <a @click="New"><i class="el-icon-plus"></i>新建</a>
-            <a @click="Edit"><i class="el-icon-edit"></i>编辑</a>
-            <a @click="delUser"><i class="el-icon-delete"></i>删除</a>
-            <a @click="queryUserList"><i class="el-icon-refresh"></i>刷新</a>
+            <a @click="New"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
+            <a @click="Edit"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
+            <a @click="delUser"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
+            <a @click="queryUserList"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a>
           </div>
         </div>
         <div class="tableList">
@@ -159,13 +159,13 @@
             @selection-change="SelectRow"
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
-            <el-table-column prop="name" align="center" label="用户名"></el-table-column>
-            <el-table-column prop="roleName" align="center" label="角色"></el-table-column>
-            <el-table-column prop="groupName" align="center" label="用户分组"></el-table-column>
-            <el-table-column prop="terName" align="center" label="终端分组"></el-table-column>
-            <el-table-column prop="desc" align="center" label="备注"></el-table-column>
-            <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
-            <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="name" align="center" :label="$t('Content.ID_USERNAME')"></el-table-column>
+            <el-table-column prop="roleName" align="center" :label="$t('Content.ID_ROLE')"></el-table-column>
+            <el-table-column prop="groupName" align="center" :label="$t('Content.ID_USER_GROUP')"></el-table-column>
+            <el-table-column prop="terName" align="center" :label="$t('Content.ID_GROUP')"></el-table-column>
+            <el-table-column prop="desc" align="center" :label="$t('Content.ID_REMARK')"></el-table-column>
+            <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
+            <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
           </el-table>
         </div>
         <div class="page">
@@ -180,24 +180,24 @@
     </Content>
     <footer-bar></footer-bar>
     <el-dialog :title="title" :visible.sync="openDialog" width="27.5%">
-      <el-dialog width="30%" title="选择终端分组" :visible.sync="openD" append-to-body>
+      <el-dialog width="30%" :title="$t('Msg.ID_MSG_28')" :visible.sync="openD" append-to-body>
         <el-tree
           :data="terGroupTree" show-checkbox default-expand-all :check-strictly="true"
           node-key="id" ref="terGroupTree" highlight-current>
         </el-tree>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="openD = false">取 消</el-button>
-          <el-button type="primary" @click="terGroupSelect">确 定</el-button>
+          <el-button @click="openD = false">{{$t('Content.ID_CANCEL')}}</el-button>
+          <el-button type="primary" @click="terGroupSelect">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--终端分组选择-->
-      <el-dialog width="30%" title="选择用户角色" :visible.sync="openR" append-to-body>
+      <el-dialog width="30%" :title="$t('Content.ID_USER_ROLE')" :visible.sync="openR" append-to-body>
         <el-table
           :data="roleList"
           @selection-change="roleSelectRow"
           style="width: 100%">
           <el-table-column type="selection" align="center" width="55"></el-table-column>
-          <el-table-column prop="name" align="center" label="角色名称"></el-table-column>
-          <el-table-column prop="desc" align="center" label="角色描述"></el-table-column>
+          <el-table-column prop="name" align="center" :label="$t('Content.ID_ROLE_NAME')"></el-table-column>
+          <el-table-column prop="desc" align="center" :label="$t('Content.ID_ROLE_DESCRIPTION')"></el-table-column>
         </el-table>
         <div class="page">
           <el-pagination
@@ -208,78 +208,78 @@
           </el-pagination>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="openR = false">取 消</el-button>
-          <el-button type="primary" @click="roleSelect">确 定</el-button>
+          <el-button @click="openR = false">{{$t('Content.ID_CANCEL')}}</el-button>
+          <el-button type="primary" @click="roleSelect">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--用户角色选择-->
-      <el-dialog width="30%" title="选择用户分组" :visible.sync="openG" append-to-body>
+      <el-dialog width="30%" :title="$t('Content.ID_USER_GROUP')" :visible.sync="openG" append-to-body>
         <el-tree
           :data="groupTree" show-checkbox default-expand-all :check-strictly="true"
           node-key="id" ref="groupTree" highlight-current>
         </el-tree>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="openG = false">取 消</el-button>
-          <el-button type="primary" @click="groupSelect">确 定</el-button>
+          <el-button @click="openG = false">{{$t('Content.ID_CANCEL')}}</el-button>
+          <el-button type="primary" @click="groupSelect">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--用户分组选择-->
       <el-form :model="form">
-        <el-form-item label="用户名称" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_USERNAME')" :label-width="LabelWidth">
           <el-input v-model="form.userName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item v-if="title!='编辑用户'" label="用户密码" :label-width="LabelWidth">
+        <el-form-item v-if="title!=$t('Content.ID_EDIT_USER')" :label="$t('Content.ID_PASSWORD')" :label-width="LabelWidth">
           <el-input type="password" v-model="form.userPass" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item v-if="title!='编辑用户'" label="确认密码" :label-width="LabelWidth">
+        <el-form-item v-if="title!=$t('Content.ID_EDIT_USER')" :label="$t('Content.ID_CONFIRM_PASSWORD')" :label-width="LabelWidth">
           <el-input type="password" v-model="form.password" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="终端分组" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP')" :label-width="LabelWidth">
           <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openTerGroup" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="用户角色" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_USER_ROLE')" :label-width="LabelWidth">
           <input v-model="form.role" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openRole" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="用户分组" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_USER_GROUP')" :label-width="LabelWidth">
           <input v-model="form.group" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openGroup" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="备注" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_REMARK')" :label-width="LabelWidth">
           <el-input v-model="form.desc" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openDialog = false">取 消</el-button>
-        <el-button type="primary" @click="submit">确 定</el-button>
+        <el-button @click="openDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="submit">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="treeTitle" ref="TreeDialog" :visible.sync="openTreeDialog" width="27.5%">
-      <el-dialog width="30%" title="选择分组上级" :visible.sync="openSuperG" append-to-body>
+      <el-dialog width="30%" :title="$t('Content.ID_PARENT_GROUP')" :visible.sync="openSuperG" append-to-body>
         <el-tree
           :data="groupSuper" show-checkbox default-expand-all :check-strictly="true"
           node-key="id" ref="groupSuper" highlight-current @check-change="groupSuperCheckCheck">
         </el-tree>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="openSuperG = false">取 消</el-button>
-          <el-button type="primary" @click="selectSuperGroup">确 定</el-button>
+          <el-button @click="openSuperG = false">{{$t('Content.ID_CANCEL')}}</el-button>
+          <el-button type="primary" @click="selectSuperGroup">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--上级分组选择-->
       <el-form :model="treeForm">
-        <el-form-item label="分组名称" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP_NAME')" :label-width="LabelWidth">
           <el-input v-model="treeForm.groupName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="上级分组" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_PARENT_GROUP')" :label-width="LabelWidth">
           <input v-model="treeForm.superiorGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openSuperG = true" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="分组描述" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP_DESCRIPTION')" :label-width="LabelWidth">
           <el-input type="textarea" v-model="treeForm.groupDesc" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openTreeDialog = false">取 消</el-button>
-        <el-button type="primary" @click="groupSubmit">确 定</el-button>
+        <el-button @click="openTreeDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="groupSubmit">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -303,10 +303,10 @@
         value: '',
         select: [{
           value: '1',
-          label: '图形模式'
+          label: this.$t('Content.ID_IMAGE_MODE')
         }, {
           value: '2',
-          label: '列表模式'
+          label: this.$t('Content.ID_LIST_MODE')
         }],
         treeId: 51,
         pageCount: 11,     //每页显示数目
@@ -416,7 +416,7 @@
             _this.groupSuper = _this.userTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -443,7 +443,7 @@
             }
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -456,7 +456,7 @@
       },              //当前页翻页
       New() {
         this.openDialog = true;
-        this.title = '新建用户'
+        this.title = this.$t('Content.ID_NEW_USER')
       },                              //新建
       openTerGroup() {
         this.openD = true;
@@ -475,7 +475,7 @@
             _this.terGroupTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -500,7 +500,7 @@
             _this.roleTotal = response.data.cust.pages.count
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -524,7 +524,7 @@
             _this.groupTree = response.data.cust.trees
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -534,33 +534,33 @@
 
       submit() {
         if (this.form.userName == '') {
-          this.$message({message: '请填写用户名称！', center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_48'), center: true, type: 'warning'});
           return false
         }
-        if (this.title == '新建用户') {
+        if (this.title == this.$t('Content.ID_NEW_USER')) {
           if (this.form.password == '' || this.form.userPass == '') {
-            this.$message({message: '请填写用户密码！', center: true, type: 'warning'});
+            this.$message({message: this.$t('Msg.ID_MSG_49'), center: true, type: 'warning'});
             return false
           }
           if (this.form.password != this.form.userPass) {
-            this.$message({message: '两次输入的密码不匹配！', center: true, type: 'warning'});
+            this.$message({message: this.$t('Msg.ID_MSG_50'), center: true, type: 'warning'});
             return false
           }
         }
         if (this.form.terGroup == '') {
-          this.$message({message: '请选择终端分组！', center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_51'), center: true, type: 'warning'});
           return false
         }
         if (this.form.role == '') {
-          this.$message({message: '请选择用户角色！', center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_52'), center: true, type: 'warning'});
           return false
         }
         if (this.form.group == '') {
-          this.$message({message: '请选择用户分组！', center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_53'), center: true, type: 'warning'});
           return false
         }
         let data = {}, url = '', method = '', msg = '';
-        if (this.title == '新建用户') {
+        if (this.title == this.$t('Content.ID_NEW_USER')) {
           data = {
             creator: sessionStorage.getItem('name'),
             desc: this.form.desc,
@@ -572,7 +572,7 @@
           };
           url = 'user/create';
           method = 'post';
-          msg = '新建用户成功'
+          msg = this.$t('Msg.ID_MSG_54')
         }
         else {
           data = {
@@ -586,7 +586,7 @@
           };
           url = 'user/update';
           method = 'put';
-          msg = '编辑用户成功'
+          msg = this.$t('Msg.ID_MSG_55')
         }
         this.$http({
           method: method,
@@ -604,7 +604,7 @@
             this.queryUserList()
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               center: true,
               type: 'error'
             });
@@ -619,7 +619,7 @@
       roleSelect() {
         if (this.roleRow.length > 1 || this.roleRow.length == 0) {
           this.$message({
-            message: '请选择一个角色！',
+            message: this.$t('Msg.ID_MSG_56'),
             center: true,
             type: 'warning'
           });
@@ -635,7 +635,7 @@
       terGroupSelect() {
         let tree = this.$refs.terGroupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '不允许多项操作，只允许选择一个分组进行操作！', center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_57'), center: true, type: 'warning'});
           return false
         }
         this.terGroupId = tree[0].id;
@@ -645,7 +645,7 @@
       groupSelect() {
         let tree = this.$refs.groupTree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '不允许多项操作，只允许选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_57'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.groupId = tree[0].id;
@@ -655,7 +655,7 @@
 
       Edit() {
         this.openDialog = true;
-        this.title = '编辑用户';
+        this.title = this.$t('Content.ID_EDIT_USER');
         this.form.userName = this.userRow[0].name;
         this.form.terGroup = this.userRow[0].terName;
         this.form.role = this.userRow[0].roleName;
@@ -672,9 +672,9 @@
 
       delUser() {
         var ids = this.userRow.map(item => item.id).join(' ')
-        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('Msg.ID_MSG_58'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -687,7 +687,7 @@
             }
           }).then(response => {
             if (response.data.code == '0000') {
-              this.$message({message: '删除成功！', showClose: true, center: true, type: 'success'});
+              this.$message({message: this.$t('Content.ID_DELETE_SUCCESS'), showClose: true, center: true, type: 'success'});
               this.queryUserList()
             } else if (response.data.code == 'USER006') {
               this.$message({
@@ -698,7 +698,7 @@
               });
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -711,13 +711,13 @@
       NewTree() {
         this.treeForm.groupName = '';
         this.treeForm.superiorGroup = '';
-        this.treeTitle = "新建分组";
+        this.treeTitle = this.$t('Content.ID_NEW_GROUP');
         this.openTreeDialog = true
       },                          //新建节目分组
       selectSuperGroup() {
         let tree = this.$refs.groupSuper.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组作为上级！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_40'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.superId = tree[0].id;
@@ -725,10 +725,10 @@
         this.openSuperG = false
       },                 //选择上级分组
       EditTree() {
-        this.treeTitle = "编辑分组";
+        this.treeTitle = this.$t('Content.ID_EDIT_GROUP');
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.creator = tree[0].creator;
@@ -740,14 +740,14 @@
       },                         //编辑节目分组
       groupSubmit() {
         if (this.treeForm.groupName == '') {
-          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_41'), showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.treeForm.superiorGroup == '') {
-          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_42'), showClose: true, center: true, type: 'warning'});
           return false
         }
-        if (this.treeTitle == '新建分组') {
+        if (this.treeTitle == this.$t('Content.ID_NEW_GROUP')) {
           let _this = this;
           let data = {
             parentId: this.superId,
@@ -766,11 +766,11 @@
           }).then(response => {
             if (response.data.code == '0000') {
               _this.getTree();
-              this.$message({message: '新建分组成功！', showClose: true, center: true, type: 'success'});
+              this.$message({message: this.$t('Msg.ID_MSG_37'), showClose: true, center: true, type: 'success'});
               this.openTreeDialog = false
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -799,7 +799,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               _this.getTree();
-              _this.$message({message: '编辑分组成功！', showClose: true, center: true, type: 'success'});
+              _this.$message({message: this.$t('Msg.ID_MSG_37'), showClose: true, center: true, type: 'success'});
               this.openTreeDialog = false;
               _this.treeForm.superiorGroup = '';
               _this.treeForm.groupName = ''
@@ -812,7 +812,7 @@
               });
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'
@@ -824,13 +824,13 @@
       delTree() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id;
-        this.$confirm('此操作将永久删除该分组, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('Msg.ID_MSG_39'), this.$t('Content.ID_PROMPT'), {
+          confirmButtonText: this.$t('Content.ID_OK'),
+          cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
           this.$http({
@@ -844,7 +844,7 @@
           }).then(response => {
             if (response.data.code == '0000') {
               this.$message({
-                message: '删除成功！',
+                message: this.$t('Content.ID_DELETE_SUCCESS'),
                 showClose: true,
                 center: true,
                 type: 'success'
@@ -859,7 +859,7 @@
               });
             } else {
               this.$message({
-                message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+                message: response.data.infor + '。',
                 showClose: true,
                 center: true,
                 type: 'error'

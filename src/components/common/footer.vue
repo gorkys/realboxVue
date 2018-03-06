@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <p>多媒体信息发布系统 V0.1.20171102 CopyRight©2017 - 2018</p>
+    <p>{{$t('Msg.ID_MSG_22')}} V0.1.20171102 CopyRight©2017 - 2018</p>
   </div>
 </template>
 <script>

@@ -42,10 +42,10 @@
     <nav-bar></nav-bar>
     <Breadcrumb></Breadcrumb>
     <div class="content">
-      <div class="title">常规设置</div>
+      <div class="title">{{$t('Content.ID_REGULAR')}}</div>
       <div class="Setting">
         <div class="audit">
-          <label>发布节目是否需要审核：</label>
+          <label>{{$t('Msg.ID_MSG_21')}}：</label>
           <el-switch
             v-model="audit"
             active-color="#13ce66"
