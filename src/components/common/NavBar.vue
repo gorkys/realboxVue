@@ -124,6 +124,7 @@
     },
     mounted() {
       this.check();
+      this.$i18n.locale = localStorage.getItem('lang')
     },
     methods: {
       //注销登录
@@ -133,7 +134,22 @@
         this.$router.push('/');
       },
       changeLang(val) {
-        val === 'zh' ? this.$i18n.locale = 'zh' : this.$i18n.locale = 'en'
+        this.$http({
+          method: 'get',
+          url: 'system/language?language=' + val,
+          withCredentials: true,
+          headers: {
+            token: sessionStorage.getItem('token'),
+            name: sessionStorage.getItem('name')
+          }
+        }).then(response => {
+          if (response.data.code === '0000') {
+            localStorage.setItem('lang',val);
+            this.$i18n.locale = val;
+            this.$emit('lang-change')
+          }
+        });
+
       },
       check() {
         let _this = this;
@@ -150,14 +166,15 @@
             }).then(response => {
               if (response.data.code == 'TOKEN000') {
                 clearTimeout(_this.int);
-                _this.$alert('登录失效，请重新登录?', '提示', {
+                _this.$alert(this.$t('Msg.ID_MSG_73'), this.$t('Content.ID_PROMPT'), {
+                  confirmButtonText: this.$t('Content.ID_OK'),
+                  cancelButtonText: this.$t('Content.ID_CANCEL'),
                   type: 'warning',
-                  confirmButtonText: '确定',
                   callback: () => {
                     _this.$router.push('/');
                   }
                 });
-              }else {
+              } else {
                 this.check();
               }
             })

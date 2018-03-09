@@ -5,7 +5,7 @@ module.exports = {
     Password: 'Password',
     Captcha: 'Captcha',
     Language: 'Language',
-    zh: 'Chinese',
+    zh: '中文',
     en: 'English'
   },
   nav: {
@@ -106,9 +106,9 @@ module.exports = {
     ID_MSG_70: 'Please join the background first!',
     ID_MSG_71: 'Please join the block!',
     ID_MSG_72: 'No background selected!',
-    ID_MSG_73: '',
-    ID_MSG_74: '',
-    ID_MSG_75: '',
+    ID_MSG_73: 'Login failed, please log in again!',
+    ID_MSG_74: 'Captcha cannot be empty!',
+    ID_MSG_75: 'Account and password can not be empty!',
     ID_MSG_76: '',
   },
   Content: {
@@ -288,8 +288,8 @@ module.exports = {
     ID_USER_GROUP: 'userGroup',
     ID_USER_LIST: 'userList',
     ID_REMARK: 'Remark',
-    ID_PASSWORD: 'password',
-    ID_CONFIRM_PASSWORD: 'confirmPassword',
+    ID_PASSWORD: 'Password',
+    ID_CONFIRM_PASSWORD: 'Confirm',
     ID_USER_ROLE: 'userRole',
     ID_ROLE_SET: 'roleSet',
     ID_ROLE_NAME: 'roleName',
@@ -298,8 +298,8 @@ module.exports = {
     ID_SET_PRIVILEGE: 'setPrivilege',
     ID_SYSTEM: 'System',
     ID_REGULAR: 'Regular',
-    ID_SYSTEM_TEMPLATE: 'systemTemplate',
-    ID_USER_TEMPLATE: 'userTemplate',
+    ID_SYSTEM_TEMPLATE: 'SystemTemplate',
+    ID_USER_TEMPLATE: 'UserTemplate',
     ID_RETURN: 'Return'
   }
 };

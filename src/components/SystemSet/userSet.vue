@@ -117,7 +117,7 @@
 
 <template>
   <div id="play">
-    <nav-bar></nav-bar>
+    <nav-bar @lang-change="langChange"></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
       <div id="userTree">
@@ -222,7 +222,7 @@
           <el-button type="primary" @click="groupSelect">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--用户分组选择-->
-      <el-form :model="form">
+      <el-form :model="form" label-width="200">
         <el-form-item :label="$t('Content.ID_USERNAME')" :label-width="LabelWidth">
           <el-input v-model="form.userName" auto-complete="off"></el-input>
         </el-form-item>
@@ -265,7 +265,7 @@
           <el-button type="primary" @click="selectSuperGroup">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--上级分组选择-->
-      <el-form :model="treeForm">
+      <el-form :model="treeForm" label-width="200">
         <el-form-item :label="$t('Content.ID_GROUP_NAME')" :label-width="LabelWidth">
           <el-input v-model="treeForm.groupName" auto-complete="off"></el-input>
         </el-form-item>
@@ -329,7 +329,7 @@
           superiorGroup: '',
           groupDesc: ''
         },
-        LabelWidth: '70px',
+        LabelWidth: '100px',
         openD: false,          //打开选择终端分组对话框
         openR: false,          //打开选择角色对话框
         openG: false,         //打开选择分组对话框
@@ -867,7 +867,10 @@
             }
           })
         })
-      }                           //删除节目分组
+      },                           //删除节目分组
+      langChange(){
+        this.getTree();
+      }
     }
   }
 </script>

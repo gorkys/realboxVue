@@ -6,7 +6,7 @@ module.exports = {
     Captcha: '验证码',
     Language: '语言',
     zh: '中文',
-    en: '英文'
+    en: 'English'
   },
   nav: {
     Home: '首页',
@@ -108,9 +108,9 @@ module.exports = {
     ID_MSG_70:'使用文本请先加入背景！',
     ID_MSG_71:'请加入区域块！',
     ID_MSG_72:'未选择背景!',
-    ID_MSG_73:'',
-    ID_MSG_74:'',
-    ID_MSG_75:'',
+    ID_MSG_73:'登录失效，请重新登录！',
+    ID_MSG_74:'验证码不能为空！',
+    ID_MSG_75:'账号与密码不能为空！',
     ID_MSG_76:'',
   },
   Content: {

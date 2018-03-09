@@ -151,7 +151,7 @@
         </div>
       </el-dialog>            <!--选择终端分组-->
 
-      <el-form :model="form">
+      <el-form :model="form" label-width="200">
         <el-form-item :label="$t('Content.ID_GROUP')" :label-width="LabelWidth">
           <input v-model="form.terGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="clickEntDep" readonly="readonly"/>
@@ -191,7 +191,7 @@
         terId: '',                    //部门ID
         groupId: '',                  //分组ID
         title: '',
-        LabelWidth: '70px',
+        LabelWidth: '100px',
         form: {
           terGroup: '',               //终端分组
           num: 1                      //生成数量

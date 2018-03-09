@@ -154,7 +154,7 @@
 
 <template>
   <div id="resource">
-    <nav-bar></nav-bar>
+    <nav-bar @lang-change="langChange"></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
       <div id="resourceTree">
@@ -302,7 +302,7 @@
         downloadUrl: '',          //下载地址
         downloadName: '',         //下载名称
         view: false,              //双击预览显示
-        ids:[],
+        ids: [],
         select: [
           {
             value: 1,
@@ -317,7 +317,7 @@
         pageNo: 1,          //当前页
         total: 0,            //总数目
         format: '',               //资源格式
-        resName:''                //资源名称
+        resName: ''                //资源名称
       }
     },
     computed: {
@@ -343,7 +343,7 @@
     },
     methods: {
       getTree() {
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: 'tree/query?id=0',
@@ -392,7 +392,7 @@
         this.title = this.treeName.slice(0, 2);
         this.dialog = true
       },                                //打开上传对话框
-      uploadCon(){
+      uploadCon() {
         this.$refs.upload.clearFiles();             //清除上传List
         this.dialog = false
       },                                  //上传确认
@@ -416,7 +416,7 @@
           this.resourceQuery()
         } else {
           this.$message({
-            message:response.data.infor + '。',
+            message: response.data.infor + '。',
             center: true,
             type: 'error'
           });
@@ -494,7 +494,7 @@
           return false
         }
         this.view = true;
-        if(this.format == 'video'){
+        if (this.format == 'video') {
           let myVideo = document.getElementById('myVideo');
           myVideo.load();
         }
@@ -532,7 +532,7 @@
         _this.resources = [];
         this.$http({
           method: 'get',
-          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&name=" +this.resName,
+          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&name=" + this.resName,
           withCredentials: true,
           headers: {
             token: sessionStorage.getItem('token'),
@@ -547,7 +547,7 @@
             }
           } else {
             this.$message({
-              message:response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -586,6 +586,21 @@
         let myVideo = document.getElementById('myVideo');
         myVideo.currentTime = 0;
         myVideo.pause();
+      },
+      langChange() {
+        this.getTree();
+        this.select = [
+          {
+            value: 1,
+            label: this.$t('Content.ID_IMAGE_MODE')
+          },
+          {
+            value: 2,
+            label: this.$t('Content.ID_LIST_MODE')
+          }
+        ];
+        this.treeName = this.$t('Content.ID_IMAGE');
+        this.directions=this.$t('Msg.ID_MSG_7');
       }
     }
   }

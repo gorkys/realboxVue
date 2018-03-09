@@ -49,7 +49,7 @@
 
 <template>
   <div id="departmentSet">
-    <nav-bar></nav-bar>
+    <nav-bar @lang-change="langChange"></nav-bar>
     <Breadcrumb></Breadcrumb>
     <div class="content">
       <div class="title">{{$t('Content.ID_TERMINAL_SETTINGS')}}</div>
@@ -85,7 +85,7 @@
           <el-button type="primary" @click="submitSD">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--上级分组选择-->
-      <el-form :model="form">
+      <el-form :model="form" label-width="200">
         <el-form-item :label="$t('Content.ID_GROUP_NAME')" :label-width="LabelWidth">
           <el-input v-model="form.deartmentName" auto-complete="off"></el-input>
         </el-form-item>
@@ -124,7 +124,7 @@
           superiorDeartment: '',             //上级分组
           deartmentDescribe: ''              //分组备注
         },
-        LabelWidth: '70px',
+        LabelWidth: '100px',
         departmentTree: [],
         superiorId: '',                     //上级分组ID
         treeId: 40,                         //终端树ID
@@ -359,7 +359,10 @@
             }
           })
         })
-      }                 //删除分组方法
+      },                 //删除分组方法
+      langChange(){
+        this.getTree();
+      }
     }
   }
 </script>

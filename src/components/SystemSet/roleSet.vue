@@ -130,7 +130,7 @@
     </div>
     <FooterBar></FooterBar>
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="27.5%">
-      <el-form :model="form">
+      <el-form :model="form" label-width="200">
         <el-form-item :label="$t('Content.ID_ROLE_NAME')" :label-width="LabelWidth">
           <el-input v-model="form.roleName" auto-complete="off"></el-input>
         </el-form-item>
@@ -170,7 +170,7 @@
           roleName: '',               // 角色名称
           roleDescribe: '',           //角色描述
         },
-        LabelWidth: '70px',
+        LabelWidth: '100px',
         userPrivId: '',               //当前用户权限ID
         rolePrivId: '',               //当前编辑角色的权限ID
         powerTree: [],                //权限树

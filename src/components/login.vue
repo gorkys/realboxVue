@@ -31,7 +31,12 @@
 
   export default {
     mounted() {
-      this.$i18n.locale === 'zh' ? this.language = 0 : this.language = 1
+      if (localStorage.getItem('lang') === null) {
+        localStorage.setItem('lang', 'zh');
+        this.language = 0
+      } else {
+        localStorage.getItem('lang') === 'zh' ? this.language = 0 : this.language = 1
+      }
     },
     data() {
       return {
@@ -52,11 +57,12 @@
     methods: {
       getLogin() {
         if (this.name == '' || this.pass == '') {
-          this.$message({message: '账号与密码不能为空！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_75'), showClose: true, center: true, type: 'warning'});
         }
         if (this.code == '') {
-          this.$message({message: '验证码不能为空！', showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_74'), showClose: true, center: true, type: 'warning'});
         }
+
         this.$http({
           method: 'post',
           url: 'login',
@@ -64,7 +70,8 @@
           data: {
             name: this.name,
             password: this.pass,
-            code: this.code
+            code: this.code,
+            language: localStorage.getItem('lang')
           }
         }).then(response => {
           if (response.data.code == '0000') {
@@ -75,7 +82,7 @@
             this.$router.push('/index')
           } else {
             this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
+              message: response.data.infor + '。',
               showClose: true,
               center: true,
               type: 'error'
@@ -91,7 +98,12 @@
     },
     watch: {
       language: function (val) {
-        val === 0 ? this.$i18n.locale = 'zh' : this.$i18n.locale = 'en';
+        if (val === 0) {
+          localStorage.setItem('lang', 'zh')
+        } else {
+          localStorage.setItem('lang', 'en')
+        }
+        this.$i18n.locale = localStorage.getItem('lang');
         Vue.set(this.lang, 0, {label: this.$t('message.zh'), value: 0});
         Vue.set(this.lang, 1, {label: this.$t('message.en'), value: 1})
       }

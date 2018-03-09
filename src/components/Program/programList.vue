@@ -255,7 +255,7 @@
 
 <template>
   <div id="play">
-    <nav-bar></nav-bar>
+    <nav-bar @lang-change="langChange"></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
       <div id="playTree">
@@ -428,7 +428,7 @@
           <el-button type="primary" @click="selectSuperGroup">{{$t('Content.ID_OK')}}</el-button>
         </div>
       </el-dialog>            <!--上级分组选择-->
-      <el-form :model="treeForm">
+      <el-form :model="treeForm" label-width="200">
         <el-form-item :label="$t('Content.ID_GROUP_NAME')" :label-width="LabelWidth">
           <el-input v-model="treeForm.groupName" auto-complete="off"></el-input>
         </el-form-item>
@@ -436,7 +436,7 @@
           <input v-model="treeForm.superiorGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openSuperG = true" readonly="readonly"/>
         </el-form-item>
-        <el-form-item label="$t('Content.ID_GROUP_DESCRIPTION')" :label-width="LabelWidth">
+        <el-form-item :label="$t('Content.ID_GROUP_DESCRIPTION')" :label-width="LabelWidth">
           <el-input type="textarea" v-model="treeForm.groupDesc" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -503,7 +503,7 @@
         openSuperG: false,
         creator: '',
         currentGroupId: '',       //当前组ID
-        LabelWidth: '70px',
+        LabelWidth: '100px',
         treeForm: {
           groupName: '',
           superiorGroup: '',
@@ -551,7 +551,7 @@
         }
       },                 //树单选
       getTree() {
-        let _this = this
+        let _this = this;
         this.$http({
           method: 'get',
           url: 'tree/query?id=30',
@@ -957,6 +957,23 @@
           })
         }
       },                   //删除节目分组
+      langChange() {
+        this.getTree();
+        this.select = [{
+          value: '1',
+          label: this.$t('Content.ID_IMAGE_MODE')
+        }, {
+          value: '2',
+          label: this.$t('Content.ID_LIST_MODE')
+        }];
+        this.tSelect = [{
+          value: '1',
+          label: this.$t('Content.ID_IMAGE_MODE')
+        }, {
+          value: '2',
+          label: this.$t('Content.ID_LIST_MODE')
+        }]
+      }
     }
   }
 </script>

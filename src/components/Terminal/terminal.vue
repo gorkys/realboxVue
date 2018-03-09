@@ -94,7 +94,7 @@
 
 <template>
   <div id="terminal">
-    <nav-bar></nav-bar>
+    <nav-bar @lang-change="langChange"></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
       <div id="terminalTree">
@@ -349,6 +349,9 @@
         this.terId = val.id;
         this.queryTerminalList()
       },                     //点击树
+      langChange(){
+        this.getTree()
+      }
     }
   }
 </script>

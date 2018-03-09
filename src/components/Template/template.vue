@@ -134,7 +134,7 @@
 
 <template>
   <div id="template">
-    <nav-bar></nav-bar>
+    <nav-bar @lang-change="langChange"></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
       <div id="templateTree">
@@ -169,7 +169,8 @@
           </div>
           <div class="control">
             <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="openDialog=true"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
-            <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="editTemplate(temName)"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
+            <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="editTemplate(temName)"><i
+              class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
             <a v-if="treeName==$t('Content.ID_USER_TEMPLATE')" @click="delTemplate"><i
               class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
           </div>
@@ -236,7 +237,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openDialog = false">{{$t('Content.ID_ID_CANCEL')}}</el-button>
+        <el-button @click="openDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
         <el-button type="primary" @click="NewTemplateMake">{{$t('Content.ID_OK')}}</el-button>
       </div>
     </el-dialog>
@@ -271,7 +272,7 @@
         treeId: 21,
 
         openDialog: false,       //新建对话框
-        LabelWidth: '70px',
+        LabelWidth: '100px',
         form: {
           temName: '',
           resolution: '1280×720',
@@ -420,7 +421,7 @@
           });
           return false
         }
-        this.$confirm(this.$t('Msg.ID_MSG_16'),this.$t('Content.ID_PROMPT'), {
+        this.$confirm(this.$t('Msg.ID_MSG_16'), this.$t('Content.ID_PROMPT'), {
           confirmButtonText: this.$t('Content.ID_OK'),
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
@@ -473,7 +474,18 @@
         this.form.resolution = this.resolution.map(item => {
           if (item.value == val) return item.label
         }).join('');
-      }                    //分辨率选择
+      },                    //分辨率选择
+      langChange() {
+        this.getTree();
+        this.select = [{
+          value: '1',
+          label: this.$t('Content.ID_IMAGE_MODE')
+        }, {
+          value: '2',
+          label: this.$t('Content.ID_LIST_MODE')
+        }];
+        this.treeName = this.$t('Content.ID_SYSTEM_TEMPLATE');
+      }
     }
   }
 </script>
