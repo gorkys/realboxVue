@@ -179,7 +179,7 @@
           <el-table :data="templates" style="width: 100%">
             <el-table-column prop="name" align="center" :label="$t('Content.ID_TEMPLATE_NAME')"></el-table-column>
             <el-table-column prop="preview" align="center" :label="$t('Content.ID_THUMBNAIL')">
-              <template scope="scope">
+              <template slot-scope="scope">
                 <img :src="scope.row.preview" width="30" height="50"/>
               </template>
             </el-table-column>
@@ -215,7 +215,7 @@
       </div>
     </Content>
     <footer-bar></footer-bar>
-    <el-dialog :title="$t('Content.ID_NEW_TEMPLATE')" ref="dialog" :visible.sync="openDialog" width="18%">
+    <el-dialog :title="$t('Content.ID_NEW_TEMPLATE')" ref="dialog" :visible.sync="openDialog" width="500px">
       <el-form :model="form">
         <el-form-item :label="$t('Content.ID_TEMPLATE_NAME')" :label-width="LabelWidth">
           <el-input v-model="form.temName" auto-complete="off"></el-input>
@@ -248,6 +248,8 @@
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
   import Content from '@/components/common/content'
+  import {getTree} from "@/api/Tree";
+  import {getTemplate,delTemplate} from '@/api/template'
 
   export default {
     mounted: function () {
@@ -275,26 +277,29 @@
         LabelWidth: '100px',
         form: {
           temName: '',
-          resolution: '1280×720',
+          resolution: '1280*720',
           temType: this.$t('Content.ID_USER_TEMPLATE'),
           desc: '',              //备注
         },
-        rltValue: '1280×720',
+        rltValue: '1280*720',
         resolution: [{
           value: '1',
-          label: '1280×720'
+          label: '1280*720'
         }, {
           value: '2',
-          label: '1920×1080'
+          label: '1920*1080'
         }, {
           value: '3',
-          label: '1080×1920'
+          label: '1080*1740'
         }, {
           value: '4',
-          label: '720×1280'
+          label: '720*1280'
         }, {
           value: '5',
-          label: '1920×200'
+          label: '1920*200'
+        }, {
+          value: '6',
+          label: '1080*1920'
         }],                     //分辨率
         temName: '',            //模板名
         treeName: this.$t('Content.ID_SYSTEM_TEMPLATE'),
@@ -312,60 +317,35 @@
     methods: {
       getTree() {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=20',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.templateTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          id: 20
+        };
+        getTree(params).then(response => {
+          _this.templateTree = response.cust.trees
         })
       },                        //查询模板树
       queryList() {
         let _this = this;
         this.templates = [];
-        this.$http({
-          method: 'get',
-          url: 'template/query?groupId=' + this.treeId + '&pageNo=' + this.pageNo + '&pageCount=' + this.pageCount + '&name=' + this.searchName + '&resolution=' + this.searchResolution,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let templates = response.data.cust.templates;
-            _this.total = response.data.cust.pages.count;
-            for (let template of templates) {
-              _this.templates.push(template)
-            }
-
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          groupId: this.treeId,
+          pageNo: this.pageNo,
+          pageCount: this.pageCount,
+          name: this.searchName,
+          resolution: this.searchResolution
+        };
+        getTemplate(params).then(response => {
+          let templates = response.cust.templates;
+          _this.total = response.cust.pages.count;
+          for (let template of templates) {
+            _this.templates.push(template)
           }
         })
       },                      //获取模板列表
       editTemplate(name) {
         this.temName = '';
         if (this.treeName === this.$t('Content.ID_SYSTEM_TEMPLATE')) return false;
-        if (name == '') {
+        if (name === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_36'),
             showClose: true,
@@ -378,7 +358,7 @@
       },               //编辑模板
       handleCurrentChange(val) {
         this.pageNo = val;
-        this.getRoleList()
+        this.queryList()
       },         //翻页回调
       handleNodeClick(val) {
         this.treeId = val.id;
@@ -396,7 +376,7 @@
           target = e.target
         }*/     //currentTarget与target的区别
         let children = target.children[0];
-        if (children.style.display != 'block') {
+        if (children.style.display !== 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
           this.ids.push(dom);
@@ -405,14 +385,14 @@
           children.style.display = 'none';
           target.style.backgroundColor = "white";
           for (let i = 0; i < this.ids.length; i++) {
-            if (this.ids[i] == dom) this.ids.splice(i, 1)
+            if (this.ids[i] === dom) this.ids.splice(i, 1)
           }    //取消则从ids删除该元素
           this.temName = ''
         }
       },                      //单击选择文件
       delTemplate() {
         let ids = this.ids.join(' ');
-        if (ids == '') {
+        if (ids === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_36'),
             showClose: true,
@@ -426,43 +406,26 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'template/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.queryList();
-              this.$message({
-                message: this.$t('Content.ID_DELETE_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              })
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
-          })
+          let params={ids:ids};
+          delTemplate(params).then(response=>{
+            this.queryList();
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            })
+          });
         })
       },                    //删除模板
       NewTemplateMake() {
-        if (this.form.temName == '') {
+        if (this.form.temName === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_59'),
             showClose: true,
             center: true,
             type: 'warning'
           });
-          return false
         }
         sessionStorage.setItem('temName', this.form.temName);
         sessionStorage.setItem('resolution', this.form.resolution);
@@ -472,7 +435,7 @@
       },                //新建模板
       rltChange(val) {
         this.form.resolution = this.resolution.map(item => {
-          if (item.value == val) return item.label
+          if (item.value === val) return item.label
         }).join('');
       },                    //分辨率选择
       langChange() {

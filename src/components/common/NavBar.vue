@@ -67,7 +67,6 @@
           <!--<el-menu-item index="">终端列表</el-menu-item>-->
           <el-menu-item index="/activeCode">{{$t('nav.ActiveCode')}}</el-menu-item>
         </el-submenu>
-
         <el-menu-item index="/template">{{$t('nav.Template')}}</el-menu-item>
         <el-submenu index="5">
           <template slot="title">{{$t('nav.Program')}}</template>
@@ -115,6 +114,8 @@
 </template>
 
 <script>
+  import {setLanguage, checkStatus} from "@/api/login";
+
   export default {
     data() {
       return {
@@ -134,37 +135,19 @@
         this.$router.push('/');
       },
       changeLang(val) {
-        this.$http({
-          method: 'get',
-          url: 'system/language?language=' + val,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code === '0000') {
-            localStorage.setItem('lang',val);
-            this.$i18n.locale = val;
-            this.$emit('lang-change')
-          }
-        });
-
+        let params = {language: val};
+        setLanguage(params).then(response => {
+          localStorage.setItem('lang', val);
+          this.$i18n.locale = val;
+          this.$emit('lang-change')
+        })
       },
       check() {
         let _this = this;
         if (_this.name != null) {
           _this.int = setTimeout(() => {
-            _this.$http({
-              method: 'get',
-              url: 'system/check',
-              withCredentials: true,
-              headers: {
-                token: sessionStorage.getItem('token'),
-                name: sessionStorage.getItem('name')
-              }
-            }).then(response => {
-              if (response.data.code == 'TOKEN000') {
+            checkStatus().then(response => {
+              if (response.code === 'TOKEN000') {
                 clearTimeout(_this.int);
                 _this.$alert(this.$t('Msg.ID_MSG_73'), this.$t('Content.ID_PROMPT'), {
                   confirmButtonText: this.$t('Content.ID_OK'),
@@ -178,7 +161,7 @@
                 this.check();
               }
             })
-          }, 9000)
+          }, 90000)
         } else {
           this.$router.push('/')
         }
@@ -191,7 +174,7 @@
   .navBarBox {
     width: 100%;
     height: 80px;
-    min-width: 1120px;
+    min-width: 1240px;
     background-color: #d33a31;
     display: flex;
     justify-content: space-between;
@@ -209,7 +192,8 @@
 
   .navBox {
     width: 60%;
-    padding: 0 5%;
+    padding: 0 10px;
+    min-width: 820px;
     display: flex;
     justify-content: center;
     align-items: flex-end;

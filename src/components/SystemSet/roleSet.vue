@@ -157,6 +157,15 @@
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import {
+    getRole,
+    newRole,
+    updateRole,
+    delRole,
+    getPrivilege,
+    newPrivilege,
+    updatePrivilege
+  } from "@/api/roleSet";
 
   export default {
     mounted: function () {
@@ -200,65 +209,40 @@
       },        //新建角色
       getTree: function () {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'privilege/query?userId=' + this.userPrivId + '&roleId=' + this.rolePrivId,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.powerTree = response.data.cust.trees;
-            let rolePriv = response.data.cust.tree;
-            if (_this.rolePrivId != '') {
-              let rolePrivId = [];
-              rolePriv.map(function (item) {
-                rolePrivId.push(item.id)
-              });
-              /*_this.$refs.tree.setCheckedNodes(rolePriv)*/        //方法无效
-              _this.$refs.tree.setCheckedKeys(rolePrivId);
-            } else {
-              _this.$refs.tree.setCheckedKeys([])
-            }
-            _this.rolePrivId = _this.userPrivId = ''
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
+        let params = {
+          userId: this.userPrivId,
+          roleId: this.rolePrivId
+        };
+        getPrivilege(params).then(response => {
+          _this.powerTree = response.cust.privileges;
+          let rolePriv = response.cust.tree;
+          if (_this.rolePrivId !== '') {
+            let rolePrivId = [];
+            rolePriv.map(function (item) {
+              rolePrivId.push(item.id)
             });
+            /*_this.$refs.tree.setCheckedNodes(rolePriv)*/        //方法无效
+            _this.$refs.tree.setCheckedKeys(rolePrivId);
+          } else {
+            _this.$refs.tree.setCheckedKeys([])
           }
-        })
+          _this.rolePrivId = _this.userPrivId = ''
+        });
       },        //获取权限树
       getRoleList: function () {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: '/role/query?pageCount=' + _this.pageCount + '&pageNo=' + _this.pageNo + '&name=' + this.searchName,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.roles = response.data.cust.roles
-            _this.total = response.data.cust.pages.count
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          name: this.searchName
+        };
+        getRole(params).then(response => {
+          _this.roles = response.cust.roles;
+          _this.total = response.cust.pages.count
         })
       },    //获取角色列表
       submit() {
-        if (this.title == this.$t('Content.ID_NEW_ROLE')) {
+        if (this.title === this.$t('Content.ID_NEW_ROLE')) {
           this.powerAdd()
         } else {
           this.updatePower()
@@ -272,31 +256,13 @@
           data[name] = 1                            //添加到对象并赋值为1（1为有权限0为无），对象的访问方式有data.name与data[name],动态添加需要使用data[name]
         });
         let _this = this;
-        this.$http({
-          method: 'post',
-          url: 'privilege/create',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.userPrivId = response.data.cust.id
-            _this.roleAdd()
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        newPrivilege(data).then(response => {
+          _this.userPrivId = response.cust.id;
+          _this.roleAdd()
+        });
       },       //新建权限
       roleAdd: function () {
-        if (this.roleName == '') {
+        if (this.roleName === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_43'),
             showClose: true,
@@ -312,34 +278,16 @@
           privId: this.userPrivId
         };
         let _this = this;
-        this.$http({
-          method: 'post',
-          url: 'role/create',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            this.$message({
-              message: this.$t('Msg.ID_MSG_44'),
-              showClose: true,
-              center: true,
-              type: 'success'
-            });
-            this.getRoleList()
-            _this.openDialog = false
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        newRole(data).then(response => {
+          this.$message({
+            message: this.$t('Msg.ID_MSG_44'),
+            showClose: true,
+            center: true,
+            type: 'success'
+          });
+          this.getRoleList();
+          _this.openDialog = false
+        });
       },        //新建角色方法
       updatePower() {
         let power = this.$refs.tree.getCheckedNodes();
@@ -349,30 +297,12 @@
           data[name] = 1                            //添加到对象并赋值为1（1为有权限0为无），对象的访问方式有data.name与data[name],动态添加需要使用data[name]
         });
         let _this = this;
-        this.$http({
-          method: 'put',
-          url: 'privilege/update',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.updateRole()
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        updatePrivilege(data).then(respons => {
+          _this.updateRole()
         })
       },                  //编辑权限
       updateRole() {
-        if (this.roleName == '') {
+        if (this.roleName === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_43'),
             showClose: true,
@@ -389,67 +319,35 @@
           privId: this.row[0].privId
         };
         let _this = this;
-        this.$http({
-          method: 'put',
-          url: 'role/update',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            this.$message({
-              message: this.$t('Msg.ID_MSG_45'),
-              showClose: true,
-              center: true,
-              type: 'success'
-            });
-            this.getRoleList();
-            _this.openDialog = false
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        updateRole(data).then(response => {
+          this.$message({
+            message: this.$t('Msg.ID_MSG_45'),
+            showClose: true,
+            center: true,
+            type: 'success'
+          });
+          this.getRoleList();
+          _this.openDialog = false
+        });
       },                //编辑角色
       delRole() {
-        var ids = this.row.map(item => item.id).join(' ')
-        this.$confirm( this.$t('Msg.ID_MSG_46'),this.$t('Content.ID_PROMPT'), {
+        let ids = this.row.map(item => item.id).join(' ');
+        this.$confirm(this.$t('Msg.ID_MSG_46'), this.$t('Content.ID_PROMPT'), {
           confirmButtonText: this.$t('Content.ID_OK'),
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'role/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({
-                message: this.$t('Content.ID_DELETE_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              });
-              this.getRoleList()
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          delRole(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.getRoleList()
           })
         })
       },                   //删除角色
@@ -457,7 +355,7 @@
         this.row = selection
       },     //通过选择回调进行批量删除
       editRole() {
-        if (this.row.length > 1 || this.row.length == 0) {
+        if (this.row.length > 1 || this.row.length === 0) {
           this.$message({
             message: this.$t('Msg.ID_MSG_20'),
             showClose: true,

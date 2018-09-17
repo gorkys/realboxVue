@@ -171,6 +171,14 @@
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import {
+    newActivate,
+    getActivate,
+    delActivate,
+    exportActivate,
+    unbundledActivate
+  } from '@/api/activeCode'
+  import {getTree} from '@/api/Tree'
 
   export default {
     mounted: function () {
@@ -209,59 +217,34 @@
     },
     methods: {
       generate() {
-        this.$http({
-          method: 'get',
-          url: 'activate/create?number=' + this.form.num + '&terId=' + this.terId + '&creator=' + this.creator,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            this.$message({
-              message: this.$t('Content.ID_GENERATE_SUCCESS'),
-              showClose: true,
-              center: true,
-              type: 'success'
-            });
-            this.activeQuery()
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          number: this.form.num,
+          terId: this.terId,
+          creator: this.creator
+        };
+        newActivate(params).then(response => {
+          this.$message({
+            message: this.$t('Content.ID_GENERATE_SUCCESS'),
+            showClose: true,
+            center: true,
+            type: 'success'
+          });
+          this.activeQuery()
         });
         this.openDialog = false
       },
       activeQuery() {
         let _this = this;
         _this.activates = [];
-        this.$http({
-          method: 'get',
-          url: 'activate/query?pageNo=' + _this.pageNo + '&pageCount=' + _this.pageCount,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.total = response.data.cust.pages.count;
-            let activates = response.data.cust.activates;
-            for (let activate of activates) {
-              _this.activates.push(activate);
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          pageNo: _this.pageNo,
+          pageCount: _this.pageCount
+        };
+        getActivate(params).then(response => {
+          _this.total = response.cust.pages.count;
+          let activates = response.cust.activates;
+          for (let activate of activates) {
+            _this.activates.push(activate);
           }
         })
       },                              //查询激活码
@@ -281,31 +264,17 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'activate/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({
-                message: this.$t('Content.ID_DELETE_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              });
-              this.activeQuery()
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          delActivate(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.activeQuery()
           })
         })
       },                                  //删除激活码
@@ -313,7 +282,7 @@
         this.rowId = selection
       },                    //通过选择回调进行批量删除
       handleCurrentChange(val) {
-        this.pageNo = val
+        this.pageNo = val;
         this.activeQuery()
       },                   //当前页翻页
       gert() {
@@ -343,25 +312,11 @@
 
       getTree() {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=40',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.terGroupTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          id: 40
+        };
+        getTree(params).then(response => {
+          _this.terGroupTree = response.cust.trees
         })
       },                                  //获取树资源
       exportCode() {
@@ -371,31 +326,17 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'get',
-            url: 'activate/export?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              let url = response.data.cust.desc;
-              let a = document.createElement('a');
-              a.href = url;
-              a.download = '';
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          exportActivate(params).then(response => {
+            let url = response.cust.desc;
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
           })
         })
 
@@ -407,31 +348,17 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'get',
-            url: 'activate/unbundled?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({
-                message: this.$t('Content.ID_UNBIND_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              });
-              this.activeQuery()
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          unbundledActivate(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_UNBIND_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.activeQuery()
           })
         })
       }                                  //解绑激活码

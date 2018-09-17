@@ -112,6 +112,11 @@ module.exports = {
     ID_MSG_76: '',
   },
   Content: {
+    ID_SHOW_SETTING:"Show setting",
+    ID_SHOW_WEATHER:'Show weather',
+    ID_SHOW_TIME:'Show time',
+    ID_ADD_AUDIO:'Add audio',
+    ID_AUDIO:'Audio',
     ID_ANDROID: 'Android',
     ID_CHOOSE_BG: 'Choose background',
     ID_FAST: 'Fast',

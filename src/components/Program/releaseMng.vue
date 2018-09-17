@@ -208,6 +208,9 @@
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
   import vueMarquee from "@/components/common/Marquee.vue"
+  import {getProgram} from "@/api/program";
+  import {getTemplate} from "@/api/template";
+  import {getRelease, delRelease} from "@/api/release";
 
   export default {
     mounted() {
@@ -246,28 +249,18 @@
       queryPublishList() {
         let _this = this;
         this.publish = [];
-        this.$http({
-          method: 'get',
-          url: "publish/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&proName=' + this.searchName + '&status=' + this.searchStatus + '&proStatus=' + this.searchProStatus,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let publish = response.data.cust.publish
-            _this.total = response.data.cust.pages.count
-            for (let item of publish) {
-              _this.publish.push(item)
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          proName: this.searchName,
+          status: this.searchStatus,
+          proStatus: this.searchProStatus
+        };
+        getRelease(params).then(response => {
+          let publish = response.cust.publish;
+          _this.total = response.cust.pages.count;
+          for (let item of publish) {
+            _this.publish.push(item)
           }
         })
       },                //获取节目列表
@@ -295,33 +288,22 @@
           cancelButtonText: _this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          _this.$http({
-            method: 'delete',
-            url: 'publish/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              _this.$message({message: _this.$t('Content.ID_DELETE_SUCCESS'), showClose: true, center: true, type: 'success'});
-              _this.queryPublishList()
-            } else {
-              _this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {ids: ids};
+          delRelease(params).then(response => {
+            _this.$message({
+              message: _this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            _this.queryPublishList()
           })
         })
       },                      //删除节目
 
       viewClose(done) {
         let myVideo = document.getElementById('myVideo');
-        if (myVideo != undefined) {
+        if (myVideo !== undefined && myVideo !== null) {
           myVideo.currentTime = 0;                            //将视频当前时间初始化
           myVideo.pause();
         }
@@ -333,91 +315,61 @@
         _this.template = '';
         _this.program = '';
         _this.items = [];
-        this.$http({
-          method: 'get',
-          url: 'program/query?id=' + data.proId + '&pageNo=1&pageCount=1',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-            if (response.data.code == '0000') {
-              _this.program = response.data.cust.programs[0];
+        let params = {
+          id: data.proId,
+          pageNo: 1,
+          pageCount: 1
+        };
+        getProgram(params).then(response => {
+          _this.program = response.cust.programs[0];
 
-              _this.$nextTick(function () {
-                  _this.$http({
-                    method: 'get',
-                    url: 'template/query?id=' + _this.program.modelId + '&pageNo=1&pageCount=1',
-                    withCredentials: true,
-                    headers: {
-                      token: sessionStorage.getItem('token'),
-                      name: sessionStorage.getItem('name')
+          _this.$nextTick(function () {
+              let params = {id: _this.program.modelId, pageNo: 1, pageCount: 1};
+              getTemplate(params).then(response => {
+                _this.template = response.cust.templates[0];
+                /*根据模板高度设置缩放比例*/
+                if (_this.template.height == '1080') _this.PP = 0.4;
+                if (_this.template.height == '720') _this.PP = 0.7;
+                if (_this.template.height == '1280') _this.PP = 0.6;
+                if (_this.template.height == '1920' || _this.template.height == '1740') _this.PP = 0.4;
+                if (_this.template.height == '200') _this.PP = 0.5;
+                for (let i of _this.program.proItems) {
+                  for (let y of _this.template.temItems) {
+                    if (i.itemsId === y.id) {
+                      _this.items.push({
+                        id: y.id,
+                        type: y.type,
+                        height: y.height,
+                        width: y.width,
+                        x: y.x,
+                        y: y.y,
+                        url: i.url,
+                        scrollContent: i.scrollContent,
+                        scrollColor: i.scrollColor,
+                        scrollDirection: i.scrollDirection,
+                        scrollFontSize: i.scrollFontSize,
+                        scrollFontFamily: i.scrollFontFamily,
+                        scrollBGColor: i.scrollBGColor,
+                        scrollSpeed: i.scrollSpeed,
+                        scrollBGTransparency: i.scrollBGTransparency,
+                        scrollDuration: i.scrollDuration,
+                        justify: i.justify,
+                        txtContent: i.txtContent,
+                        font: i.font,
+                        fontSize: i.fontSize,
+                        fontColor: i.fontColor,
+                        align: i.align,
+                        bold: i.bold,
+                        italic: i.italic,
+                        underline: i.underline
+                      })
                     }
-                  }).then(response => {
-                    if (response.data.code == '0000') {
-                      _this.template = response.data.cust.templates[0];
-                      /*根据模板高度设置缩放比例*/
-                      if (_this.template.height == '1080') _this.PP = 0.4;
-                      if (_this.template.height == '720') _this.PP = 0.7;
-                      if (_this.template.height == '1280') _this.PP = 0.6;
-                      if (_this.template.height == '1920') _this.PP = 0.4;
-                      if (_this.template.height == '200') _this.PP = 0.5;
-                      for (let i of _this.program.proItems) {
-                        for (let y of _this.template.temItems) {
-                          if (i.itemsId === y.id) {
-                            _this.items.push({
-                              id: y.id,
-                              type: y.type,
-                              height: y.height,
-                              width: y.width,
-                              x: y.x,
-                              y: y.y,
-                              url: i.url,
-                              scrollContent: i.scrollContent,
-                              scrollColor: i.scrollColor,
-                              scrollDirection: i.scrollDirection,
-                              scrollFontSize: i.scrollFontSize,
-                              scrollFontFamily: i.scrollFontFamily,
-                              scrollBGColor: i.scrollBGColor,
-                              scrollSpeed: i.scrollSpeed,
-                              scrollBGTransparency: i.scrollBGTransparency,
-                              scrollDuration: i.scrollDuration,
-                              justify: i.justify,
-                              txtContent: i.txtContent,
-                              font: i.font,
-                              fontSize: i.fontSize,
-                              fontColor: i.fontColor,
-                              align: i.align,
-                              bold: i.bold,
-                              italic: i.italic,
-                              underline: i.underline
-                            })
-                          }
-                        }
-                      }
-                    } else {
-                      this.$message({
-                        message: response.data.infor + '。',
-                        showClose: true,
-                        center: true,
-                        type: 'error'
-                      });
-                    }
-                  })
+                  }
                 }
-              )
+              })
             }
-            else {
-              _this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
-          }
-        );
+          )
+        });
         this.openScroll = true;
         this.view = true;
       }            //节目预览

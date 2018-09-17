@@ -100,7 +100,7 @@
       <div id="terminalTree">
         <div class="title">{{$t('Content.ID_GROUP')}}</div>
         <div class="controlTree">
-          <div style="width: 120px">
+          <div style="">
           </div>
           <div><a @click="getTree"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a></div>
         </div>
@@ -147,10 +147,12 @@
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
             <el-table-column prop="name" align="center" :label="$t('Content.ID_TERMINAL_NAME')"></el-table-column>
-            <el-table-column prop="name" align="center" :label="$t('Content.ID_TERMINAL_CODE')"></el-table-column>
+            <el-table-column prop="terminalCode" align="center"
+                             :label="$t('Content.ID_TERMINAL_CODE')"></el-table-column>
             <el-table-column prop="type" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
             <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
-            <el-table-column prop="sversion" align="center" :label="$t('Content.ID_SOFTWARE_VERSION')"></el-table-column>
+            <el-table-column prop="sversion" align="center"
+                             :label="$t('Content.ID_SOFTWARE_VERSION')"></el-table-column>
             <el-table-column prop="version" align="center" :label="$t('Content.ID_SYSTEM_VERSION')"></el-table-column>
             <el-table-column prop="mac" align="center" :label="$t('Content.ID_MAC_ADDRESS')"></el-table-column>
             <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
@@ -161,6 +163,11 @@
               </template>
             </el-table-column>
             <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
+            <el-table-column align="center" :label="$t('Content.ID_OPERATION')">
+              <template slot-scope="scope">
+                <el-button type="text" @click="openSettingShow()">{{$t('Content.ID_TERMINAL_SETTINGS')}}</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="page">
@@ -174,6 +181,24 @@
       </div>
     </Content>
     <footer-bar></footer-bar>
+    <el-dialog
+      width="400px"
+      :title="$t('Content.ID_PARAMTERS_SETTING')"
+      :visible.sync="dialogSetting"
+      append-to-body>
+      <el-form ref="settingForm" :model="settingForm" label-width="100px">
+        <el-form-item :label="$t('Content.ID_SHOW_SETTING')">
+          <el-checkbox-group v-model="settingForm.type" size="small">
+            <el-checkbox :label="$t('Content.ID_SHOW_WEATHER')" name="type"></el-checkbox>
+            <el-checkbox :label="$t('Content.ID_SHOW_TIME')" name="type"></el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogSetting = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="submitSetting">{{$t('Content.ID_OK')}}</el-button>
+      </div>
+    </el-dialog>            <!--天气时间显示-->
   </div>
 </template>
 <script>
@@ -181,6 +206,12 @@
   import FooterBar from '@/components/common/footer'
   import Content from '@/components/common/content'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import {getTree} from "@/api/Tree"
+  import {
+    getTerminal,
+    delTerminal,
+    getTerminalSyn
+  } from "@/api/terminal";
 
   export default {
     mounted: function () {
@@ -191,7 +222,7 @@
       return {
         terminalTree: [],       //终端树
         terminals: [],
-        pageCount: 8,     //每页显示数目
+        pageCount: 6,     //每页显示数目
         pageNo: 1,          //当前页
         total: 0,            //总数目
         row: '',              //行数据
@@ -199,6 +230,10 @@
         terId: '41',                //终端分组ID
         terName: '',               //终端名称
         terCode: '',               //终端编号
+        dialogSetting: false,
+        settingForm:{
+          type:[]
+        }
       }
     },
     components: {
@@ -208,56 +243,35 @@
       Breadcrumb
     },
     methods: {
+      openSettingShow() {
+        this.dialogSetting = true
+      },
       getTree() {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=40',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.terminalTree = response.data.cust.trees;
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          id: 40
+        };
+        getTree(params).then(response => {
+          _this.terminalTree = response.cust.trees;
         })
       },                          //获取树资源
       queryTerminalList() {
         let _this = this;
         this.terminals = [];
-        this.$http({
-          method: 'get',
-          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.terId+ '&name=' + this.terName + '&code=' + this.terCode,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
+        let params = {
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          groupId: this.terId,
+          name: this.terName,
+          code: this.terCode
+        };
+        getTerminal(params).then(response => {
+          let terminals = response.cust.terminals;
+          _this.total = response.cust.pages.count;
+          for (let terminal of terminals) {
+            _this.terminals.push(terminal)
           }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let terminals = response.data.cust.terminals;
-            _this.total = response.data.cust.pages.count;
-            for (let terminal of terminals) {
-              _this.terminals.push(terminal)
-            }
-            _this.terId = '';
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+          _this.terId = '';
         })
       },                //获取终端列表
       pageChange(val) {
@@ -283,31 +297,22 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'terminal/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({message: this.$t('Content.ID_DELETE_SUCCESS'), showClose: true, center: true, type: 'success'});
-              this.queryTerminalList()
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          delTerminal(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.queryTerminalList()
           })
         })
       },                      //删除终端
-      synTerminal(){
-        if (this.row == '') {
+      synTerminal() {
+        if (this.row === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_27'),
             showClose: true,
@@ -322,26 +327,12 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'get',
-            url: 'terminal/syn?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({message: this.$t('Msg.ID_MSG_12'), showClose: true, center: true, type: 'success'});
-              this.queryTerminalList()
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          getTerminalSyn(params).then(response => {
+            this.$message({message: this.$t('Msg.ID_MSG_12'), showClose: true, center: true, type: 'success'});
+            this.queryTerminalList()
           })
         })
       },                          //强制同步
@@ -349,7 +340,7 @@
         this.terId = val.id;
         this.queryTerminalList()
       },                     //点击树
-      langChange(){
+      langChange() {
         this.getTree()
       }
     }

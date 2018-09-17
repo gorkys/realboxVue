@@ -11,11 +11,6 @@ import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
 import VueDraggableResizable from '@/components/common/vue-draggable-resizable' //可拖动调整大小插件
 Vue.component('vue-draggable-resizable', VueDraggableResizable);
 
-import Axios from 'axios'
-
-Axios.defaults.baseURL = 'http://192.168.1.6:8081/'; //AXIOS请求时默认URL
-Vue.prototype.$http = Axios; //将AXIOS转为原型链
-
 Vue.config.productionTip = false;
 
 Vue.use(ElementUI, {
@@ -24,8 +19,9 @@ Vue.use(ElementUI, {
 
 import VueI18n from 'vue-i18n'        //国际化
 Vue.use(VueI18n);
+
 const i18n = new VueI18n({
-  locale: localStorage.getItem('lang'),//'zh', // 语言标识
+  locale: 'zh',//localStorage.getItem('lang'), // 语言标识
   messages: {
     zh: Object.assign(require('@/components/common/lang/zh'), zhLocale),
     en: Object.assign(require('@/components/common/lang/en'), enLocale),

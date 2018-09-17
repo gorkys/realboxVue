@@ -9,11 +9,13 @@
 
   .left {
     width: 15%;
+    height: auto;
     overflow: hidden;
   }
 
   .right {
     width: 83%;
+    height: auto;
     overflow: hidden;
   }
 
@@ -86,14 +88,15 @@
   }
 
   .checkedList {
-    height: 394px;
+    height: 338px;
+    padding-bottom: 10px;
   }
 
   .confirm {
     display: flex;
     justify-content: flex-end;
-    padding: 10px;
-    border-top: 1px solid #d2d2d2;
+    padding: 20px 10px ;
+    border-top: 1px solid #ededed;
   }
 
   /*播放列表*/
@@ -279,7 +282,8 @@
               </el-date-picker>
             </div>
             <div v-else="">
-              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">{{$t('Content.ID_SELECT_ALL')}}
+              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">
+                {{$t('Content.ID_SELECT_ALL')}}
               </el-checkbox>
               <el-checkbox-group v-model="checkedWeeks" @change="CheckedWeeksChange">
                 <el-checkbox v-for="week in weeks" :label="week.value" :key="week.value">{{week.label}}</el-checkbox>
@@ -361,6 +365,7 @@
         </div>
         <div class="page">
           <el-pagination
+            style="padding-bottom: 10px;"
             @current-change="terChange"
             :page-size="pageCount"
             layout="total, prev, pager, next, jumper"
@@ -369,8 +374,8 @@
         </div>
       </div>
       <div class="confirm">
-        <el-button @click="release" size="mini">{{$t('Content.ID_PUBLISH')}}</el-button>
-        <el-button @click.native="exit" size="mini">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button @click.native="exit">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button style="width: 200px" type="primary" @click="release">{{$t('Content.ID_PUBLISH')}}</el-button>
       </div>
     </div>
     <el-dialog
@@ -408,24 +413,29 @@
   </div>
 </template>
 <script>
+  import {getProgram} from "@/api/program";
+  import {getTree} from "@/api/Tree";
+  import {
+    newRelease,
+    getRelease,
+    delRelease
+  } from "@/api/release";
+  import {getTerminal} from "@/api/terminal";
+
   export default {
     mounted() {
       this.getTree();
       if (this.$route.query.name != undefined) {
-        this.$http({
-          method: 'get',
-          url: 'program/query?groupId=31&pageNo=1&pageCount=1&name=' + this.$route.query.name,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let programs = response.data.cust.programs;
-            for (let play of programs) {
-              this.playImgs.push(play);
-            }
+        let params = {
+          groupId: 31,
+          pageNo: 1,
+          pageCount: 1,
+          name: this.$route.query.name
+        };
+        getProgram(params).then(response => {
+          let programs = response.cust.programs;
+          for (let play of programs) {
+            this.playImgs.push(play);
           }
         })
       }           //判断是否直接从制作节目跳转
@@ -437,7 +447,7 @@
         terSelect: 1,
         terSelects: [{
           value: 1,
-          label:this.$t('Content.ID_GROUP')
+          label: this.$t('Content.ID_GROUP')
         }/*, {
           value: 2,
           label: '终端分组'
@@ -456,7 +466,7 @@
         proType: 1,
         proTypes: [{
           value: 1,
-          label:this.$t('Content.ID_PLAY_LIST')
+          label: this.$t('Content.ID_PLAY_LIST')
         }],
         playImgs: [],                 //播放列表显示
         /*发布属性*/
@@ -580,85 +590,47 @@
       },                            //选中终端分组树节点
       getTree() {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=40',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.terTree = response.data.cust.trees;
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {id: 40};
+        getTree(params).then(response => {
+          _this.terTree = response.cust.trees;
         })
       },                            //获取树资源
       getTerList() {
         let _this = this;
         _this.terminals = [];
         _this.groupId = _this.groupId == 40 ? 41 : _this.groupId;
-        this.$http({
-          method: 'get',
-          url: "terminal/query?&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&groupId=' + _this.groupId,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
+        let params = {
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          groupId: this.groupId
+        };
+        getTerminal(params).then(response => {
+          let terminals = response.cust.terminals;
+          _this.total = response.cust.pages.count;
+          for (let terminal of terminals) {
+            _this.terminals.push(terminal)
           }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let terminals = response.data.cust.terminals;
-            _this.total = response.data.cust.pages.count;
-            for (let terminal of terminals) {
-              _this.terminals.push(terminal)
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        });
       },                     //获取终端列表
 
       queryPlayList() {
         let _this = this;
         this.plays = [];
-        this.$http({
-          method: 'get',
-          url: 'program/query?groupId=31&pageNo=' + this.proPageNo + '&pageCount=' + this.proPageCount,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let programs = response.data.cust.programs;
-            _this.proTotal = response.data.cust.pages.count;
-            for (let play of programs) {
-              _this.plays.push(play);
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          groupId: 31,
+          pageNo: this.proPageNo,
+          pageCount: this.proPageCount
+        };
+        getProgram(params).then(response => {
+          let programs = response.cust.programs;
+          _this.proTotal = response.cust.pages.count;
+          for (let play of programs) {
+            _this.plays.push(play);
           }
         })
       },                      //查询节目列表
       proChange(val) {
-        this.proPageNo = val
+        this.proPageNo = val;
         this.queryPlayList()
       },                       //节目列表翻页
       openPro() {
@@ -734,27 +706,14 @@
           disStrategy: releasePloy,                                    //发布策略
           type: type                                                   //按日期还是星期
         };
-        this.$http({
-          method: 'post',
-          url: 'publish/create',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.$message({message: this.$t('Content.ID_PUBLISH_SUCCESS'), showClose: true, center: true, type: 'success'});
-            _this.$router.push('/auditList')
-          } else {
-            _this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        newRelease(data).then(response => {
+          _this.$message({
+            message: this.$t('Content.ID_PUBLISH_SUCCESS'),
+            showClose: true,
+            center: true,
+            type: 'success'
+          });
+          _this.$router.push('/auditList')
         })
       },                            //发布
 

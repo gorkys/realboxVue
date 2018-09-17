@@ -9,6 +9,7 @@
     border: 1px solid #c1c1c1;
     height: 98%;
     width: 12%;
+    min-width: 182px;
     border-radius: 10px;
     overflow: hidden;
   }
@@ -139,11 +140,11 @@
                 <template slot="prepend">{{$t('Content.ID_USERNAME')}}</template>
               </el-input>
             </div>
-            <div style="width:200px;">
+            <!--<div style="width:200px;">
               <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchType">
                 <template slot="prepend">{{$t('Content.ID_USER_TYPE')}}</template>
               </el-input>
-            </div>
+            </div>--><!--用户类型-->
             <el-button @click="queryUserList">{{$t('Content.ID_RESEARCH')}}</el-button>
           </div>
           <div class="control">
@@ -226,10 +227,12 @@
         <el-form-item :label="$t('Content.ID_USERNAME')" :label-width="LabelWidth">
           <el-input v-model="form.userName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item v-if="title!=$t('Content.ID_EDIT_USER')" :label="$t('Content.ID_PASSWORD')" :label-width="LabelWidth">
+        <el-form-item v-if="title!=$t('Content.ID_EDIT_USER')" :label="$t('Content.ID_PASSWORD')"
+                      :label-width="LabelWidth">
           <el-input type="password" v-model="form.userPass" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item v-if="title!=$t('Content.ID_EDIT_USER')" :label="$t('Content.ID_CONFIRM_PASSWORD')" :label-width="LabelWidth">
+        <el-form-item v-if="title!=$t('Content.ID_EDIT_USER')" :label="$t('Content.ID_CONFIRM_PASSWORD')"
+                      :label-width="LabelWidth">
           <el-input type="password" v-model="form.password" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item :label="$t('Content.ID_GROUP')" :label-width="LabelWidth">
@@ -289,6 +292,14 @@
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
   import Content from '@/components/common/content'
+  import {getTree, newTree, delTree, updateTree} from "@/api/Tree";
+  import {getRole} from "@/api/roleSet";
+  import {
+    getUser,
+    newUser,
+    updateUser,
+    delUser
+  } from '@/api/user'
 
   export default {
     mounted() {
@@ -403,52 +414,30 @@
       },                   //用户分组树点击
       getTree() {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=50',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.groupSuper = _this.userTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          id: 50
+        };
+        getTree(params).then(response => {
+          _this.groupSuper = _this.userTree = response.cust.trees
         })
       },                          //用户分组树
       queryUserList() {
         let _this = this;
         _this.users = [];
-        this.$http({
-          method: 'get',
-          url: 'user/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + '&name=' + this.searchName + '&type=' + this.searchType,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
+        let params = {
+          groupId: this.treeId,
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          name: this.searchName
+          /*type: this.searchType*/
+        };
+        getUser(params).then(response => {
+          let users = response.cust.users;
+          _this.total = response.cust.pages.count;
+          for (let user of users) {
+            _this.users.push(user)
           }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let users = response.data.cust.users;
-            _this.total = response.data.cust.pages.count;
-            for (let user of users) {
-              _this.users.push(user)
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        });
       },                    //查询列表
       handleCurrentChange() {
         this.pageNo = val;
@@ -460,76 +449,31 @@
       },                              //新建
       openTerGroup() {
         this.openD = true;
-
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=40',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.terGroupTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {id: 40};
+        getTree(params).then(response => {
+          _this.terGroupTree = response.cust.trees
         })
       },                   //打开选择终端分组对话框
       openRole() {
         this.openR = true;
-
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: '/role/query?pageCount=' + _this.rolePageCount + '&pageNo=' + _this.rolePageNo,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.roleList = response.data.cust.roles;
-            _this.roleTotal = response.data.cust.pages.count
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        let params = {
+          pageCount: this.rolePageCount,
+          pageNo: this.rolePageNo
+        };
+        getRole(params).then(response => {
+          _this.roleList = response.cust.roles;
+          _this.roleTotal = response.cust.pages.count
+        });
       },                         //打开选择角色对话框
       openGroup() {
         this.openG = true;
-
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=50',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.groupTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        let params = {id: 50};
+        getTree(params).then(response => {
+          _this.groupTree = response.cust.trees
+        });
       },                        //打开选择分组对话框
 
       submit() {
@@ -559,9 +503,9 @@
           this.$message({message: this.$t('Msg.ID_MSG_53'), center: true, type: 'warning'});
           return false
         }
-        let data = {}, url = '', method = '', msg = '';
+
         if (this.title == this.$t('Content.ID_NEW_USER')) {
-          data = {
+          let data = {
             creator: sessionStorage.getItem('name'),
             desc: this.form.desc,
             name: this.form.userName,
@@ -570,12 +514,15 @@
             roleId: this.roleId,         //角色ID
             groupId: this.groupId,         //终端树ID
           };
-          url = 'user/create';
-          method = 'post';
-          msg = this.$t('Msg.ID_MSG_54')
+          newUser(data).then(response => {
+            this.$message({message: this.$t('Msg.ID_MSG_54'), center: true, type: 'success'});
+            this.openDialog = false;
+            this.queryUserList()
+          })
+
         }
         else {
-          data = {
+          let data = {
             creator: sessionStorage.getItem('name'),
             id: this.userId,
             desc: this.form.desc,
@@ -584,40 +531,21 @@
             roleId: this.roleId,         //角色ID
             groupId: this.groupId,         //分组ID
           };
-          url = 'user/update';
-          method = 'put';
-          msg = this.$t('Msg.ID_MSG_55')
-        }
-        this.$http({
-          method: method,
-          url: url,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            this.$message({message: msg, center: true, type: 'success'});
+          updateUser(data).then(response => {
+            this.$message({message: this.$t('Msg.ID_MSG_55'), center: true, type: 'success'});
             this.openDialog = false;
             this.queryUserList()
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+          })
+        }
+
       },                           //新建与编辑用户
       handleRolePage() {
-        this.rolePageNo = val
+        this.rolePageNo = val;
         this.openGroup()
       },                   //选择角色列表的分页
 
       roleSelect() {
-        if (this.roleRow.length > 1 || this.roleRow.length == 0) {
+        if (this.roleRow.length > 1 || this.roleRow.length === 0) {
           this.$message({
             message: this.$t('Msg.ID_MSG_56'),
             center: true,
@@ -671,39 +599,21 @@
       },               //用户列表选中行数据
 
       delUser() {
-        var ids = this.userRow.map(item => item.id).join(' ')
+        var ids = this.userRow.map(item => item.id).join(' ');
         this.$confirm(this.$t('Msg.ID_MSG_58'), this.$t('Content.ID_PROMPT'), {
           confirmButtonText: this.$t('Content.ID_OK'),
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'user/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({message: this.$t('Content.ID_DELETE_SUCCESS'), showClose: true, center: true, type: 'success'});
-              this.queryUserList()
-            } else if (response.data.code == 'USER006') {
-              this.$message({
-                message: response.data.infor,
-                showClose: true,
-                center: true,
-                type: 'warning'
-              });
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {ids: ids};
+          delUser(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.queryUserList()
           })
         })
       },                          //删除用户
@@ -754,28 +664,10 @@
             label: this.treeForm.groupName,
             creator: sessionStorage.getItem('name')
           };
-          this.$http({
-            method: 'post',
-            url: 'tree/create',
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            },
-            data: data
-          }).then(response => {
-            if (response.data.code == '0000') {
-              _this.getTree();
-              this.$message({message: this.$t('Msg.ID_MSG_37'), showClose: true, center: true, type: 'success'});
-              this.openTreeDialog = false
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          newTree(data).then(response => {
+            _this.getTree();
+            this.$message({message: this.$t('Msg.ID_MSG_37'), showClose: true, center: true, type: 'success'});
+            this.openTreeDialog = false
           })
         } else {
           let _this = this;
@@ -787,37 +679,12 @@
             updaterCreator: sessionStorage.getItem('name'),
             treeId: this.targetId        //目标树ID
           };
-          this.$http({
-            method: 'put',
-            url: 'tree/update',
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            },
-            data: data
-          }).then(response => {
-            if (response.data.code == '0000') {
-              _this.getTree();
-              _this.$message({message: this.$t('Msg.ID_MSG_37'), showClose: true, center: true, type: 'success'});
-              this.openTreeDialog = false;
-              _this.treeForm.superiorGroup = '';
-              _this.treeForm.groupName = ''
-            } else if (response.data.code == 'TREE006') {
-              this.$message({
-                message: response.data.infor,
-                showClose: true,
-                center: true,
-                type: 'warning'
-              });
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          updateTree(data).then(response => {
+            _this.getTree();
+            _this.$message({message: this.$t('Msg.ID_MSG_37'), showClose: true, center: true, type: 'success'});
+            this.openTreeDialog = false;
+            _this.treeForm.superiorGroup = '';
+            _this.treeForm.groupName = ''
           })
         }
       },                      //确认修改节目分组
@@ -833,42 +700,19 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'tree/delete?id=' + id,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({
-                message: this.$t('Content.ID_DELETE_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              });
-              this.getTree()
-            } else if (response.data.code == 'TREE006') {
-              this.$message({
-                message: response.data.infor,
-                showClose: true,
-                center: true,
-                type: 'warning'
-              });
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {id: id};
+          delTree(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.getTree()
           })
         })
       },                           //删除节目分组
-      langChange(){
+      langChange() {
         this.getTree();
       }
     }

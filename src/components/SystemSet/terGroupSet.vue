@@ -58,6 +58,7 @@
         <a @click="Edit"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
         <a @click="delDeartment"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
         <a @click="getTree"><i class="el-icon-refresh"></i>{{$t('Content.ID_REFRESH')}}</a>
+        <a @click="setting"><i class="el-icon-setting"></i>{{$t('Content.ID_PARAMTERS_SETTING')}}</a>
       </div>
       <el-tree
         :data="departmentTree"
@@ -70,6 +71,24 @@
       </el-tree>
     </div>
     <footer-bar></footer-bar>
+    <el-dialog
+      width="400px"
+      :title="$t('Content.ID_PARAMTERS_SETTING')"
+      :visible.sync="dialogSetting"
+      append-to-body>
+      <el-form ref="settingForm" :model="settingForm" label-width="100px">
+        <el-form-item :label="$t('Content.ID_SHOW_SETTING')">
+          <el-checkbox-group v-model="settingForm.type" size="small">
+            <el-checkbox :label="$t('Content.ID_SHOW_WEATHER')" name="type"></el-checkbox>
+            <el-checkbox :label="$t('Content.ID_SHOW_TIME')" name="type"></el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogSetting = false">{{$t('Content.ID_CANCEL')}}</el-button>
+        <el-button type="primary" @click="submitSetting">{{$t('Content.ID_OK')}}</el-button>
+      </div>
+    </el-dialog>            <!--天气时间显示-->
     <el-dialog :title="title" ref="dialog" :visible.sync="openDialog" width="27.5%">
       <el-dialog
         width="30%"
@@ -108,6 +127,8 @@
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import {getTree, delTree, updateTree, newTree} from "@/api/Tree";
+  import {setTerminalGroupWea} from "@/api/terminal";
 
   export default {
     mounted: function () {
@@ -116,8 +137,12 @@
     data() {
       return {
         label: 'aa',                        //新增树的子名称
+        dialogSetting: false,                //设置属性对话框
         openDialog: false,                  //打开对话框
         innerVisible: false,                //选择上级分组的对话框
+        settingForm:{
+          type:[]
+        },
         title: '',                          //弹出框标题
         form: {
           deartmentName: '',                 // 分组名称
@@ -143,7 +168,7 @@
     methods: {
       depCheckChang(data, node) {
         this.i++;
-        if (this.i % 2 == 0) {
+        if (this.i % 2 === 0) {
           if (node) {
             this.$refs.tree.setCheckedNodes([]);
             this.$refs.tree.setCheckedNodes([data]);
@@ -156,7 +181,7 @@
       },        //树的单选实现
       superiorDepCheckChang(data, node) {
         this.j++;
-        if (this.j % 2 == 0) {
+        if (this.j % 2 === 0) {
           if (node) {
             this.$refs.departmentTree.setCheckedNodes([]);
             this.$refs.departmentTree.setCheckedNodes([data]);
@@ -168,34 +193,20 @@
         }
       },            //上级树的单选实现
       getTree: function () {
-        let _this = this
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=' + this.treeId,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.departmentTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let _this = this;
+        let params = {
+          id: this.treeId
+        };
+        getTree(params).then(response => {
+          _this.departmentTree = response.cust.trees
         })
       },         //获取树资源
       addDeartment() {
-        if (this.form.deartmentName == '') {
+        if (this.form.deartmentName === '') {
           this.$message({message: this.$t('Msg.ID_MSG_41'), showClose: true, center: true, type: 'warning'});
           return false
         }
-        if (this.form.superiorDeartment == '') {
+        if (this.form.superiorDeartment === '') {
           this.$message({message: this.$t('Msg.ID_MSG_42'), showClose: true, center: true, type: 'warning'});
           return false
         }
@@ -205,33 +216,15 @@
           label: this.form.deartmentName,
           creator: sessionStorage.getItem('name')
         };
-        this.$http({
-          method: 'post',
-          url: 'tree/create',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.getTree();
-            this.openDialog = false
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        newTree(data).then(response => {
+          _this.getTree();
+          this.openDialog = false
         })
       },
       submitSD() {
         let superior = this.$refs.departmentTree.getCheckedNodes();
         if (superior.length > 1) {
-          this.$message({message:this.$t('Msg.ID_MSG_47'), showClose: true, center: true, type: 'warning'});
+          this.$message({message: this.$t('Msg.ID_MSG_47'), showClose: true, center: true, type: 'warning'});
           return false
         }
         this.form.superiorDeartment = superior[0].label;
@@ -239,7 +232,7 @@
         this.innerVisible = false
       },                   //选择上级分组
       submit() {
-        if (this.title == this.$t('Content.ID_NEW_GROUP')) {
+        if (this.title === this.$t('Content.ID_NEW_GROUP')) {
           this.addDeartment()
         } else {
           this.editDeartment()
@@ -283,34 +276,9 @@
           updaterCreator: sessionStorage.getItem('name'),
           newId: this.targetId
         };
-        this.$http({
-          method: 'put',
-          url: 'tree/update',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          },
-          data: data
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.getTree();
-            this.openDialog = false
-          } else if (response.data.code == 'TREE006') {
-            this.$message({
-              message: response.data.infor,
-              showClose: true,
-              center: true,
-              type: 'warning'
-            });
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        updateTree(data).then(response => {
+          _this.getTree();
+          this.openDialog = false
         })
       },              //编辑分组方法
       delDeartment() {
@@ -325,43 +293,33 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'tree/delete?id=' + id,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.$message({
-                message: this.$t('Content.ID_DELETE_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              });
-              this.getTree()
-            } else if (response.data.code == 'TREE006') {
-              this.$message({
-                message: response.data.infor,
-                showClose: true,
-                center: true,
-                type: 'warning'
-              });
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            id: id
+          };
+          delTree(params).then(response => {
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            });
+            this.getTree()
           })
         })
       },                 //删除分组方法
-      langChange(){
+      langChange() {
         this.getTree();
+      },
+      setting() {
+        let tree = this.$refs.tree.getCheckedNodes();
+        if (tree.length > 1 || tree.length === 0) {
+          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
+          return false
+        }
+        this.dialogSetting = true
+      },                                //设置属性
+      submitSetting() {
+        console.log(this.settingForm.type)
       }
     }
   }

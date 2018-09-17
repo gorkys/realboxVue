@@ -114,6 +114,11 @@ module.exports = {
     ID_MSG_76:'',
   },
   Content: {
+    ID_SHOW_SETTING:"显示设置",
+    ID_SHOW_WEATHER:'显示天气',
+    ID_SHOW_TIME:'显示时间',
+    ID_ADD_AUDIO:'加入音频',
+    ID_AUDIO:'音频',
     ID_ANDROID:'安卓',
     ID_CHOOSE_BG:'选择背景',
     ID_FAST:'快',

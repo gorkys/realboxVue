@@ -79,7 +79,7 @@
             <el-table :data="templates" style="width: 100%">
               <el-table-column prop="name" align="center" :label="$t('Content.ID_TEMPLATE_NAME')"></el-table-column>
               <el-table-column prop="preview" align="center" :label="$t('Content.ID_THUMBNAIL')">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <img :src="scope.row.preview" width="30" height="50"/>
                 </template>
               </el-table-column>
@@ -125,6 +125,8 @@
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import {getTemplate} from '@/api/template'
+  import {getTree} from '@/api/Tree'
 
   export default {
     data() {
@@ -163,28 +165,16 @@
       queryTemList() {
         let _this = this;
         this.templates = [];
-        this.$http({
-          method: 'get',
-          url: 'template/query?groupId=' + this.tTreeId + '&pageNo=' + this.tPageNo + '&pageCount=' + this.tPageCount,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let templates = response.data.cust.templates;
-            _this.tTotal = response.data.cust.pages.count;
-            for (let template of templates) {
-              _this.templates.push(template);
-            }
-          } else {
-            this.$message({
-              message:response.data.infor,
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          groupId: this.tTreeId,
+          pageNo: this.tPageNo,
+          pageCount: this.tPageCount
+        };
+        getTemplate(params).then(response => {
+          let templates = response.cust.templates;
+          _this.tTotal = response.cust.pages.count;
+          for (let template of templates) {
+            _this.templates.push(template);
           }
         })
       },                  //获取模板列表
@@ -193,30 +183,16 @@
         this.queryTemList()
       },               //点击模板树回调
       temChange(val) {
-        this.tPageNo = val
+        this.tPageNo = val;
         this.queryTemList()
       },                  //模板翻页回调
       getTemTree() {
-        let _this = this
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=20',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.templateTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor,
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let _this = this;
+        let params = {
+          id: 20
+        };
+        getTree(params).then(response => {
+          _this.templateTree = response.cust.trees
         })
       },                    //查询模板树
       selectedTem(e) {
@@ -314,6 +290,7 @@
     overflow: hidden;
     border-radius: 10px;
     width: 12%;
+    min-width: 120px;
   }
 
   #templateList {

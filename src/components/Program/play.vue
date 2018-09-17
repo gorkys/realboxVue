@@ -9,7 +9,6 @@
     border: 1px solid #c1c1c1;
     height: 98%;
     width: 12%;
-    min-width: 182px;
     border-radius: 10px;
     overflow: hidden;
   }
@@ -147,7 +146,6 @@
     overflow: hidden;
     border-radius: 10px;
     width: 12%;
-    min-width: 125px;
   }
 
   #templateList {
@@ -257,48 +255,48 @@
 
 <template>
   <div id="play">
-    <nav-bar @lang-change="langChange"></nav-bar>
+    <nav-bar></nav-bar>
     <breadcrumb></breadcrumb>
     <Content>
       <div id="playTree">
-        <div class="title">{{$t('Content.ID_PROGRAM_GROUP')}}</div>
+        <div class="title">节目分组</div>
         <div class="controlTree">
-          <a @click="NewTree"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
-          <a @click="EditTree"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
-          <a @click="delTree"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
+          <a @click="NewTree"><i class="el-icon-plus"></i>新建</a>
+          <a @click="EditTree"><i class="el-icon-edit"></i>编辑</a>
+          <a @click="delTree"><i class="el-icon-delete"></i>删除</a>
         </div>
         <el-tree :data="playTree" node-key="id" @node-click="handleNodeClick" show-checkbox :highlight-current="true"
                  :check-strictly="true" default-expand-all ref="tree" :expand-on-click-node="false"
                  @check-change="treeCheckCheck"></el-tree>
       </div>
       <div id="playList">
-        <div class="title">{{$t('Content.ID_PROGRAM_LIST')}}</div>
+        <div class="title">节目列表</div>
         <div class="controlBox">
           <div class="search">
-            <div>
-              <el-select v-model="value" :placeholder="$t('Content.ID_IMAGE_MODE')">
+            <div style="width: 110px">
+              <el-select v-model="value" placeholder="图形模式">
                 <el-option v-for="item in select"
                            :key="item.value"
                            :label="item.label"
                            :value="item.value"></el-option>
               </el-select>
             </div>
-            <div>
-              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchName">
-                <template slot="prepend">{{$t('Content.ID_PROGRAM_NAME')}}</template>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容" v-model="searchName">
+                <template slot="prepend">节目名称</template>
               </el-input>
             </div>
-            <div>
-              <el-input :placeholder="$t('Msg.ID_MSG_5')" v-model="searchResolution">
-                <template slot="prepend">{{$t('Content.ID_RESOLUTION')}}</template>
+            <div style="width:200px;">
+              <el-input placeholder="请输入内容" v-model="searchResolution">
+                <template slot="prepend">分辨率</template>
               </el-input>
             </div>
-            <el-button @click="queryPlayList">{{$t('Content.ID_RESEARCH')}}</el-button>
+            <el-button @click="queryPlayList">搜索</el-button>
           </div>
           <div class="control">
-            <a @click="newPlay"><i class="el-icon-plus"></i>{{$t('Content.ID_NEW')}}</a>
-            <a @click="editPlay(playName)"><i class="el-icon-edit"></i>{{$t('Content.ID_EDIT')}}</a>
-            <a @click="delPlay"><i class="el-icon-delete"></i>{{$t('Content.ID_DELETE')}}</a>
+            <a @click="newPlay"><i class="el-icon-plus"></i>新建</a>
+            <a @click="editPlay(playName)"><i class="el-icon-edit"></i>修改</a>
+            <a @click="delPlay"><i class="el-icon-delete"></i>删除</a>
           </div>
         </div>
         <div v-if="value == '2'" class="tableList">
@@ -306,20 +304,19 @@
             :data="plays"
             style="width: 100%">
             <el-table-column type="selection" align="center" width="55"></el-table-column>
-            <el-table-column prop="name" align="center" :label="$t('Content.ID_PROGRAM_NAME')"></el-table-column>
-            <el-table-column prop="preview" align="center" :label="$t('Content.ID_THUMBNAIL')">
+            <el-table-column prop="name" align="center" label="节目名称"></el-table-column>
+            <el-table-column prop="preview" align="center" label="预览图">
               <template slot-scope="scope">
                 <img :src="scope.row.preview" width="100" height="70"/>
               </template>
             </el-table-column>
-            <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
-            <el-table-column prop="status" align="center" :label="$t('Content.ID_STATUS')"></el-table-column>
-            <el-table-column prop="terminalType" align="center"
-                             :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
-            <el-table-column prop="address" align="center" :label="$t('Content.ID_RESOURCE_SIZE')"></el-table-column>
-            <el-table-column prop="address" align="center" :label="$t('Content.ID_PLAYTIME')"></el-table-column>
-            <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
-            <el-table-column prop="address" align="center" :label="$t('Content.ID_OPERATION')"></el-table-column>
+            <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+            <el-table-column prop="status" align="center" label="状态"></el-table-column>
+            <el-table-column prop="terminalType" align="center" label="终端类型"></el-table-column>
+            <el-table-column prop="address" align="center" label="素材大小"></el-table-column>
+            <el-table-column prop="address" align="center" label="播放时长"></el-table-column>
+            <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+            <el-table-column prop="address" align="center" label="操作"></el-table-column>
           </el-table>
         </div>
         <div v-else class="playBox">
@@ -348,14 +345,14 @@
     </Content>
     <footer-bar></footer-bar>
     <el-dialog
-      :title="$t('Content.ID_SELECT_TEMPLATE')"
+      title="选择模板"
       :visible.sync="setTem"
       width="58%"
       top="1vh"
     >
       <div class="temDialog">
         <div id="templateTree">
-          <div class="title">{{$t('Content.ID_TEMPLATE')}}</div>
+          <div class="title">模板管理</div>
           <el-tree :data="templateTree" node-key="id" @node-click="temTreeClick" :expand-on-click-node="false"
                    default-expand-all></el-tree>
         </div>
@@ -363,7 +360,7 @@
           <div class="controlBox">
             <div class="search">
               <div style="width: 110px">
-                <el-select v-model="tValue" :placeholder="$t('Content.ID_IMAGE_MODE')">
+                <el-select v-model="tValue" placeholder="图形模式">
                   <el-option v-for="item in tSelect"
                              :key="item.value"
                              :label="item.label"
@@ -371,26 +368,27 @@
                 </el-select>
               </div>
               <div style="width:200px;">
-                <el-input :placeholder="$t('Msg.ID_MSG_5')">
-                  <template slot="prepend">{{$t('Content.ID_TEMPLATE_NAME')}}</template>
+                <el-input placeholder="请输入内容">
+                  <template slot="prepend">模板名称</template>
                 </el-input>
               </div>
-              <el-button>{{$t('Content.ID_RESEARCH')}}</el-button>
+              <el-button>搜索</el-button>
             </div>
           </div>
           <div v-if="tValue == '2'" class="tableList">
             <el-table :data="templates" style="width: 100%">
-              <el-table-column prop="name" align="center" :label="$t('Content.ID_TEMPLATE_NAME')"></el-table-column>
-              <el-table-column prop="preview" align="center" :label="$t('Content.ID_THUMBNAIL')">
+              <el-table-column prop="name" align="center" label="模板名称"></el-table-column>
+              <el-table-column prop="preview" align="center" label="预览图">
                 <template slot-scope="scope">
                   <img :src="scope.row.preview" width="30" height="50"/>
                 </template>
               </el-table-column>
-              <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
-              <el-table-column prop="address" align="center" :label="$t('Content.ID_TERMINAL_TYPE')"></el-table-column>
-              <el-table-column prop="creator" align="center" :label="$t('Content.ID_CREATOR')"></el-table-column>
-              <el-table-column prop="updateTime" align="center" :label="$t('Content.ID_UPDATE_TIME')"></el-table-column>
-              <el-table-column prop="desc" align="center" :label="$t('Content.ID_DESCRIPTION')"></el-table-column>
+              <el-table-column prop="address" align="center" label="所属机构"></el-table-column>
+              <el-table-column prop="resolution" align="center" label="分辨率"></el-table-column>
+              <el-table-column prop="address" align="center" label="终端类型"></el-table-column>
+              <el-table-column prop="creator" align="center" label="创建人"></el-table-column>
+              <el-table-column prop="updateTime" align="center" label="更新时间"></el-table-column>
+              <el-table-column prop="desc" align="center" label="描述"></el-table-column>
             </el-table>
           </div>
           <div v-else class="templateBox">
@@ -418,33 +416,33 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="selectTem">{{$t('Content.ID_OK')}}</el-button>
+        <el-button type="primary" @click="selectTem">确 定</el-button>
   </span>
     </el-dialog><!--选择模板-->
     <el-dialog :title="treeTitle" ref="TreeDialog" :visible.sync="openTreeDialog" width="27.5%">
-      <el-dialog width="30%" :title="$t('Content.ID_PARENT_GROUP')" :visible.sync="openSuperG" append-to-body>
+      <el-dialog width="30%" title="选择分组上级" :visible.sync="openSuperG" append-to-body>
         <el-tree :data="groupSuper" node-key="id" :check-strictly="true" show-checkbox
                  default-expand-all ref="groupSuper" @check-change="groupSuperCheckCheck"></el-tree>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="openSuperG = false">{{$t('Content.ID_CANCEL')}}</el-button>
-          <el-button type="primary" @click="selectSuperGroup">{{$t('Content.ID_OK')}}</el-button>
+          <el-button @click="openSuperG = false">取 消</el-button>
+          <el-button type="primary" @click="selectSuperGroup">确 定</el-button>
         </div>
       </el-dialog>            <!--上级分组选择-->
-      <el-form :model="treeForm" label-width="200">
-        <el-form-item :label="$t('Content.ID_GROUP_NAME')" :label-width="LabelWidth">
+      <el-form :model="treeForm">
+        <el-form-item label="分组名称" :label-width="LabelWidth">
           <el-input v-model="treeForm.groupName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item :label="$t('Content.ID_PARENT_GROUP')" :label-width="LabelWidth">
+        <el-form-item label="上级分组" :label-width="LabelWidth">
           <input v-model="treeForm.superiorGroup" class="el-input__inner" auto-complete="off"
                  style="cursor: pointer" @click="openSuperG = true" readonly="readonly"/>
         </el-form-item>
-        <el-form-item :label="$t('Content.ID_GROUP_DESCRIPTION')" :label-width="LabelWidth">
+        <el-form-item label="分组描述" :label-width="LabelWidth">
           <el-input type="textarea" v-model="treeForm.groupDesc" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openTreeDialog = false">{{$t('Content.ID_CANCEL')}}</el-button>
-        <el-button type="primary" @click="groupSubmit">{{$t('Content.ID_OK')}}</el-button>
+        <el-button @click="openTreeDialog = false">取 消</el-button>
+        <el-button type="primary" @click="groupSubmit">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -471,10 +469,10 @@
         value: '',
         select: [{
           value: '1',
-          label: this.$t('Content.ID_IMAGE_MODE')
+          label: '图形模式'
         }, {
           value: '2',
-          label: this.$t('Content.ID_LIST_MODE')
+          label: '列表模式'
         }],
         pageCount: 21,     //每页显示数目
         pageNo: 1,          //当前页
@@ -490,10 +488,10 @@
         tValue: '',
         tSelect: [{
           value: '1',
-          label: this.$t('Content.ID_IMAGE_MODE')
+          label: '图形模式'
         }, {
           value: '2',
-          label: this.$t('Content.ID_LIST_MODE')
+          label: '列表模式'
         }],
         tPageCount: 12,     //每页显示数目
         tPageNo: 1,          //当前页
@@ -508,7 +506,7 @@
         openSuperG: false,
         creator: '',
         currentGroupId: '',       //当前组ID
-        LabelWidth: '100px',
+        LabelWidth: '70px',
         treeForm: {
           groupName: '',
           superiorGroup: '',
@@ -557,32 +555,32 @@
       },                 //树单选
       getTree() {
         let _this = this;
-        let params={id:30};
-        getTree(params).then(response=>{
+        let params = {id: 30};
+        getTree(params).then(response => {
           _this.groupSuper = _this.playTree = response.cust.trees
         })
       },
       queryPlayList() {
         let _this = this;
         this.plays = [];
-        let params={
-          groupId:this.treeId,
-          pageNo:this.pageNo,
-          pageCount:this.pageCount,
-          name:this.searchName,
-          resolution:this.searchResolution
+        let params = {
+          groupId: this.treeId,
+          pageNo: this.pageNo,
+          pageCount: this.pageCount,
+          name: this.searchName,
+          resolution: this.searchResolution
         };
-        getProgram(params).then(response=>{
+        getProgram(params).then(response => {
           let programs = response.cust.programs;
           _this.total = response.cust.pages.count;
           for (let play of programs) {
             _this.plays.push(play);
           }
-        })
+        });
       },
       handleCurrentChange(val) {
         this.pageNo = val;
-        this.queryPlayList()
+        this.getRoleList()
       },        //翻页回调
       handleNodeClick(val) {
         val.id != 30 ? this.treeId = val.id : this.treeId = 31;
@@ -623,35 +621,34 @@
         let ids = this.ids.join(' ');
         if (ids == '') {
           this.$message({
-            message: this.$t('Msg.ID_MSG_34'),
+            message: '未选择节目！',
             showClose: true,
             center: true,
             type: 'warning'
           });
           return false
         }
-        this.$confirm(this.$t('Msg.ID_MSG_9'), this.$t('Content.ID_PROMPT'), {
-          confirmButtonText: this.$t('Content.ID_OK'),
-          cancelButtonText: this.$t('Content.ID_CANCEL'),
+        this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
           type: 'warning'
         }).then(() => {
-          let params={ids:ids};
-          delProgram(params).then(response=>{
+          let params = {ids: ids};
+          delProgram(params).then(response => {
             this.queryPlayList();
             this.$message({
-              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              message: '删除成功！',
               showClose: true,
               center: true,
               type: 'success'
             });
             this.check = false
-          })
+          });
         })
       },
       editPlay(name) {
         if (name == '') {
           this.$message({
-            message: this.$t('Msg.ID_MSG_18'),
+            message: '请选择一个节目进行修改！',
             showClose: true,
             center: true,
             type: 'warning'
@@ -664,12 +661,12 @@
       queryTemList() {
         let _this = this;
         this.templates = [];
-        let params={
-          groupId:this.tTreeId,
-          pageNo:this.tPageNo,
-          pageCount:this.tPageCount
+        let params = {
+          groupId: this.tTreeId,
+          pageNo: this.tPageNo,
+          pageCount: this.tPageCount
         };
-        getTemplate(params).then(response=>{
+        getTemplate(params).then(response => {
           let templates = response.cust.templates;
           _this.tTotal = response.cust.pages.count;
           for (let template of templates) {
@@ -687,8 +684,8 @@
       },                  //模板翻页回调
       getTemTree() {
         let _this = this;
-        let params={id:20};
-        getTree(params).then(response=>{
+        let params = {id: 20};
+        getTree(params).then(response => {
           _this.templateTree = response.cust.trees
         })
       },                    //查询模板树
@@ -721,7 +718,7 @@
       selectTem() {
         if (this.temName === '') {
           this.$message({
-            message: this.$t('Msg.ID_MSG_36'),
+            message: '未选择模板！',
             showClose: true,
             center: true,
             type: 'warning'
@@ -735,14 +732,14 @@
       NewTree() {
         this.treeForm.groupName = '';
         this.treeForm.superiorGroup = '';
-        this.treeTitle = this.$t('Content.ID_NEW_GROUP');
+        this.treeTitle = "新建分组";
         this.openTreeDialog = true
       },                       //新建节目分组
       EditTree() {
-        this.treeTitle = this.$t('Content.ID_EDIT_GROUP');
+        this.treeTitle = "编辑分组";
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.creator = tree[0].creator;
@@ -755,19 +752,19 @@
       delTree() {
         let tree = this.$refs.tree.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: this.$t('Msg.ID_MSG_19'), showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组进行操作！', showClose: true, center: true, type: 'warning'});
           return false
         }
         let id = tree[0].id;
-        this.$confirm(this.$t('Msg.ID_MSG_39'), this.$t('Content.ID_PROMPT'), {
-          confirmButtonText: this.$t('Content.ID_OK'),
-          cancelButtonText: this.$t('Content.ID_CANCEL'),
+        this.$confirm('此操作将永久删除该分组, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let params={id:id};
-          delTree(params).then(response=>{
+          let params = {id: id};
+          delTree(params).then(response => {
             this.$message({
-              message: this.$t('Content.ID_DELETE'),
+              message: '删除成功！',
               showClose: true,
               center: true,
               type: 'success'
@@ -779,7 +776,7 @@
       selectSuperGroup() {
         let tree = this.$refs.groupSuper.getCheckedNodes();
         if (tree.length > 1 || tree.length == 0) {
-          this.$message({message: this.$t('Msg.ID_MSG_40'), showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请选择一个分组作为上级！', showClose: true, center: true, type: 'warning'});
           return false
         }
         this.superId = tree[0].id;
@@ -788,25 +785,25 @@
       },              //确认修改节目分组
       groupSubmit() {
         if (this.treeForm.groupName == '') {
-          this.$message({message: this.$t('Msg.ID_MSG_41'), showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写分组名称！', showClose: true, center: true, type: 'warning'});
           return false
         }
         if (this.treeForm.superiorGroup == '') {
-          this.$message({message: this.$t('Msg.ID_MSG_42'), showClose: true, center: true, type: 'warning'});
+          this.$message({message: '请填写上级分组！', showClose: true, center: true, type: 'warning'});
           return false
         }
-        if (this.treeTitle == this.$t('Content.ID_NEW_GROUP')) {
+        if (this.treeTitle == '新建分组') {
           let _this = this;
           let data = {
             parentId: this.superId,
             label: this.treeForm.groupName,
             creator: sessionStorage.getItem('name')
           };
-          newTree(data).then(response=>{
+          newTree(data).then(response => {
             _this.getTree();
-            this.$message({message: this.$t('Content.ID_MSG_37'), showClose: true, center: true, type: 'success'});
+            this.$message({message: '新建分组成功！', showClose: true, center: true, type: 'success'});
             this.openTreeDialog = false
-          })
+          });
         } else {
           let _this = this;
           let data = {
@@ -817,32 +814,15 @@
             updaterCreator: sessionStorage.getItem('name'),
             treeId: this.targetId        //目标树ID
           };
-          updateTree(data).then(response=>{
+          updateTree(data).then(respons=>{
             _this.getTree();
-            _this.$message({message: this.$t('Content.ID_MSG_38'), showClose: true, center: true, type: 'success'});
+            _this.$message({message: '编辑分组成功！', showClose: true, center: true, type: 'success'});
             this.openTreeDialog = false;
             _this.treeForm.superiorGroup = '';
             _this.treeForm.groupName = ''
           })
         }
       },                   //删除节目分组
-      langChange() {
-        this.getTree();
-        this.select = [{
-          value: '1',
-          label: this.$t('Content.ID_IMAGE_MODE')
-        }, {
-          value: '2',
-          label: this.$t('Content.ID_LIST_MODE')
-        }];
-        this.tSelect = [{
-          value: '1',
-          label: this.$t('Content.ID_IMAGE_MODE')
-        }, {
-          value: '2',
-          label: this.$t('Content.ID_LIST_MODE')
-        }]
-      }
     }
   }
 </script>

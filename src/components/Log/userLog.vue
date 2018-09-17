@@ -120,6 +120,7 @@
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import {getUserLog,exportUserLog} from "@/api/log";
 
   export default {
     data() {
@@ -141,26 +142,14 @@
     },
     methods: {
       getUserLog() {
-        this.$http({
-          method: 'get',
-          url: "log/query/user?pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&operator=" + this.operator,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            this.logs = response.data.cust.logs;
-            this.total = response.data.cust.pages.count;
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          operator: this.operator
+        };
+        getUserLog(params).then(response=>{
+          this.logs = response.cust.logs;
+          this.total = response.cust.pages.count;
         })
       },
       pageChange(val) {
@@ -168,30 +157,13 @@
         this.getUserLog()
       },                    //分页
       download(){
-        this.$http({
-          method: 'get',
-          url: "log/export/user",
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let a = document.createElement('a');
-            a.href = response.data.cust.desc;
-            a.download = '';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        exportUserLog().then(response=>{
+          let a = document.createElement('a');
+          a.href = response.cust.desc;
+          a.download = '';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
         })
       }
     }

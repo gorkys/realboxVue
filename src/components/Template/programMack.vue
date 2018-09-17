@@ -287,7 +287,7 @@
                 :type="resource.type"
                 @mousedown="mouse($event)">
               <div class="imgBox">
-                <img @dragstart="prohibited($event)" :src="'http://'+ resource.thumbnail">
+                <img @dragstart="prohibited($event)" :src="baseURL+ resource.thumbnail">
               </div>
               <p>{{resource.name}}</p>
             </li>
@@ -308,13 +308,15 @@
       <div class="controlBox">
         <div class="name">
           <div style="width:350px;">
-            <label>{{$t('Content.ID_PROGRAM_NAME')}}</label><input v-model="proName" style="width: 50%;margin-left: 10px;" type="text">
+            <label>{{$t('Content.ID_PROGRAM_NAME')}}</label><input v-model="proName"
+                                                                   style="width: 50%;margin-left: 10px;" type="text">
           </div>
         </div>
         <div class="control">
           <a @click="quickPreview"><i class="el-icon-view"></i> {{$t('Content.ID_PREVIEW')}}</a>
           <a @click="save"><i class="iconfont icon-iconset0237"></i> {{$t('Content.ID_SAVE')}}</a>
-          <router-link to="programList"><i class="iconfont icon-lingcunwei"></i> {{$t('Content.ID_RETURN')}}</router-link>
+          <router-link to="programList"><i class="iconfont icon-lingcunwei"></i> {{$t('Content.ID_RETURN')}}
+          </router-link>
 
           <a @click="release"><i class="iconfont icon-server-kuaisufabu"></i> {{$t('Content.ID_PUBLISH')}}</a>
         </div>
@@ -323,9 +325,9 @@
     </div>
     <div id="setAttr">
       <el-tabs v-model="activeName" type="card">
-        <el-tab-pane v-for="item in temItems" v-if="item.type.indexOf('txt') == -1" :label="item.name"
+        <el-tab-pane v-for="item in temItems" :key="item.name" v-if="item.type.indexOf('txt') == -1" :label="item.name"
                      :name="item.name">
-          <el-form v-if="item.type=='scroll'" v-model="form" label-width="100px">
+          <el-form v-if="item.type==='scroll'" v-model="form" label-width="100px">
             <el-form-item :label="$t('Content.ID_SUBTITLE_CONTENT')" style="margin-bottom: 5px">
               <el-input v-model="form.scrollContent" type="textarea" :placeholder="$t('Msg.ID_MSG_60')"
                         :autosize="{ minRows: 1, maxRows: 1}" style="width: 98%" resize="none">
@@ -340,7 +342,7 @@
               <el-col :span="6">
                 <el-form-item :label="$t('Content.ID_SUBTITLE_SCROLL')" size="mini" style="margin-bottom: 5px;">
                   <el-select v-model="form.scrollDirection" :placeholder="$t('Msg.ID_MSG_61')" style="width: 150px">
-                    <el-option v-for="item in form.scrollDirections" :label="item.direction"
+                    <el-option v-for="item in form.scrollDirections" :key="item.direction" :label="item.direction"
                                :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
@@ -348,14 +350,16 @@
               <el-col :span="6">
                 <el-form-item :label="$t('Content.ID_FONT_SIZE')" size="mini" style="margin-bottom: 5px;">
                   <el-select v-model="form.scrollFontSize" :placeholder="$t('Msg.ID_MSG_62')" style="width: 150px">
-                    <el-option v-for="item in form.scrollFontSizes" :label="item.size" :value="item.value"></el-option>
+                    <el-option v-for="item in form.scrollFontSizes" :key="item.value" :label="item.size"
+                               :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
                 <el-form-item :label="$t('Content.ID_FONT_TYPE')" size="mini" style="margin-bottom: 5px;">
                   <el-select v-model="form.scrollFontFamily" :placeholder="$t('Msg.ID_MSG_63')" style="width: 150px">
-                    <el-option v-for="item in form.scrollFontFamilys" :label="item.font" :value="item.font"></el-option>
+                    <el-option v-for="item in form.scrollFontFamilys" :key="item.font" :label="item.font"
+                               :value="item.font"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -369,14 +373,17 @@
               <el-col :span="6">
                 <el-form-item :label="$t('Content.ID_SCROLL_SPEED')" size="mini">
                   <el-select v-model="form.scrollSpeed" :placeholder="$t('Msg.ID_MSG_64')" style="width: 150px">
-                    <el-option v-for="item in form.scrollSpeeds" :label="item.speed" :value="item.value"></el-option>
+                    <el-option v-for="item in form.scrollSpeeds" :key="item.value" :label="item.speed"
+                               :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
                 <el-form-item :label="$t('Content.ID_BG_OPACITY')" size="mini">
-                  <el-select v-model="form.scrollBGTransparency" :placeholder="$t('Msg.ID_MSG_65')" style="width: 150px">
-                    <el-option v-for="item in form.scrollBGTransparencys" :label="item.transparency"
+                  <el-select v-model="form.scrollBGTransparency" :placeholder="$t('Msg.ID_MSG_65')"
+                             style="width: 150px">
+                    <el-option v-for="item in form.scrollBGTransparencys" :key="item.transparency"
+                               :label="item.transparency"
                                :value="item.value"></el-option>
                   </el-select>
                 </el-form-item>
@@ -391,10 +398,18 @@
               </el-col>
             </el-row>
           </el-form>
-          <div style="display: flex;justify-content: flex-start" v-if="item.type=='image'"
+          <div style="display: flex;justify-content: flex-start" v-if="item.type==='image'"
                :style="{color:form.scrollColor,fontSize:form.scrollFontSize,fontFamily:form.scrollFontFamily}">
             <vue-marquee :BGOpacity="form.scrollBGTransparency" :BGColor="form.scrollBGColor"
                          :fontOpacity="form.scrollTransparency" content="我在没在滚动啊"></vue-marquee>
+          </div>
+          <div v-if="item.type==='audio'" class="audioBox" style="padding: 10px;width: 100%;height: 100%">
+            <el-form label-width="80px">
+              <el-form-item label="音频地址">
+                <el-input readonly style="width: 60%" class="audioAddress" v-model="audios.address" :name="item.type"
+                          placeholder="将音频文件拖入文本框..."></el-input>
+              </el-form-item>
+            </el-form>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -476,12 +491,13 @@
           <el-form style="margin-top: 20px">
             <el-form-item :label="$t('Content.ID_FONT_SIZE')" size="mini">
               <el-select v-model="fontSize" :placeholder="$t('Msg.ID_MSG_62')" style="width: 150px">
-                <el-option v-for="item in fontSizes" :label="item.size" :value="item.value"></el-option>
+                <el-option v-for="item in fontSizes" :key="item.value" :label="item.size"
+                           :value="item.value"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item :label="$t('Content.ID_FONT_TYPE')" size="mini">
               <el-select v-model="font" :placeholder="$t('Msg.ID_MSG_63')" style="width: 150px">
-                <el-option v-for="item in fonts" :label="item.font" :value="item.font"></el-option>
+                <el-option v-for="item in fonts" :key="item.font" :label="item.font" :value="item.font"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item :label="$t('Content.ID_FONT_COLOR')">
@@ -496,7 +512,7 @@
           <div v-for="item in txtSize.temItems"
                :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px'}">
             <div :name="item.type" :id="item.id" style="overflow: hidden;opacity: 0.7;">
-              <textarea v-if="item.type == 'txt'" v-model="txtContent" placeholder="$t('Msg.ID_MSG_60')"
+              <textarea v-if="item.type == 'txt'" v-model="txtContent" :placeholder="$t('Msg.ID_MSG_60')"
                         :style="{fontSize:fontSize+'px',fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
               </textarea>
               <img v-if="item.type=='BG'" style="width: 100%;height: 100%;" :src="item.backGround">
@@ -513,6 +529,11 @@
   import ElRow from "element-ui/packages/row/src/row";
   import ElCol from "element-ui/packages/col/src/col";
   import vueMarquee from "@/components/common/Marquee.vue"
+  import request from '@/utils/request'
+  import {getResource} from "@/api/rsource";
+  import {getProgram, newProgram, putProgram} from "@/api/program";
+  import {getTemplate} from "@/api/template";
+  import {getTree} from "@/api/Tree";
 
   export default {
     components: {
@@ -553,6 +574,7 @@
     computed: {},
     data() {
       return {
+        baseURL: request.defaults.baseURL,
         template: '',
         temItems: '',                //模板元素LIST
         resources: [],
@@ -691,18 +713,23 @@
           scrollDuration: '',                            //持续时间
         },
         activeName: '',                                     //当前激活的区域块标签
-
+        audios: {
+          address: '',
+          itemsId: '',
+          thumbnail: '',
+          resId: ''
+        }
       }
     },
     methods: {
       prohibited(e) {
         // 阻止默认事件的触发
-        e.preventDefault()
+        e.preventDefault();
         return false
       },                              //禁止浏览器默认拖动事件
       mouse(e) {
         let src = e.currentTarget.children[0].children[0].currentSrc;               //取当前拖动素材的缩略图
-        let url = 'http://' + e.currentTarget.getAttribute('name');                 //取当前拖动素材的文件地址
+        let url = this.baseURL + e.currentTarget.getAttribute('name');                 //取当前拖动素材的文件地址
         let type = e.currentTarget.getAttribute('type');
         $('.move>img').attr({'src': src, 'id': e.currentTarget.id, 'name': url, 'type': type});   //给弹出框赋缩略图及文件地址
         //获取x坐标和y坐标
@@ -747,206 +774,202 @@
       resourceQuery() {
         let _this = this;
         this.resources = [];
-        this.$http({
-          method: 'get',
-          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + _this.pageCount + "&pageNo=" + _this.pageNo,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let resources = response.data.cust.resources;
-            _this.total = response.data.cust.pages.count;
-            for (let resource of resources) {
-              _this.resources.push(resource)
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          groupId: _this.treeId,
+          pageCount: _this.pageCount,
+          pageNo: _this.pageNo
+        };
+        getResource(params).then(response => {
+          let resources = response.cust.resources;
+          _this.total = response.cust.pages.count;
+          for (let resource of resources) {
+            _this.resources.push(resource)
           }
         })
       },                            //查询资源列表
       handleCurrentChange(val) {
-        this.pageNo = val
+        this.pageNo = val;
         this.resourceQuery()
       },                   //当前页翻页
 
       getTree() {
-        let _this = this
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=0',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.resourceTitles = response.data.cust.trees[0].children.map(item => {
-              return {
-                id: item.id,
-                label: item.label
-              }
-            })
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
+        let _this = this;
+        let params = {
+          id: 0
+        };
+        getTree(params).then(response => {
+          _this.resourceTitles = response.cust.trees[0].children.map(item => {
+            return {
+              id: item.id,
+              label: item.label
+            }
+          })
         })
       },                                  //获取树资源
       handleClick(tab, event) {
         this.treeId = tab.label;
         this.resourceQuery()
       },                    //标签页切换
-
-      queryList() {
+      nextTick() {
         let _this = this;
-        let type = _this.$route.query.type;
-        let url = type != 0 && type != undefined ? 'program/query' : 'template/query';   //根据类型判断是新增还是编辑，0为新建1为编辑
-        this.$http({
-          method: 'get',
-          url: url + '?groupId=' + _this.$route.query.groupId + '&name=' + _this.$route.query.name + '&pageNo=1&pageCount=1',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            if (type == 0 || type == undefined) {
-              let template = response.data.cust.templates[0];
-              _this.template = template;
-              _this.temItems = template.temItems;
-              _this.temId = template.id
-            } else {
-              let program = response.data.cust.programs[0];
-              _this.template = program;
-              _this.temId = program.modelId;
-              _this.proName = program.name;
-              _this.proId = program.id;
-              _this.groupId = program.groupId;
-              program.proItems.forEach(item => {
-                if (item.scrollColor != null && item.scrollColor != '' && item.scrollColor != undefined) {
-                  _this.form.scrollBGTransparency = item.scrollBGTransparency;
-                  _this.form.scrollColor = item.scrollColor;
-                  _this.form.scrollDirection = item.scrollDirection;
-                  _this.form.scrollDuration = item.scrollDuration;
-                  _this.form.scrollFontFamily = item.scrollFontFamily;
-                  _this.form.scrollFontSize = item.scrollFontSize;
-                  _this.form.scrollFontTransparency = item.scrollFontTransparency;
-                  _this.form.scrollSpeed = item.scrollSpeed;
-                  _this.form.scrollBGColor = item.scrollBGColor;
-                  _this.form.scrollContent = item.url;
-                }  //滚动文字还原
-                if (item.font != null && item.font != '' && item.font != undefined) {
-                  _this.txtContent = item.url;
-                  _this.font = item.font;
-                  _this.fontSize = item.fontSize;
-                  _this.fontColor = item.fontColor;
-                  _this.align = item.align;
-                  _this.bold = item.bold;
-                  _this.italic = item.italic;
-                  _this.underline = item.underline;
-                }         //静态文本还原
-                _this.res.push({name: item.resId, itemsId: item.itemsId, url: item.url, thumbnail: item.thumbnail})
-              });
-              _this.getTemplate()
+        //数据渲染后为还原数据绑定事件
+        _this.$nextTick(function () {
+          //为模板添加移动事件
+          let img = $('.move>img');
+          $('div').remove('.handle');
+          $('div').remove('.action');
+          $('.vdr').on('mousemove', function () {
+            $(this).css('border', '1px solid red');
+            if (img.attr('type') === $(this).children().attr('class')) {
+              $(".move>i").removeClass('icon-iconforbidden');
+              $(".move>i").addClass('icon-yunxu');
+              $(".move>i").css("color", "#33cc1e")
+            }           //判断当前移动文件类型与模板元素的类型是否一致
+          });       //移动到目标位置的样式更改
+          $('.vdr').on('mouseup', function (event) {
+            if (img.attr('type') === $(this).children().attr('class')) {               //判断当前移动文件类型与模板元素的类型是否一致
+              let src = img.attr('src');
+              let name = img.attr('name');
+              let id = img.attr('id');
+              $(this).children('.' + img.attr('type')).children('img').remove();
+              $(this).children('.' + img.attr('type')).html("<img name='" + name + "' id='" + id + "' src='" + src + "'>")
             }
-            //数据渲染后为还原数据绑定事件
-            _this.$nextTick(function () {
-              //为模板添加移动事件
-              let img = $('.move>img');
-              $('div').remove('.handle');
-              $('div').remove('.action');
-              $('.vdr').on('mousemove', function () {
-                $(this).css('border', '1px solid red');
-                if (img.attr('type') == $(this).children().attr('class')) {
-                  $(".move>i").removeClass('icon-iconforbidden');
-                  $(".move>i").addClass('icon-yunxu');
-                  $(".move>i").css("color", "#33cc1e")
-                }           //判断当前移动文件类型与模板元素的类型是否一致
-              });       //移动到目标位置的样式更改
-              $('.vdr').on('mouseup', function (event) {
-                if (img.attr('type') == $(this).children().attr('class')) {               //判断当前移动文件类型与模板元素的类型是否一致
-                  let src = img.attr('src');
-                  let name = img.attr('name');
-                  let id = img.attr('id');
-                  $(this).children('.' + img.attr('type')).children('img').remove();
-                  $(this).children('.' + img.attr('type')).html("<img name='" + name + "' id='" + id + "' src='" + src + "'>")
+            this.isDown = false;
+            $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
+          });
+          $('.audioAddress').on('mouseup', function () {
+            if (img.attr('type') === $(this).children().attr('name')) {               //判断当前移动文件类型与模板元素的类型是否一致
+              let src = img.attr('src');
+              let name = img.attr('name');
+              let id = img.attr('id');
+              let itemsId = '';
+              _this.temItems.map(item => {
+                if (item.type === 'audio') {
+                  itemsId = item.id
                 }
-                this.isDown = false;
-                $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
               });
-              //为文本与动态文本绑定编辑事件
-              $('.txt').on('click', function () {
+              _this.audios = {
+                address: name,
+                resId: id,
+                thumbnail: src,
+                itemsId: itemsId
+              }
+            }
+            this.isDown = false;
+            $('.move').css({'display': 'none', 'left': '0px', 'top': '0px'})
+          });
+          //为文本与动态文本绑定编辑事件
+          $('.txt').on('click', function () {
 
-                _this.$http({
-                  method: 'get',
-                  url: 'template/query?id=' + _this.temId + '&pageNo=1&pageCount=1',
-                  withCredentials: true,
-                  headers: {
-                    token: sessionStorage.getItem('token'),
-                    name: sessionStorage.getItem('name')
-                  }
-                }).then(response => {
-                  if (response.data.code == '0000') {
-                    let template = response.data.cust.templates[0];
-                    _this.txtSize = template;                       //快速预览
-                    for (let item of template.temItems) {
-                      if (item.type === 'txt') _this.txtId = item.id
-                    }
-                    _this.editTxt = true
-                  } else {
-                    this.$message({
-                      message: response.data.infor + '。',
-                      showClose: true,
-                      center: true,
-                      type: 'error'
-                    });
-                  }
-                });
-
-              });
-              $('.vdr').on('click', function () {
-                _this.activeName = $(this).attr('area-name')
-              });
-              //还原节目资源
-              if (this.$route.query.type == 1) {
-                if (document.getElementById('edit') != null && document.getElementById('edit').children != null) {
-                  let edit = document.getElementById('edit').children;
-                  for (let item of this.res) {
-                    for (let i = 0; i < edit.length; i++) {
-                      if (item.itemsId == edit[i].getAttribute('name')) {
-                        if (item.thumbnail != null) {             //缩略图为空的情况只有文字
-                          edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
-                        }
-                      }
+            let params = {
+              id: _this.temId,
+              pageNo: 1,
+              pageCount: 1
+            };
+            getTemplate(params).then(response => {
+              let template = response.cust.templates[0];
+              _this.txtSize = template;                       //快速预览
+              for (let item of template.temItems) {
+                if (item.type === 'txt') _this.txtId = item.id
+              }
+              _this.editTxt = true
+            });
+          });
+          $('.vdr').on('click', function () {
+            _this.activeName = $(this).attr('area-name')
+          });
+          //还原节目资源
+          if (this.$route.query.type == 1) {
+            if (document.getElementById('edit') != null && document.getElementById('edit').children != null) {
+              let edit = document.getElementById('edit').children;
+              for (let item of this.res) {
+                for (let i = 0; i < edit.length; i++) {
+                  if (item.itemsId == edit[i].getAttribute('name')) {
+                    if (item.thumbnail != null) {             //缩略图为空的情况只有文字
+                      edit[i].children[0].innerHTML = "<img name='" + item.url + "' id='" + item.name + "' src='" + item.thumbnail + "'>"
                     }
                   }
                 }
               }
-
-            })
-          } else {
-            _this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+            }
           }
         })
+      },
+      queryList() {
+        let _this = this;
+        let type = _this.$route.query.type;
+        let params = {
+          groupId: _this.$route.query.groupId,
+          name: _this.$route.query.name,
+          pageNo: 1,
+          pageCount: 1,
+        };
+        //根据类型判断是新增还是编辑，0为新建1为编辑
+        if (type !== 0 && type !== undefined) {
+          getProgram(params).then(response => {
+            let program = response.cust.programs[0];
+            _this.template = program;
+            _this.temId = program.modelId;
+            _this.proName = program.name;
+            _this.proId = program.id;
+            _this.groupId = program.groupId;
+            program.proItems.forEach(item => {
+              if (item.scrollColor != null && item.scrollColor !== '' && item.scrollColor !== undefined) {
+                _this.form.scrollBGTransparency = item.scrollBGTransparency;
+                _this.form.scrollColor = item.scrollColor;
+                _this.form.scrollDirection = item.scrollDirection;
+                _this.form.scrollDuration = item.scrollDuration;
+                _this.form.scrollFontFamily = item.scrollFontFamily;
+                _this.form.scrollFontSize = item.scrollFontSize;
+                _this.form.scrollFontTransparency = item.scrollFontTransparency;
+                _this.form.scrollSpeed = item.scrollSpeed;
+                _this.form.scrollBGColor = item.scrollBGColor;
+                _this.form.scrollContent = item.url;
+              }  //滚动文字还原
+              if (item.font != null && item.font !== '' && item.font !== undefined) {
+                _this.txtContent = item.url;
+                _this.font = item.font;
+                _this.fontSize = item.fontSize;
+                _this.fontColor = item.fontColor;
+                _this.align = item.align;
+                _this.bold = item.bold;
+                _this.italic = item.italic;
+                _this.underline = item.underline;
+                _this.txtArray.push({
+                  id: item.itemsId,
+                  url: _this.txtContent,
+                  font: _this.font,
+                  fontSize: _this.fontSize,
+                  fontColor: _this.fontColor,
+                  align: _this.align,
+                  bold: _this.bold,
+                  italic: _this.italic,
+                  underline: _this.underline
+                });
+              }         //静态文本还原
+              if (item.url.indexOf('audio') !== -1) {//音频还原
+                _this.audios = {
+                  address: item.url,
+                  itemsId: item.itemsId,
+                  thumbnail: item.thumbnail,
+                  resId: item.resId
+                };
+                return false
+              }
+              _this.res.push({name: item.resId, itemsId: item.itemsId, url: item.url, thumbnail: item.thumbnail})
+            });
+            _this.getTemplate();
+            _this.nextTick()
+          })
+        } else {
+          getTemplate(params).then(response => {
+            let template = response.cust.templates[0];
+            _this.template = template;
+            _this.temItems = template.temItems;
+            _this.temId = template.id;
+            _this.nextTick()
+          })
+        }
       },                                //获取模板列表
       save(type) {
         let _this = this;
@@ -968,10 +991,7 @@
           /*allowTaint:true,*/
           useCORS: true,
           onrendered(image) {
-            let uri = image.toDataURL();
-            _this.preview = uri;
-
-            let queryUrl = '', method = '';
+            _this.preview = image.toDataURL();
             //获取区域块的属性值
             table.children().map(function () {
               let itemsId = $(this).attr('name');                            //元素ID
@@ -1009,16 +1029,14 @@
               }
               if (type === 'txt') {
                 for (let item of _this.txtArray) {
-                  if (itemsId == item.id) {
-                    url = item.url;
-                    font = item.font;
-                    fontSize = item.fontSize;
-                    fontColor = item.fontColor;
-                    align = item.align;
-                    bold = item.bold;
-                    italic = item.italic;
-                    underline = item.underline
-                  }
+                  url = item.url;
+                  font = item.font;
+                  fontSize = item.fontSize;
+                  fontColor = item.fontColor;
+                  align = item.align;
+                  bold = item.bold;
+                  italic = item.italic;
+                  underline = item.underline
                 }
               }
               _this.proItems.push({
@@ -1044,21 +1062,62 @@
                 underline
               });
             });
-            let data = {};
-            if (_this.$route.query.type == 0 || _this.$route.query.type == undefined) {
-              queryUrl = 'program/create';
-              method = 'post';
-              data = {
+            if (_this.audios.address !== '') {
+              _this.proItems.push({
+                itemsId: _this.audios.itemsId,
+                resId: _this.audios.resId,
+                thumbnail: _this.audios.thumbnail,
+                url: _this.audios.address,
+                scrollBGTransparency: '',
+                scrollColor: '',
+                scrollDirection: '',
+                scrollDuration: '',
+                scrollFontFamily: '',
+                scrollFontSize: '',
+                scrollFontTransparency: '',
+                scrollSpeed: '',
+                scrollBGColor: '',
+                font: '',
+                fontSize: '',
+                fontColor: '',
+                align: '',
+                bold: '',
+                italic: '',
+                underline: ''
+              });
+            }
+            //判断是否存在没有配置资源的元素
+            let check = false;
+            _this.proItems.forEach(item => {
+              if (item.url === '' || item.url === undefined || item.url === null) {
+                check = true
+              }
+            });
+            if (check) {
+              _this.$message({type: 'error', message: '请检查所有元素是否配置好资源'});
+              return false
+            }
+            //END
+            if (_this.$route.query.type === 0 || _this.$route.query.type === undefined) {
+              let data = {
                 groupId: 31,             //节目组ID(节目列表树ID)
                 modelId: _this.temId,             //模板ID
                 name: _this.proName,                //节目名称
                 preview: _this.preview,             //预览图
                 proItems: _this.proItems            //节目元素
               };
+              newProgram(data).then(response => {
+                if (type === 'release') {
+                  _this.$router.push({path: '/release', query: {name: _this.proName}})
+                } else {
+                  _this.$message({message: _this.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
+                  setTimeout(() => {
+                    _this.$router.push({path: '/programList'})
+                  }, 2000);
+                }
+              });
             } else {
-              queryUrl = 'program/update';
-              method = 'put';
-              data = {
+              let data = {
                 groupId: _this.groupId,             //节目组ID(节目列表树ID)
                 id: _this.proId,
                 modelId: _this.temId,             //模板ID
@@ -1066,43 +1125,17 @@
                 preview: _this.preview,             //预览图
                 proItems: _this.proItems          //节目元素
               };
-            } //根据类型判断是新增还是编辑，0为新建1为编辑
-            _this.$http({
-              method: method,
-              url: queryUrl,
-              withCredentials: true,
-              headers: {
-                token: sessionStorage.getItem('token'),
-                name: sessionStorage.getItem('name'),
-              },
-              data: data
-            }).then(response => {
-              if (response.data.code == '0000') {
-                if (type == 'release') {
+              putProgram(data).then(response => {
+                if (type === 'release') {
                   _this.$router.push({path: '/release', query: {name: _this.proName}})
                 } else {
-                  _this.$message({message: this.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
+                  _this.$message({message: _this.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
                   setTimeout(() => {
                     _this.$router.push({path: '/programList'})
                   }, 2000);
                 }
-              } else {
-                _this.$message({
-                  message: response.data.infor + '。',
-                  showClose: true,
-                  center: true,
-                  type: 'error'
-                });
-              }
-            })
-            /*创建一个a标签，添加点击事件直接下载*/
-            /*let a = document.createElement('a');
-            a.href = url;
-            a.download = '未命名';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);*/
-            // document.body.removeChild(canvas);
+              });
+            } //根据类型判断是新增还是编辑，0为新建1为编辑
           }
         });
 
@@ -1112,98 +1145,80 @@
       },                                  //发布
       getTemplate() {
         let _this = this;
-        _this.$http({
-          method: 'get',
-          url: 'template/query?id=' + this.temId + '&pageNo=1&pageCount=1',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.temItems = response.data.cust.templates[0].temItems
-          }
-        })
+        let params = {
+          id: this.temId,
+          pageNo: 1,
+          pageCount: 1,
+        };
+        getTemplate(params).then(response => {
+          _this.temItems = response.cust.templates[0].temItems
+        });
       },                               //获取模板
       quickPreview() {
         let _this = this;
-        _this.$http({
-          method: 'get',
-          url: 'template/query?id=' + this.temId + '&pageNo=1&pageCount=1',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let template = response.data.cust.templates[0];
-            _this.proPreview = template;                       //快速预览
+        let params = {
+          id: this.temId,
+          pageNo: 1,
+          pageCount: 1,
+        };
+        getTemplate(params).then(response => {
+          let template = response.cust.templates[0];
+          _this.proPreview = template;                       //快速预览
 
-            let items = _this.proPreview.temItems;
-            let table = $('#edit');
-            /*根据模板高度设置缩放比例*/
-            if (_this.proPreview.height == '1080') _this.PP = 0.4;
-            if (_this.proPreview.height == '720') _this.PP = 0.7;
-            if (_this.proPreview.height == '1280') _this.PP = 0.6;
-            if (_this.proPreview.height == '1920') _this.PP = 0.4;
-            if (_this.proPreview.height == '200') this.PP = 0.5;
-            /*取节目资源地址*/
+          let items = _this.proPreview.temItems;
+          let table = $('#edit');
+          /*根据模板高度设置缩放比例*/
+          if (_this.proPreview.height === '1080') _this.PP = 0.4;
+          if (_this.proPreview.height === '720') _this.PP = 0.7;
+          if (_this.proPreview.height === '1280') _this.PP = 0.6;
+          if (_this.proPreview.height === '1920' || _this.proPreview.height === '1740') _this.PP = 0.4;
+          if (_this.proPreview.height === '200') this.PP = 0.5;
+          /*取节目资源地址*/
 
-            for (let item of items) {
-              table.children().map(function () {
-                let itemsId = $(this).attr('name');                                //元素ID
-                let type = $(this).children().attr('class');
-                let url = $(this).children().children().attr('name');         //资源地址
-                if (item.id === itemsId) {
-                  item['url'] = url;
-                  if (type === 'scroll') {
-                    item['scrollContent'] = _this.form.scrollContent;
-                    item['scrollColor'] = _this.form.scrollColor;
-                    item['scrollDirection'] = _this.form.scrollDirection === 0 ? 'right' : 'left';
-                    item['scrollFontSize'] = _this.form.scrollFontSize;
-                    item['scrollFontFamily'] = _this.form.scrollFontFamily;
-                    item['scrollBGColor'] = _this.form.scrollBGColor;
-                    item['scrollSpeed'] = _this.form.scrollSpeed + '1s';
-                    item['scrollBGTransparency'] = _this.form.scrollBGTransparency;
-                    item['scrollDuration'] = _this.form.scrollDuration;
-                    item['justify'] = _this.form.scrollDirection === 'left-right' ? 'flex-end' : 'flex-start'
-                  }
-                  if (type === 'txt') {
-                    item['txtContent'] = _this.txtContent;
-                    item['font'] = _this.font;
-                    item['fontSize'] = _this.fontSize;
-                    item['fontColor'] = _this.fontColor;
-                    item['align'] = _this.align;
-                    item['bold'] = _this.bold;
-                    item['italic'] = _this.italic;
-                    item['underline'] = _this.underline;
-                  }
+          for (let item of items) {
+            table.children().map(function () {
+              let itemsId = $(this).attr('name');                                //元素ID
+              let type = $(this).children().attr('class');
+              let url = $(this).children().children().attr('name');         //资源地址
+              if (item.id === itemsId) {
+                item['url'] = url;
+                if (type === 'scroll') {
+                  item['scrollContent'] = _this.form.scrollContent;
+                  item['scrollColor'] = _this.form.scrollColor;
+                  item['scrollDirection'] = _this.form.scrollDirection === 0 ? 'right' : 'left';
+                  item['scrollFontSize'] = _this.form.scrollFontSize;
+                  item['scrollFontFamily'] = _this.form.scrollFontFamily;
+                  item['scrollBGColor'] = _this.form.scrollBGColor;
+                  item['scrollSpeed'] = _this.form.scrollSpeed + '1s';
+                  item['scrollBGTransparency'] = _this.form.scrollBGTransparency;
+                  item['scrollDuration'] = _this.form.scrollDuration;
+                  item['justify'] = _this.form.scrollDirection === 'left-right' ? 'flex-end' : 'flex-start'
                 }
-              });
-            }
-            _this.view = true;
-            _this.openScroll = true;
-            let myVideo = document.getElementById('myVideo');
-            if (myVideo != undefined) {
-              myVideo.load();
-              myVideo.play();
-            }
-          } else {
-            _this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
+                if (type === 'txt') {
+                  item['txtContent'] = _this.txtContent;
+                  item['font'] = _this.font;
+                  item['fontSize'] = _this.fontSize;
+                  item['fontColor'] = _this.fontColor;
+                  item['align'] = _this.align;
+                  item['bold'] = _this.bold;
+                  item['italic'] = _this.italic;
+                  item['underline'] = _this.underline;
+                }
+              }
             });
           }
+          _this.view = true;
+          _this.openScroll = true;
+          let myVideo = document.getElementById('myVideo');
+          if (myVideo !== undefined) {
+            myVideo.load();
+            myVideo.play();
+          }
         });
-
       },                             //快速预览
       viewClose(done) {
         let myVideo = document.getElementById('myVideo');
-        if (myVideo != undefined) {
+        if (myVideo !== null) {
           myVideo.currentTime = 0;                            //将视频当前时间初始化
           myVideo.pause();
         }

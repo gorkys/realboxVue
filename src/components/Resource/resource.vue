@@ -196,8 +196,8 @@
             <el-table-column type="selection" align="center" width="55"></el-table-column>
             <el-table-column prop="name" align="center" :label="$t('Content.ID_NAME')"></el-table-column>
             <el-table-column prop="screenshot" align="center" :label="$t('Content.ID_THUMBNAIL')">
-              <template scope="scope">
-                <img :src="'http://'+ scope.row.thumbnail" width="100" height="70"/>
+              <template slot-scope="scope">
+                <img :src="baseURL + scope.row.thumbnail" width="100" height="70"/>
               </template>
             </el-table-column>
             <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
@@ -215,7 +215,7 @@
                 <i class="el-icon-upload-success el-icon-check"></i>
               </label>
               <div class="imgBox">
-                <img :src="'http://'+ resource.thumbnail">
+                <img :src="baseURL + resource.thumbnail">
               </div>
               <p>{{resource.name}}</p>
             </li>
@@ -272,11 +272,13 @@
   </div>
 </template>
 <script>
-  import $ from 'jquery'
   import NavBar from '@/components/common/Navbar'
   import FooterBar from '@/components/common/footer'
   import Content from '@/components/common/content'
   import Breadcrumb from '@/components/common/Breadcrumb'
+  import request from '@/utils/request'
+  import {getTree} from "@/api/Tree";
+  import {getResource, delResource} from "@/api/rsource";
 
   export default {
     mounted: function () {
@@ -285,7 +287,7 @@
     },
     data() {
       return {
-        baseURL: this.$http.defaults.baseURL, //服务器地址
+        baseURL: request.defaults.baseURL, //服务器地址
         resourceTree: [],
 
         type: 'image',           //资源类型
@@ -344,24 +346,9 @@
     methods: {
       getTree() {
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'tree/query?id=0',
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            _this.resourceTree = response.data.cust.trees
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              center: true,
-              type: 'error'
-            });
-          }
+        let params = {id: 0};
+        getTree(params).then(response => {
+          _this.resourceTree = response.cust.trees
         })
       },                               //获取树资源
       handleNodeClick(val) {
@@ -450,36 +437,22 @@
           cancelButtonText: this.$t('Content.ID_CANCEL'),
           type: 'warning'
         }).then(() => {
-          this.$http({
-            method: 'delete',
-            url: 'resource/delete?ids=' + ids,
-            withCredentials: true,
-            headers: {
-              token: sessionStorage.getItem('token'),
-              name: sessionStorage.getItem('name')
-            }
-          }).then(response => {
-            if (response.data.code == '0000') {
-              this.resourceQuery();
-              this.$message({
-                message: this.$t('Content.ID_DELETE_SUCCESS'),
-                showClose: true,
-                center: true,
-                type: 'success'
-              })
-            } else {
-              this.$message({
-                message: response.data.infor + '。',
-                showClose: true,
-                center: true,
-                type: 'error'
-              });
-            }
+          let params = {
+            ids: ids
+          };
+          delResource(params).then(response => {
+            this.resourceQuery();
+            this.$message({
+              message: this.$t('Content.ID_DELETE_SUCCESS'),
+              showClose: true,
+              center: true,
+              type: 'success'
+            })
           })
         })
       },                                   //删除资源
       preview(e) {
-        this.url = "http://" + document.getElementById(e.currentTarget.id).getAttribute("url");
+        this.url = this.baseURL + document.getElementById(e.currentTarget.id).getAttribute("url");
         this.title = this.treeName.slice(0, 2);
         if (this.url.indexOf('mp4') != '-1') {
           this.format = 'video';
@@ -514,7 +487,7 @@
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 
-          this.downloadUrl = "http://" + document.getElementById(target.id).getAttribute("url")
+          this.downloadUrl = this.baseURL + document.getElementById(target.id).getAttribute("url")
           this.downloadName = target.children[2].innerText;
           this.ids.push(dom)
         } else {
@@ -530,42 +503,36 @@
       resourceQuery() {
         let _this = this;
         _this.resources = [];
-        this.$http({
-          method: 'get',
-          url: 'resource/query?groupId=' + _this.treeId + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo + "&name=" + this.resName,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let resources = response.data.cust.resources
-            _this.total = response.data.cust.pages.count
-            for (let resource of resources) {
-              _this.resources.push(resource)
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        let params = {
+          groupId: this.treeId,
+          pageCount: this.pageCount,
+          pageNo: this.pageNo,
+          name: this.resName
+        };
+        getResource(params).then(response => {
+          let resources = response.cust.resources;
+          _this.total = response.cust.pages.count;
+          for (let resource of resources) {
+            _this.resources.push(resource)
           }
         })
       },                         //查询列表
       selectChange(val) {
-        val == '2' ? this.pageCount = 5 : this.pageCount = 21
+        val == '2' ? this.pageCount = 5 : this.pageCount = 21;
         this.resourceQuery()
       },                       //选择显示模式
       download() {
         if (this.value == '2') {
-          this.downloadUrl = 'http://' + this.row.map(item => item.url).join('')
+          this.downloadUrl = this.baseURL + this.row.map(item => item.url).join('');
           this.downloadName = 'http://' + this.row.map(item => item.name).join('')
         }
         if (this.downloadUrl != '' || this.downloadName != '') {
-
+          let a = document.createElement('a');
+          a.href = this.downloadUrl;
+          a.download = '';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
         } else {
           this.$message({
             message: this.$t('Msg.ID_MSG_24'),
@@ -576,7 +543,7 @@
         }
       },                              //下载文件
       handleCurrentChange(val) {
-        this.pageNo = val
+        this.pageNo = val;
         this.resourceQuery()
       },                //当前页翻页
       tableSelect(row) {
@@ -600,7 +567,7 @@
           }
         ];
         this.treeName = this.$t('Content.ID_IMAGE');
-        this.directions=this.$t('Msg.ID_MSG_7');
+        this.directions = this.$t('Msg.ID_MSG_7');
       }
     }
   }

@@ -69,6 +69,15 @@
     padding-top: 5px;
     position: absolute;
     right: 0;
+    display: none;
+  }
+
+  .BG:hover .action {
+    display: block;
+  }
+
+  .resizable:hover .action {
+    display: block;
   }
 
   .action > span > i {
@@ -306,17 +315,28 @@
     <div class="area">
       <div class="title">{{$t('Content.ID_AREA')}}</div>
       <ul class="areaList">
-        <li @click="openSetBG"><i :style="{color:BG?'#5ea2d3':'rgb(195, 195, 195)'}"
-                                  class="iconfont icon-beijing"></i><b
-          :style="{color:BG?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_BACKGROUND')}}</b></li>
-        <li @click="add('image',true)"><i class="iconfont icon-tupian"></i><b>{{$t('Content.ID_IMAGE')}}</b></li>
-        <li @click="add('video',true)"><i :style="{color:video?'#5ea2d3':'rgb(195, 195, 195)'}"
-                                          class="iconfont icon-shipin"></i><b
-          :style="{color:video?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_VIDEO')}}</b></li>
-        <li @click="add('txt',false)"><i class="iconfont icon-txt"></i><b>{{$t('Content.ID_TEXT')}}</b></li>
-        <li @click="add('scroll',false)"><i :style="{color:scroll?'#5ea2d3':'rgb(195, 195, 195)'}"
-                                            class="iconfont icon-wenben"></i><b
-          :style="{color:scroll?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_SCROLL_TEXT')}}</b></li>
+        <li @click="openSetBG">
+          <i :style="{color:BG?'#5ea2d3':'rgb(195, 195, 195)'}" class="iconfont icon-beijing"></i>
+          <b :style="{color:BG?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_BACKGROUND')}}</b></li>
+        <li @click="add('image',true)">
+          <i class="iconfont icon-tupian"></i>
+          <b>{{$t('Content.ID_IMAGE')}}</b>
+        </li>
+        <li @click="add('video',true)">
+          <i :style="{color:video?'#5ea2d3':'rgb(195, 195, 195)'}" class="iconfont icon-shipin"></i>
+          <b :style="{color:video?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_VIDEO')}}</b>
+        </li>
+        <li @click="openAudioDialog">
+          <i :style="{color:audio?'#5ea2d3':'rgb(195, 195, 195)'}" class="iconfont icon-yinle"></i>
+          <b :style="{color:audio?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_AUDIO')}}</b>
+        </li>
+        <li @click="add('txt',false)">
+          <i class="iconfont icon-txt"></i>
+          <b>{{$t('Content.ID_TEXT')}}</b></li>
+        <li @click="add('scroll',false)">
+          <i :style="{color:scroll?'#5ea2d3':'rgb(195, 195, 195)'}" class="iconfont icon-wenben"></i>
+          <b :style="{color:scroll?'#000':'rgb(195, 195, 195)'}">{{$t('Content.ID_SCROLL_TEXT')}}</b>
+        </li>
       </ul>
     </div>
     <div id="editBox">
@@ -329,8 +349,8 @@
                                    :minw="50" :minh="50" @active="activated" @activated="onResize" :zIndex="item.zIndex"
                                    @dragging="onDrag" @resizing="onResize" :parent="true" :name="item.name"
                                    :conflictCheck="item.conflictCheck" :id="item.id" :area-name="item.areaName">
-            <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
-              <div class="action" v-show="show">
+            <div :class="{[item.content]:true}">
+              <div class="action">
                 <span @click="elements.splice(index,1)"><i class="el-icon-delete"></i></span>
               </div>
             </div>
@@ -341,8 +361,8 @@
                                    :parent="true" :conflictCheck="false" :area-name="item.name" :name="item.id"
                                    id="Uncheck"
                                    @active="activated" :draggable='false' :resizable='false' :zIndex=1>
-            <div :class="{[item.type]:true}" @mouseover="showDel($event)" @mouseout="show = false">
-              <div class="action" v-show="show">
+            <div :class="{[item.type]:true}">
+              <div class="action">
                 <span @click="BGDel(index,'edit')"><i class="el-icon-delete"></i></span>
               </div>
               <img :name="item.backGround" :src="item.backGround" :id="item.resId">
@@ -354,8 +374,8 @@
                                    @dragging="onDrag" @resizing="onResize" :parent="true"
                                    :conflictCheck="item.conflictCheck" :area-name="item.areaName" :name="item.name"
                                    :id="item.id" @active="activated" @activated="onResize" :zIndex="item.zIndex">
-            <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
-              <div class="action" v-show="show">
+            <div :class="{[item.content]:true}">
+              <div class="action">
                 <span @click="temDel(index)"><i class="el-icon-delete"></i></span>
               </div>
             </div>
@@ -365,8 +385,8 @@
                                    :parent="true" :conflictCheck="false" :area-name="item.areaName" :name="item.name"
                                    id="Uncheck"
                                    @active="activated" :draggable='false' :resizable='false' :zIndex=1>
-            <div :class="{[item.content]:true}" @mouseover="showDel($event)" @mouseout="show = false">
-              <div class="action" v-show="show">
+            <div :class="{[item.content]:true}">
+              <div class="action">
                 <span @click="BGDel(index,'new')"><i class="el-icon-delete"></i></span>
               </div>
               <img :name="item.BGUrl" :src="item.BGUrl" :id="item.resId">
@@ -382,7 +402,8 @@
           <li><span>{{$t('Content.ID_TEMPLATE_NAME')}}：</span><input v-model="temName" type="text"></li>
           <li><span>{{$t('Content.ID_TEMPLATE_TYPE')}}：</span><b>{{temType}}</b></li>
           <li><span>{{$t('Content.ID_TERMINAL_TYPE')}}：</span><b>{{terminalType}}</b><i class="iconfont"></i></li>
-          <li><span>{{$t('Content.ID_RESOLUTION')}}：&nbsp;&nbsp;&nbsp;</span><input type="text" v-model="resolution" readonly="readonly"></li>
+          <li><span>{{$t('Content.ID_RESOLUTION')}}：&nbsp;&nbsp;&nbsp;</span><input type="text" v-model="resolution"
+                                                                                    readonly="readonly"></li>
         </ul>
       </div>
       <div class="areaInfo">
@@ -409,16 +430,16 @@
         <div class="title" style="margin-bottom: 10px;">{{$t('Content.ID_PARAMTERS_SETTING')}}</div>
         <div class="setBox">
           <div class="pixel">
-            <b>X:</b><input type="number" :value="parseInt(x/PP)"> px</br></br>
-            <b>Y:</b><input type="number" :value="parseInt(y/PP)"> px</br></br>
-            <b>W:</b><input type="number" :value="parseInt(width/PP)"> px</br></br>
+            <b>X:</b><input type="number" :value="parseInt(x/PP)"> px<br/><br/>
+            <b>Y:</b><input type="number" :value="parseInt(y/PP)"> px<br/><br/>
+            <b>W:</b><input type="number" :value="parseInt(width/PP)"> px<br/><br/>
             <b>H:</b><input type="number" :value="parseInt(height/PP)"> px
           </div>
           <div class="percent">
-            <b></b><input type="text" disabled :value="(x/600*100).toFixed(2)"> %</br></br>
-            <b></b><input type="text" disabled :value="(y/600*100).toFixed(2)"> %</br></br>
-            <b></b><input type="text" disabled :value="(width/PP/temWidth*100).toFixed(2)"> %</br></br>
-            <b></b><input type="text" disabled :value="(height/PP/temHeight*100).toFixed(2)"> %
+            <input type="text" disabled :value="(x/600*100).toFixed(2)"> %<br/><br/>
+            <input type="text" disabled :value="(y/600*100).toFixed(2)"> %<br/><br/>
+            <input type="text" disabled :value="(width/PP/temWidth*100).toFixed(2)"> %<br/><br/>
+            <input type="text" disabled :value="(height/PP/temHeight*100).toFixed(2)"> %
           </div>
         </div>
 
@@ -472,8 +493,8 @@
             <el-table-column type="selection" align="center" width="55"></el-table-column>
             <el-table-column prop="name" align="center" :label="$t('Content.ID_NAME')"></el-table-column>
             <el-table-column prop="screenshot" align="center" :label="$t('Content.ID_THUMBNAIL')">
-              <template scope="scope">
-                <img :src="'http://'+ scope.row.thumbnail" width="100" height="70"/>
+              <template slot-scope="scope">
+                <img :src="baseURL+ scope.row.thumbnail" width="100" height="70"/>
               </template>
             </el-table-column>
             <el-table-column prop="resolution" align="center" :label="$t('Content.ID_RESOLUTION')"></el-table-column>
@@ -491,7 +512,7 @@
                 <i class="el-icon-upload-success el-icon-check"></i>
               </label>
               <div class="imgBox">
-                <img :src="'http://'+ resource.thumbnail">
+                <img :src="baseURL + resource.thumbnail">
               </div>
               <p>{{resource.name}}</p>
             </li>
@@ -510,32 +531,56 @@
         <el-button type="primary" @click="setBGImg">{{$t('Content.ID_OK')}}</el-button>
        </span>
     </el-dialog><!--选择背景-->
+    <el-dialog
+      :title="$t('Content.ID_AUDIO')"
+      :visible.sync="audioDialog"
+      width="20%"
+    >
+      <div style="width: 100%;height: 100%;text-align: center;overflow: hidden">
+        <el-form ref="settingForm" :model="settingForm" label-width="100px">
+          <el-form-item :label="$t('Content.ID_ADD_AUDIO')">
+            <el-checkbox :label="$t('Content.ID_AUDIO')" v-model="settingForm.audio" name="type"></el-checkbox>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="confirmAudio">{{$t('Content.ID_OK')}}</el-button>
+       </span>
+    </el-dialog><!--选择背景-->
   </div>
 </template>
 <script>
   import html2canvas from 'html2canvas';
   import $ from 'jquery'
   import Vue from 'vue'
+  import request from '@/utils/request'
+  import {getResource} from "@/api/rsource";
+  import {
+    getTemplate, newTemplate,
+    putTemplate
+  } from "@/api/template";
 
   export default {
-    mounted() {
-      this.resourceQuery();
+    mounted: function () {
       this.temEdit();
+      this.resourceQuery();
+
       /*根据模板高度设置缩放比例*/
       if (this.temHeight == '1080') this.PP = 0.4;
       if (this.temHeight == '720') this.PP = 0.7;
       if (this.temHeight == '1280') this.PP = 0.6;
-      if (this.temHeight == '1920') this.PP = 0.4;
-      if (this.temHeight == '200') this.PP = 0.5
+      if (this.temHeight == '1920' || this.temHeight == '1740') this.PP = 0.4;
+      if (this.temHeight == '200') this.PP = 0.5;
+      debugger
     },
-    data() {
+    data: function () {
       return {
+        baseURL: request.defaults.baseURL,
         width: 0,
         height: 0,
         x: 0,
         y: 0,
         items: [],
-        show: false,
         id: 1,
         zIndex: 10,
         areaList: [
@@ -553,8 +598,8 @@
         desc: sessionStorage.getItem('desc'),                           //备注
         resolution: sessionStorage.getItem('resolution'),               //分辨率
         preview: '',                                                    //预览图
-        temWidth: sessionStorage.getItem('resolution').split('×')[0],  //模板宽
-        temHeight: sessionStorage.getItem('resolution').split('×')[1],  //模板高
+        temWidth: (sessionStorage.getItem('resolution') || '').split('*')[0],  //模板宽
+        temHeight: (sessionStorage.getItem('resolution') || '').split('*')[1],  //模板高
         //背景弹出框
         resources: [],
         value: "",
@@ -588,12 +633,17 @@
         video: true,                                                      //视频只允许添加一次，如果被添加则赋值为false,添加按钮不可点击
         areaName: '',                                                     //区域名称
         zBGImg: [],                                                        //模板还原时的背景容器
+        audio: true,                                                      //音频只允许添加一次，如果被添加则赋值为false,添加按钮不可点击
+        audioDialog: false,
+        settingForm: {
+          audio: false
+        }
       }
     },
     components: {},
     methods: {
       areaChange(val, index) {
-        if(val!=''){
+        if (val !== '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_69'),
             showClose: true,
@@ -654,17 +704,14 @@
         this.x = left;
         this.y = top
       },                     //移动的回调
-      showDel(e) {
-        this.show = true;
-      },
       add: function (content, status) {
-        if (content == 'video' && !this.video) return false;
+        if (content === 'video' && !this.video) return false;
         let id = '';
         let areaName = '';
-        if (content == 'image') {
+        if (content === 'image') {
           this.image++;
           areaName = content + this.image
-        } else if (content == 'txt') {
+        } else if (content === 'txt') {
           if (this.BG) {
             this.$message({message: this.$t('Msg.ID_MSG_70'), showClose: true, center: true, type: 'warning'});
             return false
@@ -681,7 +728,10 @@
         } else {
           areaName = content;
         }
-        if (content === 'video' && this.video) this.video = false;
+        if (content === 'video' && this.video) {
+          this.video = false;
+          this.audio = false;
+        }
         status ? id = 'check' : id = 'Uncheck';      //判断是否检查，用来给不检查的元素赋ID值
         let zIndex = this.zIndex++;
         this.items.push({
@@ -699,8 +749,8 @@
         })
       },                  //添加区域块
       temDel(index) {
-        if (this.items[index].content == 'video') this.video = true;
-        if (this.items[index].content == 'scroll') this.scroll = true;
+        if (this.items[index].content === 'video') this.audio = this.video = true;
+        if (this.items[index].content === 'scroll') this.scroll = true;
         this.items.splice(index, 1);
         this.areaList[0].children.splice(index, 1);      //区域列表
       },                                    //模板删除
@@ -708,15 +758,13 @@
         let vm = this;
         let table = $('#edit');
         let treeId = 0;                                      //树ID
-        this.temType == this.$t('Content.ID_USER_TEMPLATE') ? treeId = 22 : treeId = 21;
+        this.temType === this.$t('Content.ID_USER_TEMPLATE') ? treeId = 22 : treeId = 21;
         let html = $('.editBox').html();                      //模板代码
         let creator = sessionStorage.getItem('name');         //创建人
 
         let Array = [];                                       //区域块的属性值
-        let queryUrl = '';                                    //区分新建与编辑的请求地址
-        let method = '';                                      //区分新建与编辑的请求方式
         let query = this.$route.query;                        //区分新建与编辑
-        let data = {};                                        //请求参数
+
         //获取区域块的属性值
         table.children().map(function () {
           let height = $(this).height() / vm.PP;
@@ -743,6 +791,20 @@
             zIndex: zIndex
           });
         });
+        if (vm.settingForm.audio) {
+          Array.push({
+            height: '',
+            width: '',
+            x: '',
+            y: '',
+            type: 'audio',
+            id: new Date().getTime(),
+            name: 'audio',
+            backGround: '',
+            bgId: '',
+            zIndex: ''
+          })
+        }  //是否包含音频
         let elements = Array;    //end
         /* 这部分代码用来解决生成的图片不清晰的问题 */
         // let tableWidth = table.offsetWidth;
@@ -763,14 +825,12 @@
             document.getElementById('exportedImage').src = url;
             vm.preview = url;
 
-            if (table.html() == "") {
+            if (table.html() === "") {
               vm.$message({message: this.$t('Msg.ID_MSG_71'), showClose: true, center: true, type: 'warning'});
             } else {
               //区分新建与编辑
-              if (query.name == undefined && query.groupId == undefined) {
-                queryUrl = 'template/create';
-                method = 'post';
-                data = {
+              if (query.name === undefined && query.groupId === undefined) {
+                let data = {
                   body: html,                     //模板js代码
                   creator: creator,               //创建人
                   temItems: elements,             //List<Elements>模板元素集合
@@ -782,11 +842,19 @@
                   preview: vm.preview,            //模板截图
                   terminalType: vm.terminalType,  //终端类型
                   desc: vm.desc                   //备注
-                }
+                };
+                newTemplate(data).then(response => {
+                  if (value === 'use') {
+                    vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
+                  } else {
+                    vm.$message({message: vm.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
+                    setTimeout(() => {
+                      vm.$router.push({path: '/template'})
+                    }, 2000);
+                  }
+                });
               } else {
-                queryUrl = 'template/update';
-                method = 'put';
-                data = {
+                let data = {
                   body: html,                     //模板js代码
                   creator: creator,               //创建人
                   temItems: elements,             //List<Elements>模板元素集合
@@ -799,37 +867,19 @@
                   terminalType: vm.terminalType,  //终端类型
                   desc: vm.desc,                  //备注
                   id: vm.temId
-                }
-              }
-            }
-            vm.$http({
-              method: method,
-              url: queryUrl,
-              withCredentials: true,
-              headers: {
-                token: sessionStorage.getItem('token'),
-                name: sessionStorage.getItem('name'),
-              },
-              data: data
-            }).then(response => {
-              if (response.data.code == '0000') {
-                if (value == 'use') {
-                  vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
-                } else {
-                  vm.$message({message: this.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
-                  setTimeout(() => {
-                    vm.$router.push({path: '/template'})
-                  }, 2000);
-                }
-              } else {
-                vm.$message({
-                  message: response.data.infor + '。',
-                  showClose: true,
-                  center: true,
-                  type: 'error'
+                };
+                putTemplate(data).then(response => {
+                  if (value === 'use') {
+                    vm.$router.push({path: '/programMack', query: {name: vm.temName, groupId: treeId}})
+                  } else {
+                    vm.$message({message: vm.$t('Msg.ID_MSG_68'), showClose: true, center: true, type: 'success'});
+                    setTimeout(() => {
+                      vm.$router.push({path: '/template'})
+                    }, 2000);
+                  }
                 });
               }
-            })
+            }
           }
         });
 
@@ -838,29 +888,17 @@
 
       resourceQuery() {
         let _this = this;
-        this.resources = [];
-        this.$http({
-          method: 'get',
-          url: 'resource/query?groupId=1' + "&pageCount=" + this.pageCount + "&pageNo=" + this.pageNo,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let resources = response.data.cust.resources;
-            _this.total = response.data.cust.pages.count;
-            for (let resource of resources) {
-              _this.resources.push(resource)
-            }
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
+        _this.resources = [];
+        let params = {
+          groupId: 1,
+          pageCount: _this.pageCount,
+          pageNo: _this.pageNo
+        };
+        getResource(params).then(response => {
+          let resources = response.cust.resources;
+          _this.total = response.cust.pages.count;
+          for (let resource of resources) {
+            _this.resources.push(resource)
           }
         })
       },                                  //查询资源列表
@@ -869,7 +907,7 @@
         this.resourceQuery()
       },                         //当前页翻页
       selectChange(val) {
-        val == '2' ? this.pageCount = 5 : this.pageCount = 21;
+        val === '2' ? this.pageCount = 5 : this.pageCount = 21;
         this.resourceQuery()
       },                                //选择显示模式
       tableSelect(row, val) {
@@ -887,11 +925,11 @@
           target = e.target
         }*/     //currentTarget与target的区别
         let children = target.children[0];
-        if (children.style.display != 'block') {
+        if (children.style.display !== 'block') {
           children.style.display = 'block';
           target.style.backgroundColor = "#ebebeb";
 
-          this.BGUrl = "http://" + document.getElementById(target.id).getAttribute("url");
+          this.BGUrl = this.baseURL + document.getElementById(target.id).getAttribute("url");
           this.BGId = dom;
           //去掉兄弟元素的选择项
           if (p.length > 1) {
@@ -911,74 +949,71 @@
 
       temEdit() {
         let query = this.$route.query;
-        if (query.name == undefined && query.groupId == undefined) return false;
+        if (query.name === undefined && query.groupId === undefined) return false;
         this.revert = true;
         let _this = this;
-        this.$http({
-          method: 'get',
-          url: 'template/query?groupId=' + query.groupId + '&pageNo=1&pageCount=1' + '&name=' + query.name,
-          withCredentials: true,
-          headers: {
-            token: sessionStorage.getItem('token'),
-            name: sessionStorage.getItem('name')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            let elements = response.data.cust.templates[0].temItems;
-            let template = response.data.cust.templates[0];
-            _this.temId = template.id;
-            _this.temName = template.name;
-            _this.terminalType = template.terminalType;
-            _this.temType = template.type;
-            _this.desc = template.desc;
-            _this.resolution = template.resolution;
-            elements.forEach(item => {
-              if (item.type === 'BG') {
-                _this.zBGImg.push(item);
-                _this.BG = false;
-                return false
-              }
-              let data = {};                       //这个需要定义在循环内部
-              data['width'] = item.width;
-              data['height'] = item.height;
-              data['x'] = item.x;
-              data['y'] = item.y;
-              data['name'] = item.id;                     //元素的唯一标识
-              data['areaName'] = item.name;
-              data['zIndex'] = item.zIndex;
-              if (item.type === 'image') {
-                data['content'] = item.type;
-                data['conflictCheck'] = true;
-                data['id'] = 'check'
-              }
-              if (item.type === 'video') {
-                data['content'] = item.type;
-                data['conflictCheck'] = true;
-                data['id'] = 'check';
-                _this.video = false
-              }
-              if (item.type === 'txt') {
-                data['content'] = item.type;
-                data['conflictCheck'] = false;
-                data['id'] = 'Uncheck';
-                _this.scroll = false
-              }
-              if (item.type === 'scroll') {
-                data['content'] = item.type;
-                data['conflictCheck'] = false;
-                data['id'] = 'Uncheck'
-              }
-              _this.elements.push(data)
-            })
-          } else {
-            this.$message({
-              message: '错误编码：' + response.data.code + ',错误类型：' + response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-          }
-        })
+        let params = {
+          groupId: query.groupId,
+          pageNo: 1,
+          pageCount: 1,
+          name: query.name,
+        };
+        getTemplate(params).then(response => {
+          let elements = response.cust.templates[0].temItems;
+          let template = response.cust.templates[0];
+          _this.temId = template.id;
+          _this.temName = template.name;
+          _this.terminalType = template.terminalType;
+          _this.temType = template.type;
+          _this.desc = template.desc;
+          _this.resolution = template.resolution;
+          _this.temWidth= (template.resolution || '').split('*')[0];  //模板宽
+          _this.temHeight= (template.resolution || '').split('*')[1];  //模板高
+          elements.forEach(item => {
+            if (item.type === 'BG') {
+              _this.zBGImg.push(item);
+              _this.BG = false;
+              return false
+            }
+            if (item.type === 'audio') {
+              _this.audio = true;
+              _this.settingForm.audio = true;
+              _this.video = false;
+              return false
+            }
+            let data = {};                       //这个需要定义在循环内部
+            data['width'] = item.width;
+            data['height'] = item.height;
+            data['x'] = item.x;
+            data['y'] = item.y;
+            data['name'] = item.id;                     //元素的唯一标识
+            data['areaName'] = item.name;
+            data['zIndex'] = item.zIndex;
+            if (item.type === 'image') {
+              data['content'] = item.type;
+              data['conflictCheck'] = true;
+              data['id'] = 'check'
+            }
+            if (item.type === 'video') {
+              data['content'] = item.type;
+              data['conflictCheck'] = true;
+              data['id'] = 'check';
+              _this.video = false
+            }
+            if (item.type === 'txt') {
+              data['content'] = item.type;
+              data['conflictCheck'] = false;
+              data['id'] = 'Uncheck';
+              _this.scroll = false
+            }
+            if (item.type === 'scroll') {
+              data['content'] = item.type;
+              data['conflictCheck'] = false;
+              data['id'] = 'Uncheck'
+            }
+            _this.elements.push(data)
+          })
+        });
       },                                        //模板编辑
       activated() {
         this.areaName = $('.active').attr('area-name');
@@ -991,7 +1026,7 @@
         if (this.BG) this.setBg = true
       },                                      //打开背景选择对话框
       setBGImg() {
-        if(this.BGUrl=='') {
+        if (this.BGUrl === '') {
           this.$message({
             message: this.$t('Msg.ID_MSG_72'),
             showClose: true,
@@ -1018,7 +1053,16 @@
         } else {
           this.zBGImg.splice(index, 1);
         }
-      }                                 //删除背景图片
+      },                                 //删除背景图片
+      openAudioDialog() {
+        if (this.audio) {
+          this.audioDialog = true
+        }
+      },                           //打开音频弹出框
+      confirmAudio() {
+        this.video = !this.settingForm.audio;
+        this.audioDialog = false
+      }
     }
   }
 </script>

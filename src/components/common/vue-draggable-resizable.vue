@@ -94,8 +94,8 @@
       conflictCheck: {
         type: Boolean, default: true
       },
-      zIndex:{
-        type:Number, default:100
+      zIndex: {
+        type: Number, default: 100
       }
     },
     created: function () {
@@ -169,73 +169,73 @@
     },
     methods: {
       elmDown: function (e) {   //鼠标按下时激活当前选择的块
-        const target = e.target || e.srcElement
+        const target = e.target || e.srcElement;
 
         if (this.$el.contains(target)) {
 
           if (!this.active) {
             /*this.zIndex += 1*/
-            this.active = true
+            this.active = true;
 
             this.$emit('activated', this.left, this.top, this.width, this.height)
           }
           //激活区域块时获取当前区域块的X,Y,W,H
-          this.elmX = parseInt(this.$el.style.left)
-          this.elmY = parseInt(this.$el.style.top)
-          this.elmW = this.$el.offsetWidth || this.$el.clientWidth
-          this.elmH = this.$el.offsetHeight || this.$el.clientHeight
+          this.elmX = parseInt(this.$el.style.left);
+          this.elmY = parseInt(this.$el.style.top);
+          this.elmW = this.$el.offsetWidth || this.$el.clientWidth;
+          this.elmH = this.$el.offsetHeight || this.$el.clientHeight;
 
           if (this.draggable) {
 
-            this.restoreY = this.top           //将移动前的位置存储
-            this.restoreX = this.left
-            this.restoreW = this.width
-            this.restoreH = this.height
+            this.restoreY = this.top;           //将移动前的位置存储
+            this.restoreX = this.left;
+            this.restoreW = this.width;
+            this.restoreH = this.height;
 
-            this.opacity = 0.6
+            this.opacity = 0.6;
             this.dragging = true
           }
         }
       },
       deselect: function (e) {
-        const target = e.target || e.srcElement
-        const regex = new RegExp('handle-([trmbl]{2})', '')
+        const target = e.target || e.srcElement;
+        const regex = new RegExp('handle-([trmbl]{2})', '');
 
         if (!this.$el.contains(target) && !regex.test(target.className)) {
           if (this.active) {
 
-            this.active = false
+            this.active = false;
             this.$emit('deactivated')
           }
         }
       },
       handleDown: function (handle, e) {
-        this.handle = handle
+        this.handle = handle;
 
-        if (e.stopPropagation) e.stopPropagation()
-        if (e.preventDefault) e.preventDefault()
-        console.log('操作点被点击', this.resizing)
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+        /*console.log('操作点被点击', this.resizing)*/
 
         //当区域块处于被激活状态时，手柄被点击时获取当前区域块的X,Y,W,H（如果不加进来，会出现区域块会跳动到回退前的位置）
-        this.elmX = parseInt(this.$el.style.left)
-        this.elmY = parseInt(this.$el.style.top)
-        this.elmW = this.$el.offsetWidth || this.$el.clientWidth
-        this.elmH = this.$el.offsetHeight || this.$el.clientHeight
+        this.elmX = parseInt(this.$el.style.left);
+        this.elmY = parseInt(this.$el.style.top);
+        this.elmW = this.$el.offsetWidth || this.$el.clientWidth;
+        this.elmH = this.$el.offsetHeight || this.$el.clientHeight;
 
-        this.restoreY = this.top           //将移动前的位置存储
-        this.restoreX = this.left
-        this.restoreW = this.width
-        this.restoreH = this.height
+        this.restoreY = this.top;           //将移动前的位置存储
+        this.restoreX = this.left;
+        this.restoreW = this.width;
+        this.restoreH = this.height;
 
-        console.log('top.a:' + this.top + "height.a:" + this.height)
+        /*console.log('top.a:' + this.top + "height.a:" + this.height)*/
 
         this.resizing = true
-        console.log('记录了移动前的位置，改变大小', this.resizing)
+        /*console.log('记录了移动前的位置，改变大小', this.resizing)*/
       },
       fillParent: function (e) {
-        if (!this.parent || !this.resizable || !this.maximize) return
+        if (!this.parent || !this.resizable || !this.maximize) return;
 
-        let done = false
+        let done = false;
 
         const animate = () => {
           if (!done) {
@@ -261,99 +261,99 @@
 
           if (this.axis === 'x' || this.axis === 'both') {
             if (this.width < this.parentW) {
-              this.width++
+              this.width++;
               this.elmW++
             }
 
             if (this.left > this.parentX) {
-              this.left--
+              this.left--;
               this.elmX--
             }
           }
 
           if (this.axis === 'y' || this.axis === 'both') {
             if (this.height < this.parentH) {
-              this.height++
+              this.height++;
               this.elmH++
             }
 
             if (this.top > this.parentY) {
-              this.top--
+              this.top--;
               this.elmY--
             }
           }
 
           this.$emit('resizing', this.left, this.top, this.width, this.height)
-        }
+        };
 
         window.requestAnimationFrame(animate)
       },
       handleMove: function (e) {
-        this.mouseX = e.pageX || e.clientX + document.documentElement.scrollLeft    //获取鼠标的X,Y坐标
-        this.mouseY = e.pageY || e.clientY + document.documentElement.scrollTop
+        this.mouseX = e.pageX || e.clientX + document.documentElement.scrollLeft;    //获取鼠标的X,Y坐标
+        this.mouseY = e.pageY || e.clientY + document.documentElement.scrollTop;
 
-        let diffX = this.mouseX - this.lastMouseX + this.mouseOffX
-        let diffY = this.mouseY - this.lastMouseY + this.mouseOffY
+        let diffX = this.mouseX - this.lastMouseX + this.mouseOffX;
+        let diffY = this.mouseY - this.lastMouseY + this.mouseOffY;
 
-        this.mouseOffX = this.mouseOffY = 0
+        this.mouseOffX = this.mouseOffY = 0;
 
-        this.lastMouseX = this.mouseX
-        this.lastMouseY = this.mouseY
+        this.lastMouseX = this.mouseX;
+        this.lastMouseY = this.mouseY;
 
-        let dX = diffX
-        let dY = diffY
+        let dX = diffX;
+        let dY = diffY;
 
         if (this.resizing) {
           if (this.handle.indexOf('t') >= 0) {
-            if (this.elmH - dY < this.minh) this.mouseOffY = (dY - (diffY = this.elmH - this.minh))
-            else if (this.elmY + dY < this.parentY) this.mouseOffY = (dY - (diffY = this.parentY - this.elmY))
+            if (this.elmH - dY < this.minh) this.mouseOffY = (dY - (diffY = this.elmH - this.minh));
+            else if (this.elmY + dY < this.parentY) this.mouseOffY = (dY - (diffY = this.parentY - this.elmY));
 
-            this.elmY += diffY
+            this.elmY += diffY;
             this.elmH -= diffY
 
           }
 
           if (this.handle.indexOf('b') >= 0) {
-            if (this.elmH + dY < this.minh) this.mouseOffY = (dY - (diffY = this.minh - this.elmH))
-            else if (this.elmY + this.elmH + dY > this.parentH) this.mouseOffY = (dY - (diffY = this.parentH - this.elmY - this.elmH))
+            if (this.elmH + dY < this.minh) this.mouseOffY = (dY - (diffY = this.minh - this.elmH));
+            else if (this.elmY + this.elmH + dY > this.parentH) this.mouseOffY = (dY - (diffY = this.parentH - this.elmY - this.elmH));
             this.elmH += diffY
           }
 
           if (this.handle.indexOf('l') >= 0) {
-            if (this.elmW - dX < this.minw) this.mouseOffX = (dX - (diffX = this.elmW - this.minw))
-            else if (this.elmX + dX < this.parentX) this.mouseOffX = (dX - (diffX = this.parentX - this.elmX))
-            this.elmX += diffX
+            if (this.elmW - dX < this.minw) this.mouseOffX = (dX - (diffX = this.elmW - this.minw));
+            else if (this.elmX + dX < this.parentX) this.mouseOffX = (dX - (diffX = this.parentX - this.elmX));
+            this.elmX += diffX;
             this.elmW -= diffX
 
           }
 
           if (this.handle.indexOf('r') >= 0) {
-            if (this.elmW + dX < this.minw) this.mouseOffX = (dX - (diffX = this.minw - this.elmW))
-            else if (this.elmX + this.elmW + dX > this.parentW) this.mouseOffX = (dX - (diffX = this.parentW - this.elmX - this.elmW))
+            if (this.elmW + dX < this.minw) this.mouseOffX = (dX - (diffX = this.minw - this.elmW));
+            else if (this.elmX + this.elmW + dX > this.parentW) this.mouseOffX = (dX - (diffX = this.parentW - this.elmX - this.elmW));
             this.elmW += diffX
           }
 
-          console.log('elm.Y:' + this.elmY + "elm.H:" + this.elmH)
+          /*console.log('elm.Y:' + this.elmY + "elm.H:" + this.elmH)*/
 
-          this.left = (Math.round(this.elmX / this.grid[0]) * this.grid[0])
-          this.top = (Math.round(this.elmY / this.grid[1]) * this.grid[1])
+          this.left = (Math.round(this.elmX / this.grid[0]) * this.grid[0]);
+          this.top = (Math.round(this.elmY / this.grid[1]) * this.grid[1]);
 
-          this.width = (Math.round(this.elmW / this.grid[0]) * this.grid[0])
-          this.height = (Math.round(this.elmH / this.grid[1]) * this.grid[1])
+          this.width = (Math.round(this.elmW / this.grid[0]) * this.grid[0]);
+          this.height = (Math.round(this.elmH / this.grid[1]) * this.grid[1]);
 
-          console.log('top.b:' + this.top + "height.b:" + this.height)
+          /*console.log('top.b:' + this.top + "height.b:" + this.height)*/
 
           this.$emit('resizing', this.left, this.top, this.width, this.height)
         } else if (this.dragging) {
           //如果当前移动块的left+鼠标移动的距离小于父容器的left,就用鼠标移动的距离-
-          if (this.elmX + dX < this.parentX) this.mouseOffX = (dX - (diffX = this.parentX - this.elmX))
-          else if (this.elmX + this.elmW + dX > this.parentW) this.mouseOffX = (dX - (diffX = this.parentW - this.elmX - this.elmW))
+          if (this.elmX + dX < this.parentX) this.mouseOffX = (dX - (diffX = this.parentX - this.elmX));
+          else if (this.elmX + this.elmW + dX > this.parentW) this.mouseOffX = (dX - (diffX = this.parentW - this.elmX - this.elmW));
 
-          if (this.elmY + dY < this.parentY) this.mouseOffY = (dY - (diffY = this.parentY - this.elmY))
-          else if (this.elmY + this.elmH + dY > this.parentH) this.mouseOffY = (dY - (diffY = this.parentH - this.elmY - this.elmH))
+          if (this.elmY + dY < this.parentY) this.mouseOffY = (dY - (diffY = this.parentY - this.elmY));
+          else if (this.elmY + this.elmH + dY > this.parentH) this.mouseOffY = (dY - (diffY = this.parentH - this.elmY - this.elmH));
 
-          this.elmX += diffX
-          this.elmY += diffY
+          this.elmX += diffX;
+          this.elmY += diffY;
 
           if (this.axis === 'x' || this.axis === 'both') {
             this.left = (Math.round(this.elmX / this.grid[0]) * this.grid[0])
@@ -366,11 +366,11 @@
         }
       },
       handleUp: function (e) {
-        this.$emit('active')                //松开鼠标回调事件
-        this.handle = null
+        this.$emit('active');               //松开鼠标回调事件
+        this.handle = null;
         if (this.resizing) {
           //停止改变大小后进行冲突检测
-          this.resizing = false
+          this.resizing = false;
           if (this.conflictCheck) {
             let p = this.$el.parentNode.childNodes;
             //判断是否存在兄弟元素
@@ -382,52 +382,52 @@
                   let tl = p[i].offsetLeft;
                   let tt = p[i].offsetTop;
 
-                  if (this.top >= tt && this.left >= tl && tt + th >= this.top && tl + tw >= this.left ||
-                    this.top <= tt && this.left <= tl && this.top + this.height >= tt && this.left + this.width >= tl) { /*左上角与右下角重叠*/
+                  if (this.top >= tt && this.left >= tl && tt + th > this.top && tl + tw > this.left ||
+                    this.top <= tt && this.left < tl && this.top + this.height > tt && this.left + this.width > tl) { /*左上角与右下角重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;         //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
+                  } else if (this.left <= tl && this.top >= tt && this.left + this.width > tl && this.top < tt + th ||
+                    this.top < tt && this.left > tl && this.top + this.height > tt && this.left < tl + tw) { /*右上角与左下角重叠*/
 
-                  } else if (this.left <= tl && this.top >= tt && this.left + this.width >= tl && this.top <= tt + th ||
-                    this.top <= tt && this.left >= tl && this.top + this.height >= tt && this.left <= tl + tw) { /*右上角与左下角重叠*/
-
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;          //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.top <= tt && this.left <= tl && this.top + this.height >= tt && this.left + this.width >= tl ||
-                    this.top >= tt && this.left >= tl && this.top <= tt + th && this.left <= tl + tw) { /*下边与上边重叠*/
+                  } else if (this.top < tt && this.left <= tl && this.top + this.height > tt && this.left + this.width > tl ||
+                    this.top > tt && this.left >= tl && this.top < tt + th && this.left < tl + tw) { /*下边与上边重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;          //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.top <= tt && this.left >= tl && this.top + this.height >= tt && this.left <= tl + tw ||
-                    this.top >= tt && this.left <= tl && this.top <= tt + th && this.left >= tl + tw) { /*上边与下边重叠（宽度不一样）*/
+                  } else if (this.top <= tt && this.left >= tl && this.top + this.height > tt && this.left < tl + tw ||
+                    this.top >= tt && this.left <= tl && this.top < tt + th && this.left > tl + tw) { /*上边与下边重叠（宽度不一样）*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
-                    this.height = this.restoreH
-                  } else if (this.left >= tl && this.top >= tt && this.left <= tl + tw && this.top <= tt + th ||
-                    this.top >= tt && this.left <= tl && this.left + this.width >= tl && this.top <= tt + th) { /*左边与右边重叠*/
-
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;          //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.top <= tt && this.left >= tl && this.top + this.height >= tt && this.left <= tl + tw ||
-                    this.top >= tt && this.left <= tl && this.top <= tt + th && this.left + this.width >= tl) { /*左边与右边重叠（高度不一样）*/
+                  } else if (this.left >= tl && this.top >= tt && this.left < tl + tw && this.top < tt + th ||
+                    this.top > tt && this.left <= tl && this.left + this.width > tl && this.top < tt + th) { /*左边与右边重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;         //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
+                    this.height = this.restoreH
+
+                  } else if (this.top <= tt && this.left >= tl && this.top + this.height > tt && this.left < tl + tw ||
+                    this.top >= tt && this.left <= tl && this.top < tt + th && this.left + this.width > tl) { /*左边与右边重叠（高度不一样）*/
+
+                    this.top = this.restoreY;         //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
                   }
@@ -438,7 +438,7 @@
           this.$emit('resizestop', this.left, this.top, this.width, this.height)
         }
         if (this.dragging) {
-          this.dragging = false
+          this.dragging = false;
           if (this.conflictCheck) {
             let p = this.$el.parentNode.childNodes;
             if (p.length > 1) {
@@ -449,52 +449,52 @@
                   let tl = p[i].offsetLeft;
                   let tt = p[i].offsetTop;
 
-                  if (this.top >= tt && this.left >= tl && tt + th >= this.top && tl + tw >= this.left ||
-                    this.top <= tt && this.left <= tl && this.top + this.height >= tt && this.left + this.width >= tl) { /*左上角与右下角重叠*/
+                  if (this.top >= tt && this.left >= tl && tt + th > this.top && tl + tw > this.left ||
+                    this.top <= tt && this.left < tl && this.top + this.height > tt && this.left + this.width > tl) { /*左上角与右下角重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;         //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.left <= tl && this.top >= tt && this.left + this.width >= tl && this.top <= tt + th ||
-                    this.top <= tt && this.left >= tl && this.top + this.height >= tt && this.left <= tl + tw) { /*右上角与左下角重叠*/
+                  } else if (this.left <= tl && this.top >= tt && this.left + this.width > tl && this.top < tt + th ||
+                    this.top < tt && this.left > tl && this.top + this.height > tt && this.left < tl + tw) { /*右上角与左下角重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;          //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.top <= tt && this.left <= tl && this.top + this.height >= tt && this.left + this.width >= tl ||
-                    this.top >= tt && this.left >= tl && this.top <= tt + th && this.left <= tl + tw) { /*下边与上边重叠*/
+                  } else if (this.top < tt && this.left <= tl && this.top + this.height > tt && this.left + this.width > tl ||
+                    this.top > tt && this.left >= tl && this.top < tt + th && this.left < tl + tw) { /*下边与上边重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;          //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.top <= tt && this.left >= tl && this.top + this.height >= tt && this.left <= tl + tw ||
-                    this.top >= tt && this.left <= tl && this.top <= tt + th && this.left >= tl + tw) { /*上边与下边重叠（宽度不一样）*/
+                  } else if (this.top <= tt && this.left >= tl && this.top + this.height > tt && this.left < tl + tw ||
+                    this.top >= tt && this.left <= tl && this.top < tt + th && this.left > tl + tw) { /*上边与下边重叠（宽度不一样）*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;          //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.left >= tl && this.top >= tt && this.left <= tl + tw && this.top <= tt + th ||
-                    this.top >= tt && this.left <= tl && this.left + this.width >= tl && this.top <= tt + th) { /*左边与右边重叠*/
+                  } else if (this.left >= tl && this.top >= tt && this.left < tl + tw && this.top < tt + th ||
+                    this.top > tt && this.left <= tl && this.left + this.width > tl && this.top < tt + th) { /*左边与右边重叠*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;         //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
-                  } else if (this.top <= tt && this.left >= tl && this.top + this.height >= tt && this.left <= tl + tw ||
-                    this.top >= tt && this.left <= tl && this.top <= tt + th && this.left + this.width >= tl) { /*左边与右边重叠（高度不一样）*/
+                  } else if (this.top <= tt && this.left >= tl && this.top + this.height > tt && this.left < tl + tw ||
+                    this.top >= tt && this.left <= tl && this.top < tt + th && this.left + this.width > tl) { /*左边与右边重叠（高度不一样）*/
 
-                    this.top = this.restoreY          //如果冲突，就将回退到移动前的位置
-                    this.left = this.restoreX
-                    this.width = this.restoreW
+                    this.top = this.restoreY;         //如果冲突，就将回退到移动前的位置
+                    this.left = this.restoreX;
+                    this.width = this.restoreW;
                     this.height = this.restoreH
 
                   }
@@ -504,11 +504,11 @@
           }
           this.$emit('dragstop', this.left, this.top)
         }
-        this.opacity = 1
+        this.opacity = 1;
         //将X,Y,W,H赋给当前区域块
-        this.elmX = this.left
-        this.elmY = this.top
-        this.elmW = this.width
+        this.elmX = this.left;
+        this.elmY = this.top;
+        this.elmW = this.width;
         this.elmH = this.height
       }
     },

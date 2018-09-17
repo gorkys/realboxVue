@@ -14,7 +14,7 @@
             </div>
             <div class="lang">
               <el-radio-group v-model="language" size="mini">
-                <el-radio v-for="item of lang" :label="item.value" border>{{item.label}}</el-radio>
+                <el-radio v-for="item of lang" :key="item.value" :label="item.value" border>{{item.label}}</el-radio>
               </el-radio-group>
             </div>
             <a class="entry" @click="getLogin(name)">{{$t('message.login')}}</a>
@@ -28,6 +28,8 @@
 
 <script>
   import Vue from 'vue'
+  import request from "@/utils/request"
+  import {login} from '@/api/login'
 
   export default {
     mounted() {
@@ -51,7 +53,7 @@
           label: this.$t('message.en'),
           value: 1
         }],
-        codeSrc: this.$http.defaults.baseURL + '/code'
+        codeSrc: request.defaults.baseURL + '/code'
       }
     },
     methods: {
@@ -62,35 +64,21 @@
         if (this.code == '') {
           this.$message({message: this.$t('Msg.ID_MSG_74'), showClose: true, center: true, type: 'warning'});
         }
-
-        this.$http({
-          method: 'post',
-          url: 'login',
-          withCredentials: true,
-          data: {
-            name: this.name,
-            password: this.pass,
-            code: this.code,
-            language: localStorage.getItem('lang')
-          }
-        }).then(response => {
-          if (response.data.code == '0000') {
-            sessionStorage.setItem("token", response.data.cust.token);
-            sessionStorage.setItem("name", response.data.cust.name);
-            sessionStorage.setItem("privId", response.data.cust.privId);
-            sessionStorage.setItem("userId", response.data.cust.userId)
-            this.$router.push('/index')
-          } else {
-            this.$message({
-              message: response.data.infor + '。',
-              showClose: true,
-              center: true,
-              type: 'error'
-            });
-            this.getCode();
-          }
+        let data = {
+          name: this.name,
+          password: this.pass,
+          code: this.code,
+          language: localStorage.getItem('lang')
+        };
+        login(data).then(response => {
+          sessionStorage.setItem("token", response.cust.token);
+          sessionStorage.setItem("name", response.cust.name);
+          sessionStorage.setItem("privId", response.cust.privId);
+          sessionStorage.setItem("userId", response.cust.userId);
+          this.$router.push('/index')
+        }).catch(() => {
+          this.getCode();
         })
-
       },
       getCode: function () {
         this.codeSrc += '?l=' + Math.random();
