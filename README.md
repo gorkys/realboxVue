@@ -302,9 +302,12 @@ Default: `true`</br>
 暂时的解决办法是给每个组件添加一个ID，需要冲突检测的为check，不然为Uncheck。代码在templateMake.vue的107行
 #### 2.将模板布局的代码存放在服务器中，再使用v-html渲染出来，无法添加@drop事件，从而让图片移入。</br>
 解决办法：
-</br>引入jQuery:
-</br>2.1npm install jquery --save</br>
-2.2import $ from 'jquery'</br>
+引入jQuery:
+
+2.1`npm install jquery --save`
+
+2.2`import $ from 'jquery'`
+
 2.3</br>
 ```vue
 mounted:function () {

@@ -1,3 +1,3 @@
 window.config={
-  serverURL:'http://192.168.1.44:8082/'
+  serverURL:'http://192.168.1.89:8080/'
 };

@@ -571,7 +571,6 @@
       if (this.temHeight == '1280') this.PP = 0.6;
       if (this.temHeight == '1920' || this.temHeight == '1740') this.PP = 0.4;
       if (this.temHeight == '200') this.PP = 0.5;
-      debugger
     },
     data: function () {
       return {
