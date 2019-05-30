@@ -14,5 +14,14 @@
   ],
   "profile": {
     "name": "typicode"
+  },
+  "login": {
+    "code": "0000",
+    "cust": {
+      "token": "1234",
+      "name": "1234",
+      "privId": "1234",
+      "userId": "1234"
+    }
   }
 }
