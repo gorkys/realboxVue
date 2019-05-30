@@ -116,7 +116,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="selectTem">{{$t('Content.ID_OK')}}</el-button>
-  </span>
+      </span>
     </el-dialog><!--选择模板-->
   </div>
 </template>
