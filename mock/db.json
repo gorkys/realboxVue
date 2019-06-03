@@ -1,19 +1,8 @@
 {
-  "user":
-    {
-      "code": "0000",
-      "name": "amdin",
-      "pass": "123456"
-    },
-  "comments": [
-    {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
-    }
-  ],
-  "profile": {
-    "name": "typicode"
+  "user": {
+    "code": "0000",
+    "name": "amdin",
+    "pass": "123456"
   },
   "login": {
     "code": "0000",
@@ -22,6 +11,66 @@
       "name": "1234",
       "privId": "1234",
       "userId": "1234"
+    }
+  },
+  "template_groups": {
+    "code": "0000",
+    "cust": {
+      "trees": [
+        {
+          "id": 21,
+          "label": "用户模板"
+        }
+      ]
+    }
+  },
+  "resource_groups": {
+    "code": "0000",
+    "cust": {
+      "trees": [
+        {
+          "id": 1,
+          "treeType": "image",
+          "label": "图片"
+        },
+        {
+          "id": 2,
+          "treeType": "video",
+          "label": "视频"
+        },
+        {
+          "id": 3,
+          "treeType": "audio",
+          "label": "音频"
+        }
+      ]
+    }
+  },
+  "image_resources": {
+    "code": "0000",
+    "cust": {
+      "resources": [],
+      "pages": {
+        "count": 1
+      }
+    }
+  },
+  "video_resources": {
+    "code": "0000",
+    "cust": {
+      "resources": [],
+      "pages": {
+        "count": 1
+      }
+    }
+  },
+  "audio_resources": {
+    "code": "0000",
+    "cust": {
+      "resources": [],
+      "pages": {
+        "count": 1
+      }
     }
   }
 }
