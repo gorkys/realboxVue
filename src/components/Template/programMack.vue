@@ -798,7 +798,7 @@
           id: 0
         };
         getTree(params).then(response => {
-          _this.resourceTitles = response.cust.trees[0].children.map(item => {
+          _this.resourceTitles = response.cust.trees.map(item => {
             return {
               id: item.id,
               label: item.label
