@@ -280,7 +280,7 @@
     <div id="material">
       <div class="title">{{$t('Content.ID_SELECT_RESOURCE')}}</div>
       <el-tabs type="border-card" @tab-click="handleClick">
-        <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id">
+        <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id.toString()">
           <span slot="label">{{resourceTitle.label}}</span>
           <ul class="resourceList">
             <li v-for="(resource,id) in resources" :key="id" :id="resource.id" :name="resource.url"
