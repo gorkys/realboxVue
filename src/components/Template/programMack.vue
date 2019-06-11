@@ -510,7 +510,7 @@
         <div id="editTxt" :style="{width : txtSize.width + 'px',height : txtSize.height + 'px'}"
              style="background-color: black">
           <div v-for="item in txtSize.temItems"
-               :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px'}">
+               :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px', 'z-index': item.zIndex}">
             <div :name="item.type" :id="item.id" style="overflow: hidden;opacity: 0.7;">
               <textarea v-if="item.type == 'txt'" v-model="txtContent" :placeholder="$t('Msg.ID_MSG_60')"
                         :style="{fontSize:fontSize+'px',fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
