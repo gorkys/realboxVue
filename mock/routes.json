@@ -8,6 +8,7 @@
   "/tree/query\\?id=20": "/template_groups",
   "/template/query?groupId=21*": "/system_template_group",
   "/template/query?groupId=22*": "/user_template_group",
+  "/template/query*": "/user_template_group",
   "/template/create": "/new_template_response",
 
   "/tree/query\\?id=30": "/template_groups"
