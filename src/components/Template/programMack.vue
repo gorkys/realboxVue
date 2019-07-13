@@ -280,7 +280,7 @@
     <div id="material">
       <div class="title">{{$t('Content.ID_SELECT_RESOURCE')}}</div>
       <el-tabs type="border-card" @tab-click="handleClick">
-        <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id">
+        <el-tab-pane v-for="(resourceTitle) in resourceTitles" :key="resourceTitle.id" :label="resourceTitle.id.toString()">
           <span slot="label">{{resourceTitle.label}}</span>
           <ul class="resourceList">
             <li v-for="(resource,id) in resources" :key="id" :id="resource.id" :name="resource.url"
@@ -510,7 +510,7 @@
         <div id="editTxt" :style="{width : txtSize.width + 'px',height : txtSize.height + 'px'}"
              style="background-color: black">
           <div v-for="item in txtSize.temItems"
-               :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px'}">
+               :style="{width:item.width + 'px',height : item.height  + 'px',top : item.y + 'px',left : item.x + 'px', 'z-index': item.zIndex}">
             <div :name="item.type" :id="item.id" style="overflow: hidden;opacity: 0.7;">
               <textarea v-if="item.type == 'txt'" v-model="txtContent" :placeholder="$t('Msg.ID_MSG_60')"
                         :style="{fontSize:fontSize+'px',fontFamily:font,color:fontColor,fontWeight: bold,fontStyle: italic,textDecoration: underline,textAlign:align}">
@@ -798,7 +798,7 @@
           id: 0
         };
         getTree(params).then(response => {
-          _this.resourceTitles = response.cust.trees[0].children.map(item => {
+          _this.resourceTitles = response.cust.trees.map(item => {
             return {
               id: item.id,
               label: item.label

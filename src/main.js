@@ -8,6 +8,8 @@ import '../theme/index.css'
 import enLocale from 'element-ui/lib/locale/lang/en'
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
 
+import 'babel-polyfill'
+
 import VueDraggableResizable from '@/components/common/vue-draggable-resizable' //可拖动调整大小插件
 Vue.component('vue-draggable-resizable', VueDraggableResizable);
 

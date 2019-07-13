@@ -1,0 +1,16 @@
+{
+  "/tree/query\\?id=0": "/resource_groups",
+  "/resource/query?groupId=1*": "/image_resources",
+  "/resource/query?groupId=2*": "/video_resources",
+  "/resource/query?groupId=3*": "/audio_resources",
+  "/resource/upload": "/post_response",
+
+  "/tree/query\\?id=20": "/template_groups",
+  "/template/query?groupId=21*": "/system_template_group",
+  "/template/query?groupId=22*": "/user_template_group",
+  "/template/query*": "/user_template_group",
+  "/template/create": "/new_template_response",
+
+  "/tree/query\\?id=30": "/template_groups"
+
+}
